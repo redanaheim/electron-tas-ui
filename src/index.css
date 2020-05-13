@@ -1,0 +1,37 @@
+:root {
+  --light-text: black;
+  --dark-text: rgb(216, 219, 226);
+  --light-bg: white;
+  --dark-bg: rgb(18, 18, 18);
+  --light-button-clicked-bg: rgb(21, 83, 191);
+  --dark-button-clicked-bg: rgb(21, 83, 191);
+  --light-border: darkblue;
+  --dark-border: lightblue;
+}
+.light {
+  --bg: var(--light-bg);
+  --text: var(--light-text);
+  --button-clicked-bg: var(--light-button-clicked-bg);
+  --border: var(--light-border);
+}
+.dark {
+  --bg: var(--dark-bg);
+  --text: var(--dark-text);
+  --button-clicked-bg: var(--dark-button-clicked-bg);
+  --border: var(--dark-border);
+}
+body {
+  font-family: -apple-system, "Roboto", BlinkMacSystemFont, "Segoe UI",
+    Helvetica, Arial, sans-serif;
+  font-size: 16rem;
+  color: var(--text);
+  background-color: var(--bg);
+  padding: 0px;
+  margin: 0px;
+}
+.header {
+  font-size: 18rem;
+}
+button {
+  outline: none;
+}

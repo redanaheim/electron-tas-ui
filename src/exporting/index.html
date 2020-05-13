@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html style="font-size: 1px; padding: 0px;">
+  <head>
+    <title>Export nx-TAS Script to Switch</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto"
+    />
+    <script>
+        require("./index.js");
+        require("../theme.js");
+    </script>
+  </head>
+  <body>
+    <table>
+        <tr>
+            <td id="switch_ip_caption">
+                Switch's local IP address:
+            </td>
+            <td>
+                <input type="text" id="switch_ip" value="192.168.1.1"></input>
+            </td>
+        </tr>
+        <tr>
+            <td id="file_path_caption">
+                File path:
+            </td>
+            <td>
+                <button id="pick_file" onclick="console.log()">
+                    Choose Script
+                </button>
+            </td>
+        </tr>
+        <tr>
+            <td id="export_as_caption">
+                Export as on Switch:
+            </td>
+            <td>
+                <input type="text" id="path_on_switch" value="/scripts/script1.txt"></input>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <button id="export" onclick="console.log()">Send</button>
+            </td>
+        </tr>
+    </table>
+  </body>
+</html>
