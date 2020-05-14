@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu, MenuItem } from "electron";
+import { app, BrowserWindow, Menu, MenuItem, shell } from "electron";
 import * as path from "path";
 import { Store } from "./storing";
 
@@ -73,6 +73,11 @@ const toggle_theme = async () => {
   });
 };
 
+const open_backups = async () => {
+  let path = app.getPath("userData") + "/backups/";
+  shell.openItem(path);
+};
+
 app.on("ready", create_window);
 
 app.on("window-all-closed", () => {
@@ -105,6 +110,11 @@ let menu = Menu.buildFromTemplate([
         click: create_export_window,
         label: "Export Existing Script",
       },
+      { type: "separator" },
+      {
+        click: open_backups,
+        label: "Open Script Backups",
+      },
     ],
   },
   {
@@ -114,6 +124,7 @@ let menu = Menu.buildFromTemplate([
         click: toggle_theme,
         label: "Toggle Theme",
       },
+      { type: "separator" },
       {
         click: (menu_item, browser_window, event) => {
           browser_window.webContents.openDevTools();

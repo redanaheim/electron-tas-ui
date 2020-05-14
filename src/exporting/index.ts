@@ -16,14 +16,33 @@ const send = async function (): Promise<void> {
   const this_window = BrowserWindow.getFocusedWindow();
   let ip_text = $("#switch_ip").val().toString();
   let name = $("#path_on_switch").val().toString();
-
+  if (/^[0-9a-zA-Z.]+$/.test(name) === false) {
+    await dialog.showMessageBox(this_window, {
+      message: "Invalid Export Name",
+      details: "You can only use '.' and alphanumeric characters.",
+      type: "error",
+      buttons: ["OK"],
+    });
+    return;
+  }
   let switch_ip = new IpAddr(ip_text);
+  if (switch_ip.did_succeed === false) {
+    await dialog.showMessageBox(this_window, {
+      message: "Invalid IP Address",
+      details:
+        "Switch's IP address can only be 4 numbers between 0 and 255 separated by '.'",
+      type: "error",
+      buttons: ["OK"],
+    });
+    return;
+  }
   let is_replacing: boolean;
   try {
     is_replacing = await switch_ip.exists("/scripts/", name, 5000);
   } catch (err) {
     await dialog.showMessageBox(this_window, {
-      message: err.toString(),
+      message: "Error",
+      details: err.toString(),
       type: "error",
       buttons: ["OK"],
     });
@@ -45,7 +64,8 @@ const send = async function (): Promise<void> {
     result = await switch_ip.send(path, name, 5000);
   } catch (err) {
     await dialog.showMessageBox(this_window, {
-      message: err.toString(),
+      message: "Error",
+      details: err.toString(),
       type: "error",
       buttons: ["OK"],
     });
