@@ -9,7 +9,9 @@
     />
     <script>window.$ = window.jQuery = require('../assets/jquery.min.js');</script>
     <script>
-        const pick_file = require("./index.js");
+        let index = require("./index.js");
+        const pick_file = index.pick_file;
+        const send = index.send;
         require("../theme.js");
     </script>
   </head>
@@ -40,12 +42,12 @@
                 Export as on Switch:
             </td>
             <td>
-                <input type="text" id="path_on_switch" value="/scripts/script1.txt"></input>
+                <input type="text" id="path_on_switch" value="script1.txt"></input>
             </td>
         </tr>
         <tr>
             <td colspan="2">
-                <button id="export" onclick="console.log()">Send</button>
+                <button id="export" onclick="send()">Send</button>
             </td>
         </tr>
     </table>
