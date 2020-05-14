@@ -1,6 +1,7 @@
 const Client = require("ftp");
 const fs = require("fs");
 const electron = require("electron");
+const ping = require("ping");
 const format_time = function (): string {
   let date = new Date();
   let weekday = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][
@@ -44,6 +45,15 @@ export class IpAddr {
       this.did_succeed = false;
     }
   }
+  is_valid(port?: number): Promise<boolean> {
+    return new Promise((res, rej) => {
+      ping.sys.probe(this.parts.join("."), (exists: boolean) => {
+        res(exists);
+        return;
+      });
+      return false;
+    });
+  }
   get_connnect_obj(port?: number): any {
     return {
       host: this.parts.join("."),
@@ -57,7 +67,20 @@ export class IpAddr {
     connection?: any,
     connection_ready?: boolean
   ): Promise<PathTo<string>> {
-    return new Promise((res, rej) => {
+    let that = this;
+    return new Promise(async (res, rej) => {
+      if ((await that.is_valid()) === false) {
+        rej(
+          "Ping IP address " +
+            that.parts.join(".") +
+            " failed (target doesn't exist or is dead)."
+        );
+        throw new Error(
+          "Ping IP address " +
+            that.parts.join(".") +
+            " failed (target doesn't exist or is dead)."
+        );
+      }
       if (connection) {
         var client = connection;
       } else {
@@ -68,6 +91,7 @@ export class IpAddr {
         client.get(target_path, (err: any, data: any) => {
           if (err) {
             rej(err);
+            throw err;
           }
           let app_path: string;
           if (electron.app) {
@@ -77,7 +101,10 @@ export class IpAddr {
           }
           if (fs.existsSync(app_path + "/backups/" + backup_name) === false) {
             fs.writeFile(app_path + "/backups/" + backup_name, "", (err) => {
-              if (err) rej(err);
+              if (err) {
+                rej(err);
+                throw err;
+              }
             });
           }
           try {
@@ -86,6 +113,7 @@ export class IpAddr {
             );
           } catch (err) {
             rej(err);
+            throw err;
           }
           data.once("close", () => {
             res({
@@ -107,6 +135,7 @@ export class IpAddr {
           client.connect(this.get_connnect_obj(port));
         } catch (err) {
           rej(err);
+          throw err;
         }
       }
     });
@@ -118,7 +147,20 @@ export class IpAddr {
     connection?: any,
     connection_ready?: boolean
   ): Promise<boolean> {
-    return new Promise((res, rej) => {
+    let that = this;
+    return new Promise(async (res, rej) => {
+      if ((await that.is_valid()) === false) {
+        rej(
+          "Ping IP address " +
+            that.parts.join(".") +
+            " failed (target doesn't exist or is dead)."
+        );
+        throw new Error(
+          "Ping IP address " +
+            that.parts.join(".") +
+            " failed (target doesn't exist or is dead)."
+        );
+      }
       if (connection) {
         var client = connection;
       } else {
@@ -130,6 +172,7 @@ export class IpAddr {
           if (err) {
             rej(err);
             client.end();
+            throw err;
           }
           let exists = false;
           dir.forEach((item: any) => {
@@ -151,13 +194,21 @@ export class IpAddr {
           client.connect(this.get_connnect_obj(port));
         } catch (err) {
           rej(err);
+          throw err;
         }
       }
     });
   }
   async send(source: string, target: string, port: number): Promise<Result> {
     let that = this;
-    return new Promise((res, rej) => {
+    return new Promise(async (res, rej) => {
+      if ((await that.is_valid()) === false) {
+        rej(
+          "Ping IP address " +
+            that.parts.join(".") +
+            " failed (target doesn't exist or is dead)."
+        );
+      }
       let connection = new Client();
       let target_path = "/scripts/" + target;
 
@@ -175,8 +226,8 @@ export class IpAddr {
             true
           );
         } catch (err) {
-          console.error(err);
           rej(err);
+          throw err;
         }
         if (result.did_replace) {
           try {
@@ -188,14 +239,15 @@ export class IpAddr {
               true
             );
           } catch (err) {
-            console.error(err);
             rej(err);
+            throw err;
           }
         }
         // Backup file we will replace
         connection.put(source, target_path, (err: any) => {
           if (err) {
             rej(err);
+            throw err;
           }
           result.did_succeed = true;
           result.switch_ip = that;
@@ -208,6 +260,7 @@ export class IpAddr {
         connection.connect(that.get_connnect_obj(5000));
       } catch (err) {
         rej(err);
+        throw err;
       }
     });
   }

@@ -41,8 +41,8 @@ const send = async function (): Promise<void> {
     is_replacing = await switch_ip.exists("/scripts/", name, 5000);
   } catch (err) {
     await dialog.showMessageBox(this_window, {
-      message: "Error",
-      details: err.toString(),
+      title: "Error",
+      message: err.toString(),
       type: "error",
       buttons: ["OK"],
     });
@@ -64,8 +64,8 @@ const send = async function (): Promise<void> {
     result = await switch_ip.send(path, name, 5000);
   } catch (err) {
     await dialog.showMessageBox(this_window, {
-      message: "Error",
-      details: err.toString(),
+      title: "Error",
+      message: err.toString(),
       type: "error",
       buttons: ["OK"],
     });
