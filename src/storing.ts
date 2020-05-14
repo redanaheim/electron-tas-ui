@@ -63,7 +63,12 @@ export class Store {
     return (await this.data)[property];
   }
   async set(property: any, value: any): Promise<any> {
-    let data = await this.data;
+    let data: InternalData;
+    try {
+      data = await this.data;
+    } catch (err) {
+      return err;
+    }
     data[property] = value;
     let res: any;
     try {

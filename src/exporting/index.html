@@ -7,29 +7,32 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css?family=Roboto"
     />
+    <script>window.$ = window.jQuery = require('../assets/jquery.min.js');</script>
     <script>
-        require("./index.js");
+        const pick_file = require("./index.js");
         require("../theme.js");
     </script>
   </head>
   <body>
     <table>
+        <col id="captions"/>
+        <col id="sources"/>
+        <tr>
+            <td>
+                <input type="text" id="file_path" placeholder="Select a script" style="width: 100%;"></input>
+            </td>
+            <td>
+                <button id="pick_file" onclick="pick_file()">
+                    Choose Script
+                </button>
+            </td>
+        </tr>
         <tr>
             <td id="switch_ip_caption">
                 Switch's local IP address:
             </td>
             <td>
                 <input type="text" id="switch_ip" value="192.168.1.1"></input>
-            </td>
-        </tr>
-        <tr>
-            <td id="file_path_caption">
-                File path:
-            </td>
-            <td>
-                <button id="pick_file" onclick="console.log()">
-                    Choose Script
-                </button>
             </td>
         </tr>
         <tr>

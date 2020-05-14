@@ -6,7 +6,7 @@ package-lock.json
 dist/
 *.js
 *.js.map
-
+src/assets
 
 # Logs
 logs
