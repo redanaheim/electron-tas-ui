@@ -1,6 +1,8 @@
 import { desktopCapturer } from "electron";
-import { IpAddr } from "../ftp";
+import { IpAddress } from "../ftp";
 import { Store } from "../storing";
+import { fstat, existsSync } from "fs";
+import { basename } from "path";
 var path: any = null;
 const { dialog, BrowserWindow } = require("electron").remote;
 const pick_file = async function (): Promise<string> {
@@ -12,11 +14,30 @@ const pick_file = async function (): Promise<string> {
   $("#file_path").val(path || "");
   return path;
 };
-const send = async function (): Promise<void> {
+const send_on_click = async function () {
   const this_window = BrowserWindow.getFocusedWindow();
-  let ip_text = $("#switch_ip").val().toString();
-  let name = $("#path_on_switch").val().toString();
-  if (/^[0-9a-zA-Z.]+$/.test(name) === false) {
+  let source_path = $("#file_path").val().toString();
+  if (existsSync(source_path) === false) {
+    await dialog.showMessageBox(this_window, {
+      message: "Invalid Source Path",
+      details: "The given path does not point to a file.",
+      type: "error",
+      buttons: ["OK"],
+    });
+    return;
+  }
+  let export_name = $("#path_on_switch").val().toString();
+  let switch_ip = $("#switch_ip").val().toString();
+  send(source_path, export_name, switch_ip);
+};
+const send = async function (
+  source_path: string,
+  export_name: string,
+  ip_text: string
+): Promise<void> {
+  const this_window = BrowserWindow.getFocusedWindow();
+
+  if (/^[0-9a-zA-Z.]+$/.test(export_name) === false) {
     await dialog.showMessageBox(this_window, {
       message: "Invalid Export Name",
       details: "You can only use '.' and alphanumeric characters.",
@@ -25,7 +46,7 @@ const send = async function (): Promise<void> {
     });
     return;
   }
-  let switch_ip = new IpAddr(ip_text);
+  let switch_ip = new IpAddress(ip_text);
   if (switch_ip.did_succeed === false) {
     await dialog.showMessageBox(this_window, {
       message: "Invalid IP Address",
@@ -38,7 +59,7 @@ const send = async function (): Promise<void> {
   }
   let is_replacing: boolean;
   try {
-    is_replacing = await switch_ip.exists("/scripts/", name, 5000);
+    is_replacing = await switch_ip.exists("/scripts/", export_name, 5000);
   } catch (err) {
     await dialog.showMessageBox(this_window, {
       title: "Error",
@@ -50,7 +71,7 @@ const send = async function (): Promise<void> {
   }
   if (is_replacing) {
     let should_replace = await dialog.showMessageBox(this_window, {
-      message: `This will overwrite /scripts/${name} on the Switch. The current file will be backed up, however do you still want to proceed?`,
+      message: `This will overwrite /scripts/${export_name} on the Switch. The current file will be backed up, however do you still want to proceed?`,
       type: "question",
       buttons: ["Cancel", "Replace"],
     });
@@ -61,7 +82,7 @@ const send = async function (): Promise<void> {
   }
   let result;
   try {
-    result = await switch_ip.send(path, name, 5000);
+    result = await switch_ip.send(path, export_name, 5000);
   } catch (err) {
     await dialog.showMessageBox(this_window, {
       title: "Error",
@@ -79,4 +100,8 @@ const send = async function (): Promise<void> {
     buttons: ["OK"],
   });
 };
-module.exports = { pick_file: pick_file, send: send };
+module.exports = {
+  pick_file: pick_file,
+  send: send,
+  send_on_click: send_on_click,
+};

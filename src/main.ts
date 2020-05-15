@@ -48,7 +48,8 @@ const create_export_window = async () => {
   let current = await db.get("theme");
   const popup = new BrowserWindow({
     height: 150,
-    width: 350,
+    width: 330,
+    resizable: false,
     webPreferences: {
       nodeIntegration: true,
     },
@@ -68,6 +69,7 @@ const toggle_theme = async () => {
   } else {
     db.set("theme", "light");
   }
+  // Change theme for all open windows
   BrowserWindow.getAllWindows().forEach((win) => {
     win.webContents.executeJavaScript("set_theme(document);");
   });

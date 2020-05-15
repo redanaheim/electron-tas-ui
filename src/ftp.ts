@@ -16,12 +16,12 @@ interface PathTo<T> {
 class Result {
   did_succeed: boolean;
   did_replace: boolean;
-  switch_ip: IpAddr;
+  switch_ip: IpAddress;
   old_file?: PathTo<string>;
   constructor(
     did_suceed?: boolean,
     did_replace?: boolean,
-    switch_ip?: IpAddr,
+    switch_ip?: IpAddress,
     old_file?: PathTo<string>
   ) {
     this.did_succeed = did_suceed;
@@ -30,13 +30,13 @@ class Result {
     this.old_file = old_file;
   }
 }
-export class IpAddr {
+export class IpAddress {
   static regex = /^((([0-2][0-5]?[0-5]?|[0-1][0-9]?[0-9]?)|[0-9][0-9])|[0-9])\.((([0-2][0-5]?[0-5]?|[0-1][0-9]?[0-9]?)|[0-9][0-9])|[0-9])\.((([0-2][0-5]?[0-5]?|[0-1][0-9]?[0-9]?)|[0-9][0-9])|[0-9])\.((([0-2][0-5]?[0-5]?|[0-1][0-9]?[0-9]?)|[0-9][0-9])|[0-9])$/;
   parts: number[];
   did_succeed: boolean;
   error: string;
   constructor(text: string) {
-    if (IpAddr.regex.test(text)) {
+    if (IpAddress.regex.test(text)) {
       this.parts = text.split(".").map((x) => Number(x));
     } else {
       this.error =
@@ -100,12 +100,16 @@ export class IpAddr {
             app_path = electron.remote.app.getPath("userData");
           }
           if (fs.existsSync(app_path + "/backups/" + backup_name) === false) {
-            fs.writeFile(app_path + "/backups/" + backup_name, "", (err) => {
-              if (err) {
-                rej(err);
-                throw err;
+            fs.writeFile(
+              app_path + "/backups/" + backup_name,
+              "",
+              (err: any) => {
+                if (err) {
+                  rej(err);
+                  throw err;
+                }
               }
-            });
+            );
           }
           try {
             data.pipe(
@@ -213,7 +217,7 @@ export class IpAddr {
       let target_path = "/scripts/" + target;
 
       let on_ready = async function () {
-        let result = new Result(false, false, new IpAddr("0.0.0.0"), {
+        let result = new Result(false, false, new IpAddress("0.0.0.0"), {
           path: "null",
         });
         // See if file exists
