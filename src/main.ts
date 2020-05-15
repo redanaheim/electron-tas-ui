@@ -92,15 +92,7 @@ app.on("activate", () => {
   }
 });
 
-let menu = Menu.buildFromTemplate([
-  {
-    label: "Electron TAS UI",
-    submenu: [
-      {
-        label: "About",
-      },
-    ],
-  },
+let template: any = [
   {
     label: "File",
     submenu: [
@@ -128,13 +120,34 @@ let menu = Menu.buildFromTemplate([
       },
       { type: "separator" },
       {
-        click: (menu_item, browser_window, event) => {
+        click: (menu_item, browser_window: any, event) => {
           browser_window.webContents.openDevTools();
         },
         label: "Open Dev Tools",
       },
     ],
   },
-]);
+];
+
+if (process.platform === "darwin") {
+  template = [
+    {
+      label: app.name,
+      submenu: [
+        { role: "about" },
+        { type: "separator" },
+        { role: "services" },
+        { type: "separator" },
+        { role: "hide" },
+        { role: "hideothers" },
+        { role: "unhide" },
+        { type: "separator" },
+        { role: "quit" },
+      ],
+    },
+  ].concat(template);
+}
+
+let menu = Menu.buildFromTemplate(template);
 
 Menu.setApplicationMenu(menu);
