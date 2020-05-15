@@ -58,6 +58,10 @@ const create_export_window = async () => {
   popup.loadFile(path.join(__dirname, "../src/exporting/index.html"));
 };
 
+const create_compile_window = async () => {};
+
+const create_compile_export_window = async () => {};
+
 const toggle_theme = async () => {
   let db = new Store("config", {
     theme: "dark",
@@ -98,11 +102,24 @@ let template: any = [
     submenu: [
       {
         click: create_editing_window,
+        accelerator: "CmdOrCtrl+E",
         label: "New Script",
       },
       {
         click: create_export_window,
+        accelerator: "CmdOrCtrl+Shift+E",
         label: "Export Existing Script",
+      },
+      { type: "separator" },
+      {
+        click: create_compile_window,
+        accelerator: "CmdOrCtrl+M",
+        label: "Compile Script",
+      },
+      {
+        click: create_compile_export_window,
+        accelerator: "CmdOrCtrl+Shift+M",
+        label: "Compile and Export Script",
       },
       { type: "separator" },
       {
@@ -120,9 +137,13 @@ let template: any = [
       },
       { type: "separator" },
       {
-        click: (menu_item, browser_window: any, event) => {
+        click: (menu_item: any, browser_window: any, event: any) => {
           browser_window.webContents.openDevTools();
         },
+        accelerator:
+          process.platform === "darwin"
+            ? "CmdOrCtrl+Option+I"
+            : "CmdOrCtrl+Alt+I",
         label: "Open Dev Tools",
       },
     ],
