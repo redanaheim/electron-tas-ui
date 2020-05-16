@@ -11,3 +11,4 @@ Can't edit scripts in-application. Pretty much the only thing you can do is comp
 - Add compile & export functionality
 - Fix light mode look
 - Make windows look actually decent on Windows
+- Fix issue where since the backup directory isn't made, exporting to the Switch throws an error
