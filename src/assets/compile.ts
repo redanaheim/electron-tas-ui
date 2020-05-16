@@ -109,7 +109,7 @@ const opposite_keys = function (raw: string[]): string[] {
     "KEY_LSTICK",
     "KEY_RSTICK",
   ];
-  let to_return: string[];
+  let to_return: string[] = [];
   for (var i = 0; i < 16; i++) {
     if (raw.includes(valid_keys[i]) === false) {
       to_return.push(valid_keys[i]);
@@ -134,7 +134,7 @@ const parse_line = function (line: string, last_frame: number): ParsedLine {
     parameters.shift();
   } else if (/^[0-9]+$/.test(parameters[0])) {
     // frame number is a valid number
-    to_return.frame = Number(parameters[0]);
+    to_return.frame = Number(parameters[0]) + last_frame;
     parameters.shift();
   }
   for (var i = 0; i < parameters.length; i++) {
@@ -198,14 +198,13 @@ export const compile = function (script: string): string {
   let file_lines = script.split("\n");
   let update_frames: ParsedLine[] = [];
   let current_frame = 1;
-  // We go backwards here because pop is way more efficient than shift. Shift has to reindex the whole array,
-  // while pop removes the last index.
   for (var i = 0; i < file_lines.length; i++) {
     let parsed_line = parse_line(file_lines[i], current_frame);
     current_frame = parsed_line.frame;
     update_frames.push(parsed_line);
   }
   let last_frame = update_frames[update_frames.length - 1].frame;
+  // We use this instead of shift()ing because shift is very inefficient
   let next_update = update_frames[0].frame;
   let update_index = 0;
   for (var i = 1; i <= last_frame; i++) {
@@ -220,4 +219,3 @@ export const compile = function (script: string): string {
   }
   return compiled;
 };
-console.log(compile(require("fs").readFileSync("./test.txt", "utf8")));

@@ -7,7 +7,7 @@ interface InternalData {
   is_default: boolean;
 }
 
-const read_file_async = async function (
+export const read_file_async = async function (
   path: string,
   encoding: string
 ): Promise<string | Buffer> {
@@ -18,7 +18,7 @@ const read_file_async = async function (
     });
   });
 };
-const write_file_async = async function (
+export const write_file_async = async function (
   path: string,
   data: string
 ): Promise<any> {

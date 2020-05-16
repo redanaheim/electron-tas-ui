@@ -45,13 +45,15 @@ button {
   outline: none;
 }
 #pick_file:active,
-#export:active {
+#export:active,
+#pick_save_path:active {
   background-color: var(--btn-clicked-bg);
 }
 table {
   position: absolute;
   top: 50%;
   left: 50%;
+  width: 90%;
   transform: translate(-50%, -50%);
 }
 td {
@@ -60,8 +62,7 @@ td {
 td:nth-child(even) {
   padding-left: 10px;
 }
-input,
-textarea {
+input {
   background-color: var(--input-bg);
   color: var(--btn-text);
   border: none;
@@ -78,6 +79,14 @@ textarea {
   direction: rtl;
 }
 #pick_file {
+  width: 100%;
+  background-color: var(--bg);
+  color: var(--btn-text);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  height: 100%;
+}
+#pick_save_path {
   width: 100%;
   background-color: var(--bg);
   color: var(--btn-text);

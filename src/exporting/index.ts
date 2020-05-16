@@ -11,7 +11,9 @@ const pick_file = async function (): Promise<string> {
       properties: ["openFile"],
     })
   ).filePaths[0];
-  $("#file_path").val(path || "");
+  if (path) {
+    $("#file_path").val(path);
+  }
   return path;
 };
 const send_on_click = async function () {
