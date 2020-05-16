@@ -8,6 +8,8 @@ dist/
 *.js.map
 src/editing
 src/assets/buttons/svg
+forge.config.js
+yarn.lock
 
 # Logs
 logs

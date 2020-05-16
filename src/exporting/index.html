@@ -10,7 +10,7 @@
     <script>window.$ = window.jQuery = require('../assets/jquery.min.js');</script>
     <script>
         let index = require("./index.js");
-        const { pick_file, send } = index
+        const { pick_file, send, send_on_click } = index
         require("../theme.js");
     </script>
   </head>
@@ -46,7 +46,7 @@
         </tr>
         <tr>
             <td colspan="2">
-                <button id="export" onclick="send()">Send</button>
+                <button id="export" onclick="send_on_click()">Send</button>
             </td>
         </tr>
     </table>

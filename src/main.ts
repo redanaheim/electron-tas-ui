@@ -49,12 +49,13 @@ const create_export_window = async () => {
   const popup = new BrowserWindow({
     height: 150,
     width: 330,
-    resizable: false,
+    resizable: process.platform === "darwin" ? false : true,
     webPreferences: {
       nodeIntegration: true,
     },
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
   });
+  popup.setMenuBarVisibility(false);
   popup.loadFile(path.join(__dirname, "../src/exporting/index.html"));
 };
 
@@ -67,12 +68,13 @@ const create_compile_window = async () => {
   const popup = new BrowserWindow({
     height: 125,
     width: 330,
-    resizable: false,
+    resizable: process.platform === "darwin" ? false : true,
     webPreferences: {
       nodeIntegration: true,
     },
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
   });
+  popup.setMenuBarVisibility(false);
   popup.loadFile(path.join(__dirname, "../src/compiling/index.html"));
 };
 
