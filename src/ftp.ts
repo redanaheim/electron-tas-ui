@@ -99,21 +99,21 @@ export class IpAddress {
           } else {
             app_path = electron.remote.app.getPath("userData");
           }
-          if (fs.existsSync(app_path + "/backups/" + backup_name) === false) {
-            fs.writeFile(
-              app_path + "/backups/" + backup_name,
-              "",
-              (err: any) => {
-                if (err) {
-                  rej(err);
-                  throw err;
-                }
-              }
-            );
+          // Make sure backups directory exists
+          if (fs.existsSync(`${app_path}/backups/`) === false) {
+            fs.mkdirSync(`${app_path}/backups/`);
           }
+          // Make file for backup
+          fs.writeFile(`${app_path}/backups/${backup_name}`, "", (err: any) => {
+            if (err) {
+              rej(err);
+              throw err;
+            }
+          });
+          // Write old data from Switch to backup file
           try {
             data.pipe(
-              fs.createWriteStream(app_path + "/backups/" + backup_name)
+              fs.createWriteStream(`${app_path}/backups/${backup_name}`)
             );
           } catch (err) {
             rej(err);
@@ -121,7 +121,7 @@ export class IpAddress {
           }
           data.once("close", () => {
             res({
-              path: app_path + "/backups/" + backup_name,
+              path: `${app_path}/backups/${backup_name}`,
             });
             if (connection_ready === false) {
               client.end();
@@ -214,7 +214,7 @@ export class IpAddress {
         );
       }
       let connection = new Client();
-      let target_path = "/scripts/" + target;
+      let target_path = `/scripts/${target}`;
 
       let on_ready = async function () {
         let result = new Result(false, false, new IpAddress("0.0.0.0"), {
