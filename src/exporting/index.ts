@@ -94,13 +94,23 @@ const send = async function (
     });
     return;
   }
-  dialog.showMessageBox(this_window, {
-    message: result.did_succeed
-      ? "Sucessfully exported script to Switch."
-      : "Export failed.",
-    type: "info",
-    buttons: ["OK"],
+  let show_dialog_selections = await new Store("dialogs", {
+    show_compile_success: true,
+    show_export_success: true,
+    is_default: true,
   });
+  if (await show_dialog_selections.get("show_export_success")) {
+    let button = await dialog.showMessageBox(this_window, {
+      message: result.did_succeed
+        ? "Sucessfully exported script to Switch."
+        : "Export failed.",
+      type: "info",
+      buttons: ["OK", "Do not show this again"],
+    });
+    if (button.response === 1) {
+      show_dialog_selections.set("show_export_success", false);
+    }
+  }
 };
 module.exports = {
   pick_file: pick_file,

@@ -8,6 +8,24 @@ interface ParsedLine {
   rstick_changes: boolean;
 }
 class ControllerState {
+  static valid_keys = [
+    "KEY_A",
+    "KEY_B",
+    "KEY_X",
+    "KEY_Y",
+    "KEY_L",
+    "KEY_R",
+    "KEY_ZL",
+    "KEY_ZR",
+    "KEY_PLUS",
+    "KEY_MINUS",
+    "KEY_DUP",
+    "KEY_DDOWN",
+    "KEY_DLEFT",
+    "KEY_DRIGHT",
+    "KEY_LSTICK",
+    "KEY_RSTICK",
+  ];
   frame: number;
   pressed_keys: string[];
   lstick_pos: [number, number];
@@ -25,20 +43,33 @@ class ControllerState {
       ";"
     )} ${this.rstick_pos.join(";")}`;
   }
-  update(script_line: ParsedLine): void {
+  update(script_line: ParsedLine, throw_errors?: boolean): void {
     this.frame = script_line.frame;
     let pressed_keys = this.pressed_keys;
+    if (throw_errors) {
+      for (var key of pressed_keys) {
+        if (ControllerState.valid_keys.includes(key) === false) {
+          throw new Error("Invalid key name: " + key);
+        }
+      }
+    }
     let lstick_pos: [number, number];
     let rstick_pos: [number, number];
     let new_pressed_keys: string[] = [];
     // Handle keys that should be on for this frame
     for (var i = 0; i < pressed_keys.length; i++) {
-      if (script_line.keys_off.includes(pressed_keys[i]) === false) {
+      if (
+        script_line.keys_off.includes(pressed_keys[i]) === false &&
+        ControllerState.valid_keys.includes(pressed_keys[i])
+      ) {
         new_pressed_keys.push(pressed_keys[i]);
       }
     }
     for (var i = 0; i < script_line.keys_on.length; i++) {
-      if (pressed_keys.includes(script_line.keys_on[i]) === false) {
+      if (
+        pressed_keys.includes(script_line.keys_on[i]) === false &&
+        ControllerState.valid_keys.includes(script_line.keys_on[i])
+      ) {
         new_pressed_keys.push(script_line.keys_on[i]);
       }
     }
@@ -52,7 +83,7 @@ class ControllerState {
     lstick_pos = make_stick_cartesian(script_line.lstick_pos_polar);
     rstick_pos = make_stick_cartesian(script_line.rstick_pos_polar);
     if (script_line.lstick_changes === true) this.lstick_pos = lstick_pos;
-    if (script_line.rstick_changes === true) this.lstick_pos = lstick_pos;
+    if (script_line.rstick_changes === true) this.rstick_pos = rstick_pos;
   }
 }
 const separate_brackets = function (parameter: any): Array<typeof parameter> {
@@ -91,24 +122,7 @@ const make_stick_cartesian = function (
 };
 const opposite_keys = function (raw: string[]): string[] {
   // invert keys: get every key except the ones passed to the "raw" argument
-  const valid_keys = [
-    "KEY_A",
-    "KEY_B",
-    "KEY_X",
-    "KEY_Y",
-    "KEY_L",
-    "KEY_R",
-    "KEY_ZL",
-    "KEY_ZR",
-    "KEY_PLUS",
-    "KEY_MINUS",
-    "KEY_DUP",
-    "KEY_DDOWN",
-    "KEY_DLEFT",
-    "KEY_DRIGHT",
-    "KEY_LSTICK",
-    "KEY_RSTICK",
-  ];
+  const valid_keys = ControllerState.valid_keys;
   let to_return: string[] = [];
   for (var i = 0; i < 16; i++) {
     if (raw.includes(valid_keys[i]) === false) {
@@ -117,7 +131,11 @@ const opposite_keys = function (raw: string[]): string[] {
   }
   return to_return;
 };
-const parse_line = function (line: string, last_frame: number): ParsedLine {
+const parse_line = function (
+  line: string,
+  last_frame: number,
+  throw_errors?: boolean
+): ParsedLine {
   let to_return: ParsedLine = {
     frame: 0,
     lstick_changes: false,
@@ -131,12 +149,15 @@ const parse_line = function (line: string, last_frame: number): ParsedLine {
   // script can be started with a '+' as the line number
   if (parameters[0] == "+" && last_frame === 1) {
     to_return.frame = 1;
-    parameters.shift();
   } else if (/^[0-9]+$/.test(parameters[0])) {
     // frame number is a valid number
     to_return.frame = Number(parameters[0]) + last_frame;
-    parameters.shift();
+  } else {
+    if (throw_errors)
+      throw new Error(`Invalid frame number - '${parameters[0]}'`);
+    to_return.frame = last_frame + 1;
   }
+  parameters.shift();
   for (var i = 0; i < parameters.length; i++) {
     let parameter = parameters[i];
     let keyword = parameter.split("{")[0];
@@ -170,6 +191,10 @@ const parse_line = function (line: string, last_frame: number): ParsedLine {
           to_return.lstick_pos_polar = [0, 0];
         }
         let lstick_pos = separate_brackets_stick(parameter);
+        if (lstick_pos.length > 2 && throw_errors)
+          throw new Error(
+            `Invalid parameter (too many stick values) - '${parameter}'`
+          );
         while (lstick_pos.length > 2) lstick_pos.shift();
         to_return.lstick_pos_polar = lstick_pos;
         to_return.lstick_changes = true;
@@ -180,26 +205,35 @@ const parse_line = function (line: string, last_frame: number): ParsedLine {
           to_return.rstick_pos_polar = [0, 0];
         }
         let rstick_pos = separate_brackets_stick(parameter);
+        if (rstick_pos.length > 2 && throw_errors)
+          throw new Error(
+            `Invalid parameter (too many stick values) - '${parameter}'`
+          );
         while (rstick_pos.length > 2) rstick_pos.shift();
         to_return.rstick_pos_polar = rstick_pos;
         to_return.rstick_changes = true;
         break;
       }
       default: {
+        if (throw_errors) throw new Error(`Invalid parameter - '${parameter}'`);
         continue;
       }
     }
   }
   return to_return;
 };
-export const compile = function (script: string): string {
+export const compile = function (
+  script: string,
+  throw_errors?: boolean
+): string {
   let compiled = "";
   let controller = new ControllerState();
   let file_lines = script.split("\n");
   let update_frames: ParsedLine[] = [];
   let current_frame = 1;
-  for (var i = 0; i < file_lines.length; i++) {
-    let parsed_line = parse_line(file_lines[i], current_frame);
+  for (var line of file_lines) {
+    if (/^([0-9]+|\+) .+$/.test(line) === false) continue; // no valid frame number found, ignore
+    let parsed_line = parse_line(line, current_frame, throw_errors || false);
     current_frame = parsed_line.frame;
     update_frames.push(parsed_line);
   }

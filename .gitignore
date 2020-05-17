@@ -9,6 +9,7 @@ dist/
 src/assets/buttons/svg
 forge.config.js
 yarn.lock
+src/editing/framework.txt
 
 # Logs
 logs

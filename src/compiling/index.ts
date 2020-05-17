@@ -1,8 +1,8 @@
-import { read_file_async, write_file_async } from "../storing";
+import { read_file_async, write_file_async, Store } from "../storing";
 import { fstat, existsSync } from "fs";
 import { compile } from "../assets/compile";
 
-//import { basename } from "path";
+// import { basename } from "path";
 const { dialog, BrowserWindow } = require("electron").remote;
 const pick_file = async function (): Promise<string> {
   let path = (
@@ -50,11 +50,21 @@ const compile_on_click = async function () {
     });
     return;
   }
-  dialog.showMessageBox(this_window, {
-    message: "Sucessfully saved compiled script.",
-    type: "info",
-    buttons: ["OK"],
+  let show_dialog_selections = await new Store("dialogs", {
+    show_compile_success: true,
+    show_export_success: true,
+    is_default: true,
   });
+  if (await show_dialog_selections.get("show_compile_success")) {
+    let button = await dialog.showMessageBox(this_window, {
+      message: "Sucessfully saved compiled script.",
+      type: "info",
+      buttons: ["OK", "Do not show this again"],
+    });
+    if (button.response === 1) {
+      show_dialog_selections.set("show_compile_success", false);
+    }
+  }
 };
 module.exports = {
   pick_file: pick_file,
