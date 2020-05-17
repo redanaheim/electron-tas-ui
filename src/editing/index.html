@@ -9,28 +9,10 @@
       href="https://fonts.googleapis.com/css?family=Roboto"
     />
     <script>
-      require("./index.js");
+      let { key_click } = require("./index.js");
       require("../theme.js");
       $(document).ready(() => {
-        $(".key_icon").click(function () {
-          let is_dark = $("body").hasClass("dark");
-          if (is_dark) {
-            if ($(this).css("filter") === "invert(0.8)") {
-              $(this).css("filter", "invert(0)");
-            } 
-            else {
-              $(this).css("filter", "invert(0.8)");
-            }
-          }
-          else {
-            if ($(this).css("filter") === "invert(0.8)") {
-              $(this).css("filter", '');
-            } 
-            else {
-              $(this).css("filter", "invert(0.8)");
-            }
-          }
-        });
+        $(".key_icon").click(key_click);
       });
     </script>
   </head>

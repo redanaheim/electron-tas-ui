@@ -8,11 +8,13 @@
   --bg: var(--light-bg);
   --text: var(--light-text);
   --key-filter: invert(0.2);
+  --key-filter-pressed: invert(0.8);
 }
 .dark {
   --bg: var(--dark-bg);
   --text: var(--dark-text);
   --key-filter: invert(0);
+  --key-filter-pressed: invert(0.8);
 }
 body {
   font-family: -apple-system, "Roboto", BlinkMacSystemFont, "Segoe UI",
@@ -29,6 +31,7 @@ body {
 table {
   border-collapse: collapse;
   width: 90%;
+  table-layout: fixed;
 }
 #editing {
   border-radius: 5px;
@@ -55,6 +58,9 @@ table {
   width: 20px;
   filter: var(--key-filter);
   vertical-align: bottom;
+}
+.key_icon.active {
+  filter: var(--key-filter-pressed);
 }
 .stick_icon {
   height: 25px;

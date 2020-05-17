@@ -4,7 +4,7 @@ import { compile } from "../assets/compile";
 
 // import { basename } from "path";
 const { dialog, BrowserWindow } = require("electron").remote;
-const pick_file = async function (): Promise<string> {
+export const pick_file = async function (): Promise<string> {
   let path = (
     await dialog.showOpenDialog(BrowserWindow.getFocusedWindow(), {
       properties: ["openFile"],
@@ -13,7 +13,7 @@ const pick_file = async function (): Promise<string> {
   if (path) $("#file_path").val(path);
   return path;
 };
-const pick_save_path = async function (): Promise<void> {
+export const pick_save_path = async function (): Promise<void> {
   let save_path = await dialog.showSaveDialog(
     BrowserWindow.getFocusedWindow(),
     {
@@ -25,7 +25,7 @@ const pick_save_path = async function (): Promise<void> {
   $("#save_path").val(save_path.filePath || "");
   return save_path;
 };
-const compile_on_click = async function () {
+export const compile_on_click = async function () {
   const this_window = BrowserWindow.getFocusedWindow();
   let save_path = $("#save_path").val().toString();
   let source_path = $("#file_path").val().toString();
@@ -65,9 +65,4 @@ const compile_on_click = async function () {
       show_dialog_selections.set("show_compile_success", false);
     }
   }
-};
-module.exports = {
-  pick_file: pick_file,
-  pick_save_path: pick_save_path,
-  compile_on_click: compile_on_click,
 };

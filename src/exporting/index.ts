@@ -5,7 +5,7 @@ import { fstat, existsSync } from "fs";
 import { basename } from "path";
 var path: any = null;
 const { dialog, BrowserWindow } = require("electron").remote;
-const pick_file = async function (): Promise<string> {
+export const pick_file = async function (): Promise<string> {
   path = (
     await dialog.showOpenDialog(BrowserWindow.getFocusedWindow(), {
       properties: ["openFile"],
@@ -16,7 +16,7 @@ const pick_file = async function (): Promise<string> {
   }
   return path;
 };
-const send_on_click = async function () {
+export const send_on_click = async function () {
   const this_window = BrowserWindow.getFocusedWindow();
   let source_path = $("#file_path").val().toString();
   if (existsSync(source_path) === false) {
@@ -32,7 +32,7 @@ const send_on_click = async function () {
   let switch_ip = $("#switch_ip").val().toString();
   send(source_path, export_name, switch_ip);
 };
-const send = async function (
+export const send = async function (
   source_path: string,
   export_name: string,
   ip_text: string
@@ -111,9 +111,4 @@ const send = async function (
       show_dialog_selections.set("show_export_success", false);
     }
   }
-};
-module.exports = {
-  pick_file: pick_file,
-  send: send,
-  send_on_click: send_on_click,
 };
