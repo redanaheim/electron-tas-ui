@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html style="font-size: 1px; padding: 0px;">
+  <head>
+    <title>Editing nx-TAS Script</title>
+    <script>window.$ = window.jQuery = require('../assets/jquery.min.js');</script>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto"
+    />
+    <script>
+      require("./index.js");
+      require("../theme.js");
+      $(document).ready(() => {
+        $(".key_icon").click(function () {
+          let is_dark = $("body").hasClass("dark");
+          if (is_dark) {
+            if ($(this).css("filter") === "invert(0.8)") {
+              $(this).css("filter", "invert(0)");
+            } 
+            else {
+              $(this).css("filter", "invert(0.8)");
+            }
+          }
+          else {
+            if ($(this).css("filter") === "invert(0.8)") {
+              $(this).css("filter", '');
+            } 
+            else {
+              $(this).css("filter", "invert(0.8)");
+            }
+          }
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <table id="editing">
+      <col id="frame_col" />
+      <col id="input_col" />
+      <tr class="header">
+        <td id="frame_header">Frame</td>
+        <th id="button_header" colspan="15">Buttons</th>
+      </tr>
+      <tbody id="script_rows">
+        <tr>
+          <td class="frame_number">1</td>
+          <td class="key"><img class="key_icon" src="../assets/buttons/png/a.png"></img></td>
+          <td class="key"><img class="key_icon" src="../assets/buttons/png/b.png"></img></td>
+          <td class="key"><img class="key_icon" src="../assets/buttons/png/x.png"></img></td>
+          <td class="key"><img class="key_icon" src="../assets/buttons/png/y.png"></img></td>
+          <td class="key"><img class="key_icon" src="../assets/buttons/png/dleft.png"></img></td>
+          <td class="key"><img class="key_icon" src="../assets/buttons/png/dup.png"></img></td>
+          <td class="key"><img class="key_icon" src="../assets/buttons/png/ddown.png"></img></td>
+          <td class="key"><img class="key_icon" src="../assets/buttons/png/dright.png"></img></td>
+          <td class="key"><img class="key_icon" src="../assets/buttons/png/l.png"></img></td>
+          <td class="key"><img class="key_icon" src="../assets/buttons/png/r.png"></img></td>
+          <td class="key"><img class="key_icon" src="../assets/buttons/png/zl.png"></img></td>
+          <td class="key"><img class="key_icon" src="../assets/buttons/png/zr.png"></img></td>
+          <td class="key"><img class="key_icon" src="../assets/buttons/png/plus.png"></img></td>
+          <td class="key"><img class="key_icon" src="../assets/buttons/png/minus.png"></img></td>
+          <td class="key"><img class="stick_icon key_icon" src="../assets/buttons/png/lstick.png"></img></td>
+          <td class="key"><img class="stick_icon key_icon" src="../assets/buttons/png/rstick.png"></img></td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+</html>

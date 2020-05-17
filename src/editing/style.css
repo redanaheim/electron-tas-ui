@@ -1,0 +1,66 @@
+:root {
+  --light-text: black;
+  --dark-text: rgb(216, 219, 226);
+  --light-bg: white;
+  --dark-bg: rgb(0, 0, 0);
+}
+.light {
+  --bg: var(--light-bg);
+  --text: var(--light-text);
+  --key-filter: invert(0.2);
+}
+.dark {
+  --bg: var(--dark-bg);
+  --text: var(--dark-text);
+  --key-filter: invert(0);
+}
+body {
+  font-family: -apple-system, "Roboto", BlinkMacSystemFont, "Segoe UI",
+    Helvetica, Arial, sans-serif;
+  font-size: 13rem;
+  color: var(--text);
+  background-color: var(--bg);
+  padding: 0px;
+  margin: 0px;
+}
+.header {
+  font-size: 18rem;
+}
+table {
+  border-collapse: collapse;
+  width: 90%;
+}
+#editing {
+  border-radius: 5px;
+  width: 90%;
+  margin-top: 10px;
+  margin-left: auto;
+  margin-right: auto;
+}
+#frame_header {
+  vertical-align: middle;
+}
+#button_header {
+  width: 90%;
+  padding: 3px;
+  vertical-align: middle;
+}
+.frame_number {
+  text-align: center;
+  font-size: 17rem;
+  vertical-align: bottom;
+}
+.key_icon {
+  height: 20px;
+  width: 20px;
+  filter: var(--key-filter);
+  vertical-align: bottom;
+}
+.stick_icon {
+  height: 25px;
+  width: 20px;
+}
+.key {
+  text-align: center;
+  vertical-align: bottom;
+}

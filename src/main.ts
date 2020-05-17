@@ -37,7 +37,7 @@ const create_editing_window = async () => {
     },
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
   });
-  //main_window.loadFile(path.join(__dirname, "../src/editing/index.html"));
+  main_window.loadFile(path.join(__dirname, "../src/editing/index.html"));
 };
 
 const create_export_window = async () => {
