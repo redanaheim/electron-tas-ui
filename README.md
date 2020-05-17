@@ -6,6 +6,7 @@ Can't edit scripts in-application. Pretty much the only thing you can do is comp
 
 ## TODO
 - **BETTER APPLICATION NAME**
+- **CLASSES FOR CLICKED BUTTONS INSTEAD OF JANK**
 - Add in-app text editing field
 - Add functional editing UI
 - Add compile & export functionality
