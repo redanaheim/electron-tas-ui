@@ -6,7 +6,6 @@ package-lock.json
 dist/
 *.js
 *.js.map
-src/assets/buttons/svg
 forge.config.js
 yarn.lock
 src/editing/framework.txt
