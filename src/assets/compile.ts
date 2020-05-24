@@ -164,10 +164,10 @@ const get_script_functions = function (
         get_builtin(line.trim().toLowerCase().split("builtins ")[1])
       );
     }
-    if (/^DEF [a-zA-Z]+ \{$/.test(line)) {
+    if (/^DEF [a-zA-Z]+ \{$/i.test(line)) {
       in_definition = true;
       current_function = new ScriptFunction(
-        line.split("DEF ")[1].split("{")[0].trim(),
+        line.toLowerCase().split("def ")[1].split("{")[0].trim(),
         [],
         true
       );
@@ -202,7 +202,7 @@ const preprocess = function (file_lines: string[]): string[] {
         }
       }
       if (matching_function !== null) {
-        for (var function_line of script_function.internal_actions) {
+        for (var function_line of matching_function.internal_actions) {
           return_lines.push(function_line);
         }
       } else {
@@ -257,7 +257,7 @@ const parse_line = function (
       case "raw": {
         // turn off all others besides the ones included in brackets
         let included_keys = separate_brackets(parameter);
-        if (included_keys.map((x) => x.toLowerCase()) === ["none"]) {
+        if (included_keys.map((x) => x.toLowerCase()).join("_") === "none") {
           to_return.keys_on = [];
           to_return.keys_off = opposite_keys([]);
         } else if (included_keys.map((x) => x.toLowerCase()) === ["all"]) {
@@ -333,7 +333,9 @@ export const compile = function (
         next_update = update_frames[update_index].frame;
       }
     }
-    compiled += controller.print(i) + "\r\n";
+    let printed_line = controller.print(i);
+    if (/^[0-9]+ NONE 0\;0 0\;0$/i.test(printed_line) && i > 1) continue; // don't print empty lines, nx-TAS already ignores them
+    compiled += printed_line + "\r\n";
   }
   return compiled;
 };
