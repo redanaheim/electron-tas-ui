@@ -1,3 +1,7 @@
+interface ScriptFunctionExports {
+  functions: ScriptFunction[];
+  new_file_content: string[];
+}
 interface ParsedLine {
   frame: number;
   keys_on: string[];
@@ -6,6 +10,19 @@ interface ParsedLine {
   rstick_pos_polar: [number, number];
   lstick_changes: boolean;
   rstick_changes: boolean;
+}
+class ScriptFunction {
+  name: string;
+  internal_actions: string[];
+  active: boolean;
+  constructor(name: string, internal_actions: string[], active: boolean) {
+    this.name = name;
+    this.internal_actions = internal_actions;
+    this.active = active;
+  }
+  static de_init = function () {
+    return new ScriptFunction("", [], false);
+  };
 }
 class ControllerState {
   static valid_keys = [
@@ -131,6 +148,65 @@ const opposite_keys = function (raw: string[]): string[] {
   }
   return to_return;
 };
+const get_script_functions = function (
+  file_lines: string[]
+): ScriptFunctionExports {
+  // Loop through lines; find definition of functions and replace all instances of them
+  let in_definition = false;
+  let script_functions: ScriptFunction[] = [];
+  let current_function = new ScriptFunction("", [], false);
+  let new_file_content = [];
+  for (var line of file_lines) {
+    if (/^DEF [a-zA-Z]+ \{$/.test(line)) {
+      in_definition = true;
+      current_function = new ScriptFunction(
+        line.split("DEF ")[1].split("{")[0].trim(),
+        [],
+        true
+      );
+    } else if (/^\}$/.test(line) && in_definition) {
+      in_definition = false;
+      if (current_function.active) {
+        script_functions.push(current_function);
+        current_function = ScriptFunction.de_init();
+      }
+    } else if (in_definition === true && current_function.active) {
+      if (/^([0-9]+|\+) .+$/.test(line) === false) continue; // ignore invalid lines
+      current_function.internal_actions.push(line);
+    } else if ((in_definition || current_function.active) === false) {
+      new_file_content.push(line);
+    }
+  }
+  return { functions: script_functions, new_file_content: new_file_content };
+};
+const preprocess = function (file_lines: string[]): string[] {
+  let script_function_processed = get_script_functions(file_lines);
+  let script_functions = script_function_processed.functions;
+  let new_lines = script_function_processed.new_file_content;
+  let return_lines: string[] = [];
+
+  for (var line of new_lines) {
+    if (/^[a-zA-Z]+$/.test(line)) {
+      let matching_function: ScriptFunction | null = null;
+      for (var script_function of script_functions) {
+        if (script_function.name.toLowerCase() === line.toLowerCase()) {
+          matching_function = script_function;
+        }
+      }
+      if (matching_function !== null) {
+        for (var function_line of script_function.internal_actions) {
+          return_lines.push(function_line);
+        }
+      } else {
+        continue;
+      }
+    } else {
+      if (/^([0-9]+|\+) .+$/.test(line) === false) continue; // ignore invalid lines
+      return_lines.push(line);
+    }
+  }
+  return return_lines;
+};
 const parse_line = function (
   line: string,
   last_frame: number,
@@ -228,7 +304,7 @@ export const compile = function (
 ): string {
   let compiled = "";
   let controller = new ControllerState();
-  let file_lines = script.split("\n");
+  let file_lines = preprocess(script.split("\n"));
   let update_frames: ParsedLine[] = [];
   let current_frame = 1;
   for (var line of file_lines) {
