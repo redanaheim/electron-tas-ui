@@ -78,4 +78,23 @@ export class Store {
     }
     return res;
   }
+  async make(obj: InternalData): Promise<any> {
+    let data: InternalData;
+    try {
+      data = await this.data;
+    } catch (err) {
+      return err;
+    }
+    // Set each property from the object given
+    for (var i = 0; i < Object.keys(obj).length; i++) {
+      data[Object.keys(obj)[i]] = obj[Object.keys(obj)[i]];
+    }
+    let res: any;
+    try {
+      res = await write_file_async(this.path, JSON.stringify(data));
+    } catch (err) {
+      return err;
+    }
+    return res;
+  }
 }

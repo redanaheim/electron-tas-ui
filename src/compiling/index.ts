@@ -4,6 +4,17 @@ import { compile } from "../assets/compile";
 
 // import { basename } from "path";
 const { dialog, BrowserWindow } = require("electron").remote;
+export const on_init = async function (): Promise<void> {
+  // Set input values to ones from last time
+  let last_values = new Store("last_input_values", {
+    compiling_file_path: "",
+    compiling_save_path: "",
+    is_default: true,
+  });
+  let { compiling_file_path, compiling_save_path } = await last_values.data;
+  $("#file_path").val(compiling_file_path);
+  $("#save_path").val(compiling_save_path);
+};
 export const pick_file = async function (): Promise<string> {
   let path = (
     await dialog.showOpenDialog(BrowserWindow.getFocusedWindow(), {
@@ -29,6 +40,19 @@ export const compile_on_click = async function () {
   const this_window = BrowserWindow.getFocusedWindow();
   let save_path = $("#save_path").val().toString();
   let source_path = $("#file_path").val().toString();
+
+  // Store input values from this and use them as defaults next time
+  let last_values = new Store("last_input_values", {
+    compiling_file_path: "",
+    compiling_save_path: "",
+    is_default: true,
+  });
+  last_values.make({
+    compiling_file_path: source_path,
+    compiling_save_path: save_path,
+    is_default: false,
+  });
+
   if (existsSync(source_path) === false) {
     await dialog.showMessageBox(this_window, {
       message: "Invalid Source Path",

@@ -2,9 +2,26 @@ import { desktopCapturer } from "electron";
 import { IpAddress } from "../ftp";
 import { Store } from "../storing";
 import { fstat, existsSync } from "fs";
-import { basename } from "path";
+// import { basename } from "path";
 var path: any = null;
 const { dialog, BrowserWindow } = require("electron").remote;
+export const on_init = async function (): Promise<void> {
+  // Set input values to ones from last time
+  let last_values = new Store("last_input_values", {
+    exporting_source_path: "",
+    exporting_export_name: "",
+    exporting_switch_ip: "",
+    is_default: true,
+  });
+  let {
+    exporting_source_path,
+    exporting_export_name,
+    exporting_switch_ip,
+  } = await last_values.data;
+  $("#file_path").val(exporting_source_path);
+  $("#path_on_switch").val(exporting_export_name);
+  $("#switch_ip").val(exporting_switch_ip);
+};
 export const pick_file = async function (): Promise<string> {
   path = (
     await dialog.showOpenDialog(BrowserWindow.getFocusedWindow(), {
@@ -30,6 +47,19 @@ export const send_on_click = async function () {
   }
   let export_name = $("#path_on_switch").val().toString();
   let switch_ip = $("#switch_ip").val().toString();
+  // Store input values from this and use them as defaults next time
+  let last_values = new Store("last_input_values", {
+    exporting_source_path: "",
+    exporting_export_name: "",
+    exporting_switch_ip: "",
+    is_default: true,
+  });
+  last_values.make({
+    exporting_source_path: source_path,
+    exporting_export_name: export_name,
+    exporting_switch_ip: switch_ip,
+    is_default: false,
+  });
   send(source_path, export_name, switch_ip);
 };
 export const send = async function (
@@ -84,7 +114,7 @@ export const send = async function (
   }
   let result;
   try {
-    result = await switch_ip.send(path, export_name, 5000);
+    result = await switch_ip.send(source_path, export_name, 5000);
   } catch (err) {
     await dialog.showMessageBox(this_window, {
       title: "Error",

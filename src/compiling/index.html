@@ -10,8 +10,11 @@
     <script>window.$ = window.jQuery = require('../assets/jquery.min.js');</script>
     <script>
         let index = require("./index.js");
-        const { pick_file, pick_save_path, compile_on_click} = index;
+        const { pick_file, pick_save_path, compile_on_click, on_init } = index;
         require("../theme.js");
+        $(document).ready(() => {
+            on_init();
+        });
     </script>
   </head>
   <body>
