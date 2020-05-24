@@ -1,24 +1,26 @@
 import { IpAddress } from "../ftp";
-import { Store } from "../storing";
+import { read_file_async, write_file_async, Store } from "../storing";
+import { compile } from "../assets/compile";
 import { existsSync } from "fs";
+import { join } from "path";
 var path: any = null;
-const { dialog, BrowserWindow } = require("electron").remote;
+const { app, dialog, BrowserWindow } = require("electron").remote;
 export const on_init = async function (): Promise<void> {
   // Set input values to ones from last time
   let last_values = new Store("last_input_values", {
-    exporting_source_path: "",
-    exporting_export_name: "script1.txt",
-    exporting_switch_ip: "1.1.1.1",
+    compiling_exporting_source_path: "",
+    compiling_exporting_export_name: "script1.txt",
+    compiling_exporting_switch_ip: "1.1.1.1",
     is_default: true,
   });
   let {
-    exporting_source_path,
-    exporting_export_name,
-    exporting_switch_ip,
+    compiling_exporting_source_path,
+    compiling_exporting_export_name,
+    compiling_exporting_switch_ip,
   } = await last_values.data;
-  $("#file_path").val(exporting_source_path);
-  $("#path_on_switch").val(exporting_export_name);
-  $("#switch_ip").val(exporting_switch_ip);
+  $("#file_path").val(compiling_exporting_source_path);
+  $("#path_on_switch").val(compiling_exporting_export_name);
+  $("#switch_ip").val(compiling_exporting_switch_ip);
 };
 export const pick_file = async function (): Promise<string> {
   path = (
@@ -47,15 +49,15 @@ export const send_on_click = async function () {
   let switch_ip = $("#switch_ip").val().toString();
   // Store input values from this and use them as defaults next time
   let last_values = new Store("last_input_values", {
-    exporting_source_path: "",
-    exporting_export_name: "script1.txt",
-    exporting_switch_ip: "1.1.1.1",
+    compiling_exporting_source_path: "",
+    compiling_exporting_export_name: "script1.txt",
+    compiling_exporting_switch_ip: "1.1.1.1",
     is_default: true,
   });
   last_values.make({
-    exporting_source_path: source_path,
-    exporting_export_name: export_name,
-    exporting_switch_ip: switch_ip,
+    compiling_exporting_source_path: source_path,
+    compiling_exporting_export_name: export_name,
+    compiling_exporting_switch_ip: switch_ip,
     is_default: false,
   });
   send(source_path, export_name, switch_ip);
@@ -66,7 +68,6 @@ export const send = async function (
   ip_text: string
 ): Promise<void> {
   const this_window = BrowserWindow.getFocusedWindow();
-
   if (/^[0-9a-zA-Z.]+$/.test(export_name) === false) {
     await dialog.showMessageBox(this_window, {
       message: "Invalid Export Name",
@@ -109,6 +110,21 @@ export const send = async function (
       // User clicked cancel
       return;
     }
+  }
+  let file_content = (await read_file_async(source_path, "utf8")).toString();
+  // this is the path the compiled file will be stored to,
+  // and where we want to get the file from before exporting to switch
+  source_path = join(app.getPath("temp"), "compiled.txt");
+  try {
+    await write_file_async(source_path, compile(file_content));
+  } catch (err) {
+    await dialog.showMessageBox(this_window, {
+      title: "Error",
+      message: err.toString(),
+      type: "error",
+      buttons: ["OK"],
+    });
+    return;
   }
   let result;
   try {

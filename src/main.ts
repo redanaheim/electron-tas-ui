@@ -78,7 +78,24 @@ const create_compile_window = async () => {
   popup.loadFile(path.join(__dirname, "../src/compiling/index.html"));
 };
 
-const create_compile_export_window = async () => {};
+const create_compile_export_window = async () => {
+  let db = new Store("config", {
+    theme: "dark",
+    is_default: true,
+  });
+  let current = await db.get("theme");
+  const popup = new BrowserWindow({
+    height: 150,
+    width: 330,
+    resizable: process.platform === "darwin" ? false : true,
+    webPreferences: {
+      nodeIntegration: true,
+    },
+    backgroundColor: current === "dark" ? "#121212" : "#FFF",
+  });
+  popup.setMenuBarVisibility(false);
+  popup.loadFile(path.join(__dirname, "../src/compiling_to_switch/index.html"));
+};
 
 const toggle_theme = async () => {
   let db = new Store("config", {

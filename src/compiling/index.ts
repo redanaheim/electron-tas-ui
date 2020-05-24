@@ -1,7 +1,6 @@
 import { read_file_async, write_file_async, Store } from "../storing";
-import { fstat, existsSync } from "fs";
+import { existsSync } from "fs";
 import { compile } from "../assets/compile";
-
 // import { basename } from "path";
 const { dialog, BrowserWindow } = require("electron").remote;
 export const on_init = async function (): Promise<void> {
