@@ -1,3 +1,17 @@
+export class ScriptFunction {
+  name: string;
+  internal_actions: string[];
+  active: boolean;
+  constructor(name: string, internal_actions: string[], active: boolean) {
+    this.name = name;
+    this.internal_actions = internal_actions;
+    this.active = active;
+  }
+  static de_init = function () {
+    return new ScriptFunction("", [], false);
+  };
+}
+import { get_builtin } from "./compiling_builtins/builtin_names";
 interface ScriptFunctionExports {
   functions: ScriptFunction[];
   new_file_content: string[];
@@ -10,19 +24,6 @@ interface ParsedLine {
   rstick_pos_polar: [number, number];
   lstick_changes: boolean;
   rstick_changes: boolean;
-}
-class ScriptFunction {
-  name: string;
-  internal_actions: string[];
-  active: boolean;
-  constructor(name: string, internal_actions: string[], active: boolean) {
-    this.name = name;
-    this.internal_actions = internal_actions;
-    this.active = active;
-  }
-  static de_init = function () {
-    return new ScriptFunction("", [], false);
-  };
 }
 class ControllerState {
   static valid_keys = [
@@ -157,6 +158,12 @@ const get_script_functions = function (
   let current_function = new ScriptFunction("", [], false);
   let new_file_content = [];
   for (var line of file_lines) {
+    if (/^BUILTINS [a-zA-Z]+$/i.test(line)) {
+      // Get name of requested builtin and then add all of those functions to script_functions
+      script_functions = script_functions.concat(
+        get_builtin(line.trim().toLowerCase().split("builtins ")[1])
+      );
+    }
     if (/^DEF [a-zA-Z]+ \{$/.test(line)) {
       in_definition = true;
       current_function = new ScriptFunction(

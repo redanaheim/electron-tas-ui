@@ -4,6 +4,8 @@ From the `File` menu, you can compile a script from a better format to the forma
 
 ## First - Script use
 
+If a line doesn't fit the script format, it will be ignored by the compiler. This is a good way to use comments in your scripts.
+
 The first item of each line is the number of frames to wait from the last line. For the first line in the script, use `+`. If you don't understand, take a look at `example.txt`.
 
 You can include any number of parameters for each line, separated by spaces. Buttons will be pressed until they are released, and control sticks will stay in their positions until changed. These are the parameters you can choose from:
@@ -28,7 +30,11 @@ All keys from the normal nx-TAS scripts are allowed, plus `NONE` and `ALL`. You 
 
 ## Second - Script functions
 
-At any point in the script, you can define a function like this:
+You can include the built-in functions for a game like this: `BUILTINS SMO`.
+This will essentially work like you had added the functions yourself.
+The only current supported game is Super Mario Odyssey. (`BUILTINS SMO` or `BUILTINS supermariodyssey`)
+
+At any point in the script, you can also define a function like this:
 
 ```
 DEF CENTER_CAMERA {

@@ -1,11 +1,15 @@
 # electron-tas-ui
+
 User interface for editing, compiling, and exporting hamhub7/nx-TAS scripts for use on the Switch.
 
 ## Current State - 20% Complete
+
 Can't edit scripts in application. Pretty much the only thing you can do is compile and export them.
 
 ## TODO
+
 - **BETTER APPLICATION NAME**
+- Add in-app builtins function list
 - Add in-app text editing field
 - Add functional editing UI
 - Add compile & export functionality
