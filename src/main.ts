@@ -1,5 +1,6 @@
-import { app, BrowserWindow, Menu, MenuItem, shell } from "electron";
+import { app, BrowserWindow, Menu, MenuItem, shell, dialog } from "electron";
 import * as path from "path";
+import { readdir, unlink } from "fs";
 import { Store } from "./storing";
 
 if (require("electron-squirrel-startup")) {
@@ -115,8 +116,37 @@ const toggle_theme = async () => {
 };
 
 const open_backups = async () => {
-  let folder = path.join(app.getPath("userData") + "backups");
+  let folder = path.join(app.getPath("userData"), "backups");
   shell.openItem(folder);
+};
+
+const clear_backups = async () => {
+  let folder = path.join(app.getPath("userData"), "backups");
+  let response = await dialog.showMessageBox(null, {
+    title: "Confirm",
+    message: "Really delete all script backups? This cannot be undone.",
+    type: "warning",
+    buttons: ["Cancel", "Delete"],
+  });
+  if (response.response === 0) {
+    return false;
+  } else {
+    readdir(folder, (err, list) => {
+      if (err) throw err;
+
+      for (const backup of list) {
+        unlink(path.join(folder, backup), (err) => {
+          if (err) throw err;
+        });
+      }
+    });
+    dialog.showMessageBox({
+      title: "Success",
+      message: "All backups have been deleted.",
+      type: "info",
+      buttons: ["OK"],
+    });
+  }
 };
 
 app.on("ready", create_window);
@@ -160,6 +190,10 @@ let template: any = [
       {
         click: open_backups,
         label: "Open Script Backups",
+      },
+      {
+        click: clear_backups,
+        label: "Delete All Script Backups",
       },
     ],
   },
