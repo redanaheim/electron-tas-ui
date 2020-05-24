@@ -171,6 +171,7 @@ const get_script_functions = function (
         current_function = ScriptFunction.de_init();
       }
     } else if (in_definition === true && current_function.active) {
+      line = line.trim();
       if (/^([0-9]+|\+) .+$/.test(line) === false) continue; // ignore invalid lines
       current_function.internal_actions.push(line);
     } else if ((in_definition || current_function.active) === false) {
