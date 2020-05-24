@@ -20,10 +20,6 @@ You can include any number of parameters for each line, separated by spaces. But
 
 `RSTICK`: Works the same as `LSTICK` but for the right stick.
 
-### Example
-
-Read `example.txt` to see an example script. You can see the output from this code in `output.txt`.
-
 ### Valid keys
 
 All keys from the normal nx-TAS scripts are allowed, plus `NONE` and `ALL`. You cannot use these in the `RAW` parameter, however.
