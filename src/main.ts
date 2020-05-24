@@ -115,8 +115,8 @@ const toggle_theme = async () => {
 };
 
 const open_backups = async () => {
-  let path = app.getPath("userData") + "/backups/";
-  shell.openItem(path);
+  let folder = path.join(app.getPath("userData") + "backups");
+  shell.openItem(folder);
 };
 
 app.on("ready", create_window);

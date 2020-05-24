@@ -2,6 +2,7 @@ const Client = require("ftp");
 const fs = require("fs");
 const electron = require("electron");
 const ping = require("ping");
+import { join } from "path";
 const format_time = function (): string {
   let date = new Date();
   let weekday = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][
@@ -100,20 +101,24 @@ export class IpAddress {
             app_path = electron.remote.app.getPath("userData");
           }
           // Make sure backups directory exists
-          if (fs.existsSync(`${app_path}/backups/`) === false) {
-            fs.mkdirSync(`${app_path}/backups/`);
+          if (fs.existsSync(join(app_path, "backups")) === false) {
+            fs.mkdirSync(join(app_path, "backups"));
           }
           // Make file for backup
-          fs.writeFile(`${app_path}/backups/${backup_name}`, "", (err: any) => {
-            if (err) {
-              rej(err);
-              throw err;
+          fs.writeFile(
+            join(app_path, "backups", backup_name),
+            "",
+            (err: any) => {
+              if (err) {
+                rej(err);
+                throw err;
+              }
             }
-          });
+          );
           // Write old data from Switch to backup file
           try {
             data.pipe(
-              fs.createWriteStream(`${app_path}/backups/${backup_name}`)
+              fs.createWriteStream(join(app_path, "backups", backup_name))
             );
           } catch (err) {
             rej(err);
@@ -121,7 +126,7 @@ export class IpAddress {
           }
           data.once("close", () => {
             res({
-              path: `${app_path}/backups/${backup_name}`,
+              path: join(app_path, "backups", backup_name),
             });
             if (connection_ready === false) {
               client.end();
