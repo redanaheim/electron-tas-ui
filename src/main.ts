@@ -1,4 +1,12 @@
-import { app, BrowserWindow, Menu, MenuItem, shell, dialog } from "electron";
+import {
+  app,
+  BrowserWindow,
+  Menu,
+  MenuItem,
+  shell,
+  dialog,
+  nativeTheme,
+} from "electron";
 import * as path from "path";
 import { readdir, unlink } from "fs";
 import { Store } from "./storing";
@@ -115,6 +123,22 @@ const toggle_theme = async () => {
   });
 };
 
+const on_os_theme_update = async (is_dark: boolean) => {
+  let db = new Store("config", {
+    theme: "dark",
+    is_default: true,
+  });
+  if (is_dark === true) {
+    db.set("theme", "dark");
+  } else {
+    db.set("theme", "light");
+  }
+  // Change theme for all open windows
+  BrowserWindow.getAllWindows().forEach((win) => {
+    win.webContents.executeJavaScript("set_theme(document);");
+  });
+};
+
 const open_backups = async () => {
   let folder = path.join(app.getPath("userData"), "backups");
   shell.openItem(folder);
@@ -149,6 +173,8 @@ const clear_backups = async () => {
   }
 };
 
+// App events
+
 app.on("ready", create_window);
 
 app.on("window-all-closed", () => {
@@ -160,6 +186,8 @@ app.on("activate", () => {
     create_window();
   }
 });
+
+// Menu items
 
 let template: any = [
   {
@@ -241,3 +269,9 @@ if (process.platform === "darwin") {
 let menu = Menu.buildFromTemplate(template);
 
 Menu.setApplicationMenu(menu);
+
+// Theme change handling
+
+nativeTheme.on("updated", () => {
+  on_os_theme_update(nativeTheme.shouldUseDarkColors);
+});
