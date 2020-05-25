@@ -12,6 +12,5 @@ Can't edit scripts in application. Pretty much the only thing you can do is comp
 - Add in-app builtins function list
 - Add in-app text editing field
 - Add functional editing UI
-- Add compile & export functionality
 - Fix light mode look
 - Make windows look actually decent on Windows
