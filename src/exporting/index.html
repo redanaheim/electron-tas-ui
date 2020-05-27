@@ -11,7 +11,7 @@
     <script>
         let index = require("./index.js");
         const { pick_file, send, send_on_click, on_init } = index
-        require("../theme.js");
+        const { set_theme } = require("../theme.js");
         $(document).ready(() => {
             on_init();
         });

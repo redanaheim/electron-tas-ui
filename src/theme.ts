@@ -1,6 +1,6 @@
 import { Store } from "./storing";
-async function set_theme(doc: Document) {
-  let theme = await new Store("config", {
+export async function set_theme(doc: Document): Promise<void> {
+  const theme = await new Store("config", {
     theme: "dark",
     is_default: true,
   }).get("theme");
@@ -11,4 +11,3 @@ async function set_theme(doc: Document) {
   }
 }
 set_theme(document);
-window.set_theme = set_theme;

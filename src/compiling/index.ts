@@ -5,17 +5,17 @@ import { compile } from "../assets/compile";
 const { dialog, BrowserWindow } = require("electron").remote;
 export const on_init = async function (): Promise<void> {
   // Set input values to ones from last time
-  let last_values = new Store("last_input_values", {
+  const last_values = new Store("last_input_values", {
     compiling_file_path: "",
     compiling_save_path: "",
     is_default: true,
   });
-  let { compiling_file_path, compiling_save_path } = await last_values.data;
+  const { compiling_file_path, compiling_save_path } = await last_values.data;
   $("#file_path").val(compiling_file_path);
   $("#save_path").val(compiling_save_path);
 };
 export const pick_file = async function (): Promise<string> {
-  let path = (
+  const path = (
     await dialog.showOpenDialog(BrowserWindow.getFocusedWindow(), {
       properties: ["openFile"],
     })
@@ -24,7 +24,7 @@ export const pick_file = async function (): Promise<string> {
   return path;
 };
 export const pick_save_path = async function (): Promise<void> {
-  let save_path = await dialog.showSaveDialog(
+  const save_path = await dialog.showSaveDialog(
     BrowserWindow.getFocusedWindow(),
     {
       properties: ["createDirectory", "showOverwriteConfirmation"],
@@ -35,13 +35,13 @@ export const pick_save_path = async function (): Promise<void> {
   $("#save_path").val(save_path.filePath || "");
   return save_path;
 };
-export const compile_on_click = async function () {
+export const compile_on_click = async function (): Promise<void> {
   const this_window = BrowserWindow.getFocusedWindow();
-  let save_path = $("#save_path").val().toString();
-  let source_path = $("#file_path").val().toString();
+  const save_path = $("#save_path").val().toString();
+  const source_path = $("#file_path").val().toString();
 
   // Store input values from this and use them as defaults next time
-  let last_values = new Store("last_input_values", {
+  const last_values = new Store("last_input_values", {
     compiling_file_path: "",
     compiling_save_path: "",
     is_default: true,
@@ -61,7 +61,7 @@ export const compile_on_click = async function () {
     });
     return;
   }
-  let file_content = (await read_file_async(source_path, "utf8")).toString();
+  const file_content = (await read_file_async(source_path, "utf8")).toString();
   try {
     await write_file_async(save_path, compile(file_content));
   } catch (err) {
@@ -73,13 +73,13 @@ export const compile_on_click = async function () {
     });
     return;
   }
-  let show_dialog_selections = await new Store("dialogs", {
+  const show_dialog_selections = await new Store("dialogs", {
     show_compile_success: true,
     show_export_success: true,
     is_default: true,
   });
   if (await show_dialog_selections.get("show_compile_success")) {
-    let button = await dialog.showMessageBox(this_window, {
+    const button = await dialog.showMessageBox(this_window, {
       message: "Sucessfully saved compiled script.",
       type: "info",
       buttons: ["OK", "Do not show this again"],

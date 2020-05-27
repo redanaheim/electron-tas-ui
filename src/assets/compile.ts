@@ -7,7 +7,7 @@ export class ScriptFunction {
     this.internal_actions = internal_actions;
     this.active = active;
   }
-  static de_init = function () {
+  static de_init = function (): ScriptFunction {
     return new ScriptFunction("", [], false);
   };
 }
@@ -55,7 +55,7 @@ class ControllerState {
     this.pressed_keys = [];
   }
   print(frame: number): string {
-    let keys_string =
+    const keys_string =
       this.pressed_keys.length === 0 ? "NONE" : this.pressed_keys.join(";");
     return `${frame} ${keys_string} ${this.lstick_pos.join(
       ";"
@@ -63,19 +63,17 @@ class ControllerState {
   }
   update(script_line: ParsedLine, throw_errors?: boolean): void {
     this.frame = script_line.frame;
-    let pressed_keys = this.pressed_keys;
+    const pressed_keys = this.pressed_keys;
     if (throw_errors) {
-      for (var key of pressed_keys) {
+      for (const key of pressed_keys) {
         if (ControllerState.valid_keys.includes(key) === false) {
           throw new Error("Invalid key name: " + key);
         }
       }
     }
-    let lstick_pos: [number, number];
-    let rstick_pos: [number, number];
     let new_pressed_keys: string[] = [];
     // Handle keys that should be on for this frame
-    for (var i = 0; i < pressed_keys.length; i++) {
+    for (let i = 0; i < pressed_keys.length; i++) {
       if (
         script_line.keys_off.includes(pressed_keys[i]) === false &&
         ControllerState.valid_keys.includes(pressed_keys[i])
@@ -83,7 +81,7 @@ class ControllerState {
         new_pressed_keys.push(pressed_keys[i]);
       }
     }
-    for (var i = 0; i < script_line.keys_on.length; i++) {
+    for (let i = 0; i < script_line.keys_on.length; i++) {
       if (
         pressed_keys.includes(script_line.keys_on[i]) === false &&
         ControllerState.valid_keys.includes(script_line.keys_on[i])
@@ -98,8 +96,8 @@ class ControllerState {
     }
     this.pressed_keys = new_pressed_keys;
     // Handle control sticks
-    lstick_pos = make_stick_cartesian(script_line.lstick_pos_polar);
-    rstick_pos = make_stick_cartesian(script_line.rstick_pos_polar);
+    const lstick_pos = make_stick_cartesian(script_line.lstick_pos_polar);
+    const rstick_pos = make_stick_cartesian(script_line.rstick_pos_polar);
     if (script_line.lstick_changes === true) this.lstick_pos = lstick_pos;
     if (script_line.rstick_changes === true) this.rstick_pos = rstick_pos;
   }
@@ -132,7 +130,7 @@ const make_stick_cartesian = function (
   // angle from positive y axis and magnitude => cartesian coordinates
   // outside 32767 is illegal on controller
   if (polar_coords[1] > 32767) polar_coords[1] = 32767;
-  let angle = (polar_coords[0] * Math.PI) / 180;
+  const angle = (polar_coords[0] * Math.PI) / 180;
   return [
     Math.round(polar_coords[1] * Math.sin(angle)),
     Math.round(polar_coords[1] * Math.cos(angle)),
@@ -141,8 +139,8 @@ const make_stick_cartesian = function (
 const opposite_keys = function (raw: string[]): string[] {
   // invert keys: get every key except the ones passed to the "raw" argument
   const valid_keys = ControllerState.valid_keys;
-  let to_return: string[] = [];
-  for (var i = 0; i < 16; i++) {
+  const to_return: string[] = [];
+  for (let i = 0; i < 16; i++) {
     if (raw.includes(valid_keys[i]) === false) {
       to_return.push(valid_keys[i]);
     }
@@ -156,8 +154,8 @@ const get_script_functions = function (
   let in_definition = false;
   let script_functions: ScriptFunction[] = [];
   let current_function = new ScriptFunction("", [], false);
-  let new_file_content = [];
-  for (var line of file_lines) {
+  const new_file_content = [];
+  for (let line of file_lines) {
     if (/^BUILTINS [a-zA-Z]+$/i.test(line)) {
       // Get name of requested builtin and then add all of those functions to script_functions
       script_functions = script_functions.concat(
@@ -188,21 +186,21 @@ const get_script_functions = function (
   return { functions: script_functions, new_file_content: new_file_content };
 };
 const preprocess = function (file_lines: string[]): string[] {
-  let script_function_processed = get_script_functions(file_lines);
-  let script_functions = script_function_processed.functions;
-  let new_lines = script_function_processed.new_file_content;
-  let return_lines: string[] = [];
+  const script_function_processed = get_script_functions(file_lines);
+  const script_functions = script_function_processed.functions;
+  const new_lines = script_function_processed.new_file_content;
+  const return_lines: string[] = [];
 
-  for (var line of new_lines) {
+  for (const line of new_lines) {
     if (/^[a-zA-Z]+$/.test(line)) {
       let matching_function: ScriptFunction | null = null;
-      for (var script_function of script_functions) {
+      for (const script_function of script_functions) {
         if (script_function.name.toLowerCase() === line.toLowerCase()) {
           matching_function = script_function;
         }
       }
       if (matching_function !== null) {
-        for (var function_line of matching_function.internal_actions) {
+        for (const function_line of matching_function.internal_actions) {
           return_lines.push(function_line);
         }
       } else {
@@ -220,7 +218,7 @@ const parse_line = function (
   last_frame: number,
   throw_errors?: boolean
 ): ParsedLine {
-  let to_return: ParsedLine = {
+  const to_return: ParsedLine = {
     frame: 0,
     lstick_changes: false,
     rstick_changes: false,
@@ -229,7 +227,7 @@ const parse_line = function (
     lstick_pos_polar: [0, 0],
     rstick_pos_polar: [0, 0],
   };
-  let parameters = line.split(" ");
+  const parameters = line.split(" ");
   // script can be started with a '+' as the line number
   if (parameters[0] == "+" && last_frame === 1) {
     to_return.frame = 1;
@@ -242,9 +240,9 @@ const parse_line = function (
     to_return.frame = last_frame + 1;
   }
   parameters.shift();
-  for (var i = 0; i < parameters.length; i++) {
-    let parameter = parameters[i];
-    let keyword = parameter.split("{")[0];
+  for (let i = 0; i < parameters.length; i++) {
+    const parameter = parameters[i];
+    const keyword = parameter.split("{")[0];
     switch (keyword.toLowerCase()) {
       case "on": {
         to_return.keys_on = separate_brackets(parameter);
@@ -256,7 +254,7 @@ const parse_line = function (
       }
       case "raw": {
         // turn off all others besides the ones included in brackets
-        let included_keys = separate_brackets(parameter);
+        const included_keys = separate_brackets(parameter);
         if (included_keys.map((x) => x.toLowerCase()).join("_") === "none") {
           to_return.keys_on = [];
           to_return.keys_off = opposite_keys([]);
@@ -274,7 +272,7 @@ const parse_line = function (
         if (parameter.toLowerCase() === "lstick{dead}") {
           to_return.lstick_pos_polar = [0, 0];
         }
-        let lstick_pos = separate_brackets_stick(parameter);
+        const lstick_pos = separate_brackets_stick(parameter);
         if (lstick_pos.length > 2 && throw_errors)
           throw new Error(
             `Invalid parameter (too many stick values) - '${parameter}'`
@@ -288,7 +286,7 @@ const parse_line = function (
         if (parameter.toLowerCase() === "rstick{dead}") {
           to_return.rstick_pos_polar = [0, 0];
         }
-        let rstick_pos = separate_brackets_stick(parameter);
+        const rstick_pos = separate_brackets_stick(parameter);
         if (rstick_pos.length > 2 && throw_errors)
           throw new Error(
             `Invalid parameter (too many stick values) - '${parameter}'`
@@ -311,21 +309,21 @@ export const compile = function (
   throw_errors?: boolean
 ): string {
   let compiled = "";
-  let controller = new ControllerState();
-  let file_lines = preprocess(script.split("\n"));
-  let update_frames: ParsedLine[] = [];
+  const controller = new ControllerState();
+  const file_lines = preprocess(script.split("\n"));
+  const update_frames: ParsedLine[] = [];
   let current_frame = 1;
-  for (var line of file_lines) {
+  for (const line of file_lines) {
     if (/^([0-9]+|\+) .+$/.test(line) === false) continue; // no valid frame number found, ignore
-    let parsed_line = parse_line(line, current_frame, throw_errors || false);
+    const parsed_line = parse_line(line, current_frame, throw_errors || false);
     current_frame = parsed_line.frame;
     update_frames.push(parsed_line);
   }
-  let last_frame = update_frames[update_frames.length - 1].frame;
+  const last_frame = update_frames[update_frames.length - 1].frame;
   // We use this instead of shift()ing because shift is very inefficient
   let next_update = update_frames[0].frame;
   let update_index = 0;
-  for (var i = 1; i <= last_frame; i++) {
+  for (let i = 1; i <= last_frame; i++) {
     if (next_update === i) {
       controller.update(update_frames[update_index]);
       update_index++;
@@ -333,8 +331,8 @@ export const compile = function (
         next_update = update_frames[update_index].frame;
       }
     }
-    let printed_line = controller.print(i);
-    if (/^[0-9]+ NONE 0\;0 0\;0$/i.test(printed_line) && i > 1) continue; // don't print empty lines, nx-TAS already ignores them
+    const printed_line = controller.print(i);
+    if (/^[0-9]+ NONE 0;0 0;0$/i.test(printed_line) && i > 1) continue; // don't print empty lines, nx-TAS already ignores them
     compiled += printed_line + "\r\n";
   }
   return compiled;

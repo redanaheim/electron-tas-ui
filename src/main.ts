@@ -2,10 +2,10 @@ import {
   app,
   BrowserWindow,
   Menu,
-  MenuItem,
   shell,
   dialog,
   nativeTheme,
+  MenuItem,
 } from "electron";
 import * as path from "path";
 import { readdir, unlink } from "fs";
@@ -15,12 +15,12 @@ if (require("electron-squirrel-startup")) {
   app.quit();
 }
 
-const create_window = async () => {
-  let db = new Store("config", {
+const create_window = async (): Promise<void> => {
+  const db = new Store("config", {
     theme: "dark",
     is_default: true,
   });
-  let current = await db.get("theme");
+  const current = await db.get("theme");
   const main_window = new BrowserWindow({
     height: 600,
     width: 800,
@@ -32,12 +32,12 @@ const create_window = async () => {
   main_window.loadFile(path.join(__dirname, "../src/index.html"));
 };
 
-const create_editing_window = async () => {
-  let db = new Store("config", {
+const create_editing_window = async (): Promise<void> => {
+  const db = new Store("config", {
     theme: "dark",
     is_default: true,
   });
-  let current = await db.get("theme");
+  const current = await db.get("theme");
   const main_window = new BrowserWindow({
     height: 600,
     width: 800,
@@ -49,12 +49,12 @@ const create_editing_window = async () => {
   main_window.loadFile(path.join(__dirname, "../src/editing/index.html"));
 };
 
-const create_export_window = async () => {
-  let db = new Store("config", {
+const create_export_window = async (): Promise<void> => {
+  const db = new Store("config", {
     theme: "dark",
     is_default: true,
   });
-  let current = await db.get("theme");
+  const current = await db.get("theme");
   const popup = new BrowserWindow({
     height: 150,
     width: 330,
@@ -68,12 +68,12 @@ const create_export_window = async () => {
   popup.loadFile(path.join(__dirname, "../src/exporting/index.html"));
 };
 
-const create_compile_window = async () => {
-  let db = new Store("config", {
+const create_compile_window = async (): Promise<void> => {
+  const db = new Store("config", {
     theme: "dark",
     is_default: true,
   });
-  let current = await db.get("theme");
+  const current = await db.get("theme");
   const popup = new BrowserWindow({
     height: 125,
     width: 330,
@@ -87,12 +87,12 @@ const create_compile_window = async () => {
   popup.loadFile(path.join(__dirname, "../src/compiling/index.html"));
 };
 
-const create_compile_export_window = async () => {
-  let db = new Store("config", {
+const create_compile_export_window = async (): Promise<void> => {
+  const db = new Store("config", {
     theme: "dark",
     is_default: true,
   });
-  let current = await db.get("theme");
+  const current = await db.get("theme");
   const popup = new BrowserWindow({
     height: 150,
     width: 330,
@@ -106,12 +106,12 @@ const create_compile_export_window = async () => {
   popup.loadFile(path.join(__dirname, "../src/compiling_to_switch/index.html"));
 };
 
-const toggle_theme = async () => {
-  let db = new Store("config", {
+const toggle_theme = async (): Promise<void> => {
+  const db = new Store("config", {
     theme: "dark",
     is_default: true,
   });
-  let current = await db.get("theme");
+  const current = await db.get("theme");
   if (current === "light") {
     db.set("theme", "dark");
   } else {
@@ -123,8 +123,8 @@ const toggle_theme = async () => {
   });
 };
 
-const on_os_theme_update = async (is_dark: boolean) => {
-  let db = new Store("config", {
+const on_os_theme_update = async (is_dark: boolean): Promise<void> => {
+  const db = new Store("config", {
     theme: "dark",
     is_default: true,
   });
@@ -139,21 +139,21 @@ const on_os_theme_update = async (is_dark: boolean) => {
   });
 };
 
-const open_backups = async () => {
-  let folder = path.join(app.getPath("userData"), "backups");
+const open_backups = async (): Promise<void> => {
+  const folder = path.join(app.getPath("userData"), "backups");
   shell.openItem(folder);
 };
 
-const clear_backups = async () => {
-  let folder = path.join(app.getPath("userData"), "backups");
-  let response = await dialog.showMessageBox(null, {
+const clear_backups = async (): Promise<void> => {
+  const folder = path.join(app.getPath("userData"), "backups");
+  const response = await dialog.showMessageBox(null, {
     title: "Confirm",
     message: "Really delete all script backups? This cannot be undone.",
     type: "warning",
     buttons: ["Cancel", "Delete"],
   });
   if (response.response === 0) {
-    return false;
+    return;
   } else {
     readdir(folder, (err, list) => {
       if (err) throw err;
@@ -234,7 +234,11 @@ let template: any = [
       },
       { type: "separator" },
       {
-        click: (menu_item: any, browser_window: any, event: any) => {
+        click: (
+          menu_item: MenuItem,
+          browser_window: BrowserWindow,
+          _event: Event
+        ): void => {
           browser_window.webContents.openDevTools();
         },
         accelerator:
@@ -266,8 +270,7 @@ if (process.platform === "darwin") {
   ].concat(template);
 }
 
-let menu = Menu.buildFromTemplate(template);
-
+const menu = Menu.buildFromTemplate(template);
 Menu.setApplicationMenu(menu);
 
 // Theme change handling

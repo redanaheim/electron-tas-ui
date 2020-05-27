@@ -1,11 +1,14 @@
-const Client = require("ftp");
-const fs = require("fs");
-const electron = require("electron");
+/* eslint-disable @typescript-eslint/no-this-alias */
+/* eslint-disable no-async-promise-executor */
+import * as Client from "ftp";
+import { existsSync, mkdirSync, createWriteStream, writeFile } from "fs";
+import { app, remote } from "electron";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const ping = require("ping");
 import { join } from "path";
 const format_time = function (): string {
-  let date = new Date();
-  let weekday = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][
+  const date = new Date();
+  const weekday = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][
     date.getDay()
   ];
   return `${weekday} ${date.getHours()}꞉${date.getMinutes()}꞉${date.getSeconds()}`;
@@ -46,8 +49,8 @@ export class IpAddress {
       this.did_succeed = false;
     }
   }
-  is_valid(port?: number): Promise<boolean> {
-    return new Promise((res, rej) => {
+  is_valid(): Promise<boolean> {
+    return new Promise((res, _rej) => {
       ping.sys.probe(this.parts.join("."), (exists: boolean) => {
         res(exists);
         return;
@@ -65,10 +68,10 @@ export class IpAddress {
     target_path: string,
     backup_name: string,
     port: number,
-    connection?: any,
+    connection?: Client,
     connection_ready?: boolean
   ): Promise<PathTo<string>> {
-    let that = this;
+    const that = this;
     return new Promise(async (res, rej) => {
       if ((await that.is_valid()) === false) {
         rej(
@@ -82,43 +85,39 @@ export class IpAddress {
             " failed (target doesn't exist or is dead)."
         );
       }
+      let client: Client;
       if (connection) {
-        var client = connection;
+        client = connection;
       } else {
-        var client = new Client();
+        client = new Client();
       }
-      let on_ready = function () {
-        let result: PathTo<string>;
+      const on_ready = function (): void {
         client.get(target_path, (err: any, data: any) => {
           if (err) {
             rej(err);
             throw err;
           }
           let app_path: string;
-          if (electron.app) {
-            app_path = electron.app.getPath("userData");
+          if (app) {
+            app_path = app.getPath("userData");
           } else {
-            app_path = electron.remote.app.getPath("userData");
+            app_path = remote.app.getPath("userData");
           }
           // Make sure backups directory exists
-          if (fs.existsSync(join(app_path, "backups")) === false) {
-            fs.mkdirSync(join(app_path, "backups"));
+          if (existsSync(join(app_path, "backups")) === false) {
+            mkdirSync(join(app_path, "backups"));
           }
           // Make file for backup
-          fs.writeFile(
-            join(app_path, "backups", backup_name),
-            "",
-            (err: any) => {
-              if (err) {
-                rej(err);
-                throw err;
-              }
+          writeFile(join(app_path, "backups", backup_name), "", (err: any) => {
+            if (err) {
+              rej(err);
+              throw err;
             }
-          );
+          });
           // Write old data from Switch to backup file
           try {
             data.pipe(
-              fs.createWriteStream(join(app_path, "backups", backup_name))
+              createWriteStream(join(app_path, "backups", backup_name))
             );
           } catch (err) {
             rej(err);
@@ -153,10 +152,10 @@ export class IpAddress {
     directory: string,
     target: string,
     port: number,
-    connection?: any,
+    connection?: Client,
     connection_ready?: boolean
   ): Promise<boolean> {
-    let that = this;
+    const that = this;
     return new Promise(async (res, rej) => {
       if ((await that.is_valid()) === false) {
         rej(
@@ -170,13 +169,13 @@ export class IpAddress {
             " failed (target doesn't exist or is dead)."
         );
       }
+      let client: Client;
       if (connection) {
-        var client = connection;
+        client = connection;
       } else {
-        var client = new Client();
+        client = new Client();
       }
-      let on_ready = function () {
-        let result: Result;
+      const on_ready = function (): void {
         client.list(directory, (err: any, dir: any[]) => {
           if (err) {
             rej(err);
@@ -209,7 +208,7 @@ export class IpAddress {
     });
   }
   async send(source: string, target: string, port: number): Promise<Result> {
-    let that = this;
+    const that = this;
     return new Promise(async (res, rej) => {
       if ((await that.is_valid()) === false) {
         rej(
@@ -218,11 +217,11 @@ export class IpAddress {
             " failed (target doesn't exist or is dead)."
         );
       }
-      let connection = new Client();
-      let target_path = `/scripts/${target}`;
+      const connection = new Client();
+      const target_path = `/scripts/${target}`;
 
-      let on_ready = async function () {
-        let result = new Result(false, false, new IpAddress("0.0.0.0"), {
+      const on_ready = async function (): Promise<void> {
+        const result = new Result(false, false, new IpAddress("0.0.0.0"), {
           path: "null",
         });
         // See if file exists

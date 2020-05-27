@@ -1,14 +1,14 @@
 import { ScriptFunction } from "../compile";
-function repeat(script: any, reps: number) {
-  let buffer: any[] = [];
-  for (var i = 0; i < reps; i++) {
-    for (var line of script) {
+function repeat(script: any, reps: number): any[] {
+  const buffer: any[] = [];
+  for (let i = 0; i < reps; i++) {
+    for (const line of script) {
       buffer.push(line);
     }
   }
   return buffer;
 }
-let builtin_data = [
+const builtin_data = [
   {
     name: "CAPDIVE",
     internal_actions: ["1 ON{KEY_X}", "7 ON{KEY_ZL}", "1 ON{KEY_Y}"],
@@ -30,9 +30,9 @@ let builtin_data = [
     ),
   },
 ];
-const construct_builtins = function () {
-  let queue: ScriptFunction[] = [];
-  for (var script of builtin_data) {
+const construct_builtins = function (): ScriptFunction[] {
+  const queue: ScriptFunction[] = [];
+  for (const script of builtin_data) {
     queue.push(new ScriptFunction(script.name, script.internal_actions, false));
   }
   return queue;

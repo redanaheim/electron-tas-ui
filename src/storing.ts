@@ -1,6 +1,6 @@
-const electron = require("electron");
-const fs = require("fs");
-const filepath = require("path");
+import { app, remote } from "electron";
+import { readFile, writeFile } from "fs";
+import { join } from "path";
 
 interface InternalData {
   [key: string]: any;
@@ -12,7 +12,7 @@ export const read_file_async = async function (
   encoding: string
 ): Promise<string | Buffer> {
   return new Promise((res, rej) => {
-    fs.readFile(path, encoding, (err: any, data: any) => {
+    readFile(path, encoding, (err: any, data: any) => {
       if (err) rej(err);
       else res(data);
     });
@@ -23,7 +23,7 @@ export const write_file_async = async function (
   data: string
 ): Promise<any> {
   return new Promise((res, rej) => {
-    fs.writeFile(path, data, (err: any) => {
+    writeFile(path, data, (err: any) => {
       if (err) rej(err);
       else res(true);
     });
@@ -50,12 +50,12 @@ export class Store {
   path: string;
   data: Promise<InternalData>;
   constructor(filename: string, defaults: InternalData) {
-    if (electron.app) {
-      let storing_path = electron.app.getPath("userData");
-      this.path = filepath.join(storing_path, filename + ".json");
+    if (app) {
+      const storing_path = app.getPath("userData");
+      this.path = join(storing_path, filename + ".json");
     } else {
-      let storing_path = electron.remote.app.getPath("userData");
-      this.path = filepath.join(storing_path, filename + ".json");
+      const storing_path = remote.app.getPath("userData");
+      this.path = join(storing_path, filename + ".json");
     }
     this.data = get_data(this.path, defaults);
   }
@@ -86,7 +86,7 @@ export class Store {
       return err;
     }
     // Set each property from the object given
-    for (var i = 0; i < Object.keys(obj).length; i++) {
+    for (let i = 0; i < Object.keys(obj).length; i++) {
       data[Object.keys(obj)[i]] = obj[Object.keys(obj)[i]];
     }
     let res: any;
