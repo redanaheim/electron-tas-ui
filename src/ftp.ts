@@ -78,11 +78,6 @@ export class IpAddress {
             that.parts.join(".") +
             " failed (target doesn't exist or is dead)."
         );
-        throw new Error(
-          "Ping IP address " +
-            that.parts.join(".") +
-            " failed (target doesn't exist or is dead)."
-        );
       }
       let client: Client;
       if (connection) {

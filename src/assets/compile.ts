@@ -25,6 +25,29 @@ interface ParsedLine {
   lstick_changes: boolean;
   rstick_changes: boolean;
 }
+const make_stick_cartesian = function (
+  polar_coords: [number, number]
+): [number, number] {
+  // [90, 100] => (100, 0)
+  // angle from positive y axis and magnitude => cartesian coordinates
+  // outside 32767 is illegal on controller
+  if (polar_coords[1] > 32767) polar_coords[1] = 32767;
+  const angle = (polar_coords[0] * Math.PI) / 180;
+  return [
+    Math.round(polar_coords[1] * Math.sin(angle)),
+    Math.round(polar_coords[1] * Math.cos(angle)),
+  ];
+};
+const opposite_keys = function (raw: string[], valid_keys: string[]): string[] {
+  // invert keys: get every key except the ones passed to the "raw" argument
+  const to_return: string[] = [];
+  for (let i = 0; i < 16; i++) {
+    if (raw.includes(valid_keys[i]) === false) {
+      to_return.push(valid_keys[i]);
+    }
+  }
+  return to_return;
+};
 class ControllerState {
   static valid_keys = [
     "KEY_A",
@@ -90,7 +113,7 @@ class ControllerState {
       }
     }
     if (script_line.keys_on.includes("ALL")) {
-      new_pressed_keys = opposite_keys([]);
+      new_pressed_keys = opposite_keys([], ControllerState.valid_keys);
     } else if (script_line.keys_off.includes("ALL")) {
       new_pressed_keys = [];
     }
@@ -122,30 +145,6 @@ const separate_brackets_stick = function (parameter: any): [number, number] {
     .split(",")
     .slice(0, 2)
     .map((x: string) => Number(x));
-};
-const make_stick_cartesian = function (
-  polar_coords: [number, number]
-): [number, number] {
-  // [90, 100] => (100, 0)
-  // angle from positive y axis and magnitude => cartesian coordinates
-  // outside 32767 is illegal on controller
-  if (polar_coords[1] > 32767) polar_coords[1] = 32767;
-  const angle = (polar_coords[0] * Math.PI) / 180;
-  return [
-    Math.round(polar_coords[1] * Math.sin(angle)),
-    Math.round(polar_coords[1] * Math.cos(angle)),
-  ];
-};
-const opposite_keys = function (raw: string[]): string[] {
-  // invert keys: get every key except the ones passed to the "raw" argument
-  const valid_keys = ControllerState.valid_keys;
-  const to_return: string[] = [];
-  for (let i = 0; i < 16; i++) {
-    if (raw.includes(valid_keys[i]) === false) {
-      to_return.push(valid_keys[i]);
-    }
-  }
-  return to_return;
 };
 const get_script_functions = function (
   file_lines: string[]
@@ -257,13 +256,16 @@ const parse_line = function (
         const included_keys = separate_brackets(parameter);
         if (included_keys.map((x) => x.toLowerCase()).join("_") === "none") {
           to_return.keys_on = [];
-          to_return.keys_off = opposite_keys([]);
+          to_return.keys_off = opposite_keys([], ControllerState.valid_keys);
         } else if (included_keys.map((x) => x.toLowerCase()) === ["all"]) {
-          to_return.keys_on = opposite_keys([]);
+          to_return.keys_on = opposite_keys([], ControllerState.valid_keys);
           to_return.keys_off = [];
         } else {
           to_return.keys_on = separate_brackets(parameter);
-          to_return.keys_off = opposite_keys(separate_brackets(parameter));
+          to_return.keys_off = opposite_keys(
+            separate_brackets(parameter),
+            ControllerState.valid_keys
+          );
         }
         break;
       }
