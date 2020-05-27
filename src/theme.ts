@@ -1,4 +1,8 @@
 import { Store } from "./storing";
+/**
+ * Retrieves the theme from app_dir/config.json, then updates the `body` class to match.
+ * @param doc Document object for the window
+ */
 export async function set_theme(doc: Document): Promise<void> {
   const theme = await new Store("config", {
     theme: "dark",

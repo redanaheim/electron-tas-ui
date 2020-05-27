@@ -34,6 +34,9 @@ class Result {
   }
 }
 export class IpAddress {
+  /**
+   * Regular expression to check if a string is a valid dotted-decimal notation IPv4 address
+   */
   static regex = /^((([0-2][0-5]?[0-5]?|[0-1][0-9]?[0-9]?)|[0-9][0-9])|[0-9])\.((([0-2][0-5]?[0-5]?|[0-1][0-9]?[0-9]?)|[0-9][0-9])|[0-9])\.((([0-2][0-5]?[0-5]?|[0-1][0-9]?[0-9]?)|[0-9][0-9])|[0-9])\.((([0-2][0-5]?[0-5]?|[0-1][0-9]?[0-9]?)|[0-9][0-9])|[0-9])$/;
   parts: number[];
   did_succeed: boolean;
@@ -48,6 +51,9 @@ export class IpAddress {
       this.did_succeed = false;
     }
   }
+  /**
+   * Checks if the IP address the instance points to is alive.
+   */
   is_valid(): Promise<boolean> {
     return new Promise((res, _rej) => {
       sys.probe(this.parts.join("."), (exists: boolean) => {
@@ -57,12 +63,24 @@ export class IpAddress {
       return false;
     });
   }
+  /**
+   * Gets the connections object to pass to FTP module.
+   * @param port Optional port number, default is 5000 which almost always works for Switches.
+   */
   get_connnect_obj(port?: number): any {
     return {
       host: this.parts.join("."),
       port: port || 5000,
     };
   }
+  /**
+   * Backs up a file to local folder
+   * @param target_path Path to file on client to back up
+   * @param backup_name Filename of the backup, which will be located in app_folder/backups/
+   * @param port Port number to connect to with FTP
+   * @param connection Optional already-open connection object to use
+   * @param connection_ready Optional: is the passed connection object already open?
+   */
   async backup(
     target_path: string,
     backup_name: string,
@@ -138,6 +156,14 @@ export class IpAddress {
       }
     });
   }
+  /**
+   * Check if a file already exists on the client
+   * @param directory Path to the folder the file would be in
+   * @param target Filename to check
+   * @param port Port number to connect to with FTP
+   * @param connection Optional already-open connection object to use
+   * @param connection_ready Optional: is the passed connection object already open?
+   */
   async exists(
     directory: string,
     target: string,
@@ -190,6 +216,12 @@ export class IpAddress {
       }
     });
   }
+  /**
+   * Uploads a local script to the client and replaces it if it already exists
+   * @param source Path to the local file
+   * @param target Filename to upload as (will be in the /scripts/ folder)
+   * @param port Port number to connect to with FTP
+   */
   async send(source: string, target: string, port: number): Promise<Result> {
     const that = this;
     return new Promise(async (res, rej) => {
