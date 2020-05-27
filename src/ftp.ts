@@ -95,7 +95,6 @@ export class IpAddress {
         client.get(target_path, (err: any, data: any) => {
           if (err) {
             rej(err);
-            throw err;
           }
           let app_path: string;
           if (app) {
@@ -111,7 +110,6 @@ export class IpAddress {
           writeFile(join(app_path, "backups", backup_name), "", (err: any) => {
             if (err) {
               rej(err);
-              throw err;
             }
           });
           // Write old data from Switch to backup file
@@ -121,7 +119,6 @@ export class IpAddress {
             );
           } catch (err) {
             rej(err);
-            throw err;
           }
           data.once("close", () => {
             res({
@@ -143,7 +140,6 @@ export class IpAddress {
           client.connect(this.get_connnect_obj(port));
         } catch (err) {
           rej(err);
-          throw err;
         }
       }
     });
@@ -163,11 +159,6 @@ export class IpAddress {
             that.parts.join(".") +
             " failed (target doesn't exist or is dead)."
         );
-        throw new Error(
-          "Ping IP address " +
-            that.parts.join(".") +
-            " failed (target doesn't exist or is dead)."
-        );
       }
       let client: Client;
       if (connection) {
@@ -180,7 +171,6 @@ export class IpAddress {
           if (err) {
             rej(err);
             client.end();
-            throw err;
           }
           let exists = false;
           dir.forEach((item: any) => {
@@ -202,7 +192,6 @@ export class IpAddress {
           client.connect(this.get_connnect_obj(port));
         } catch (err) {
           rej(err);
-          throw err;
         }
       }
     });
@@ -235,7 +224,6 @@ export class IpAddress {
           );
         } catch (err) {
           rej(err);
-          throw err;
         }
         if (result.did_replace) {
           try {
@@ -248,7 +236,6 @@ export class IpAddress {
             );
           } catch (err) {
             rej(err);
-            throw err;
           }
         }
         // Backup file we will replace
@@ -268,7 +255,6 @@ export class IpAddress {
         connection.connect(that.get_connnect_obj(5000));
       } catch (err) {
         rej(err);
-        throw err;
       }
     });
   }
