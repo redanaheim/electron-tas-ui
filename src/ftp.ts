@@ -3,8 +3,7 @@
 import * as Client from "ftp";
 import { existsSync, mkdirSync, createWriteStream, writeFile } from "fs";
 import { app, remote } from "electron";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const ping = require("ping");
+import { sys } from "ping";
 import { join } from "path";
 const format_time = function (): string {
   const date = new Date();
@@ -51,7 +50,7 @@ export class IpAddress {
   }
   is_valid(): Promise<boolean> {
     return new Promise((res, _rej) => {
-      ping.sys.probe(this.parts.join("."), (exists: boolean) => {
+      sys.probe(this.parts.join("."), (exists: boolean) => {
         res(exists);
         return;
       });
