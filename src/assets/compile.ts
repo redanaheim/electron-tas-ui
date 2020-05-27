@@ -311,6 +311,10 @@ export const compile = function (
   let compiled = "";
   const controller = new ControllerState();
   const file_lines = preprocess(script.split("\n"));
+  if (file_lines.length === 0) {
+    if (throw_errors) throw new Error("No valid lines were found.");
+    return script;
+  }
   const update_frames: ParsedLine[] = [];
   let current_frame = 1;
   for (const line of file_lines) {
@@ -318,6 +322,10 @@ export const compile = function (
     const parsed_line = parse_line(line, current_frame, throw_errors || false);
     current_frame = parsed_line.frame;
     update_frames.push(parsed_line);
+  }
+  if (update_frames.length === 0) {
+    if (throw_errors) throw new Error("No valid lines were found.");
+    return script;
   }
   const last_frame = update_frames[update_frames.length - 1].frame;
   // We use this instead of shift()ing because shift is very inefficient

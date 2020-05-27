@@ -63,6 +63,7 @@ export const send = async function (
   try {
     is_replacing = await switch_ip.exists("/scripts/", export_name, 5000);
   } catch (err) {
+    console.error(err);
     await dialog.showMessageBox(this_window, {
       title: "Error",
       message: err.toString(),
@@ -89,6 +90,7 @@ export const send = async function (
   try {
     await write_file_async(source_path, compile(file_content));
   } catch (err) {
+    console.error(err);
     await dialog.showMessageBox(this_window, {
       title: "Error",
       message: err.toString(),
@@ -101,6 +103,7 @@ export const send = async function (
   try {
     result = await switch_ip.send(source_path, export_name, 5000);
   } catch (err) {
+    console.error(err);
     await dialog.showMessageBox(this_window, {
       title: "Error",
       message: err.toString(),

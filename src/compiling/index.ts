@@ -65,6 +65,7 @@ export const compile_on_click = async function (): Promise<void> {
   try {
     await write_file_async(save_path, compile(file_content));
   } catch (err) {
+    console.error(err);
     await dialog.showMessageBox(this_window, {
       title: "Error",
       message: err.toString(),
