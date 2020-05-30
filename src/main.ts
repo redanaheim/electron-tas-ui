@@ -15,6 +15,7 @@ if (require("electron-squirrel-startup")) {
   app.quit();
 }
 
+// TODO: Fix window size on windows
 const create_window = async (): Promise<void> => {
   const db = new Store("config", {
     theme: "dark",
@@ -188,7 +189,7 @@ app.on("activate", () => {
 });
 
 // Menu items
-
+// TODO: Add in-app builtins function list
 let template: any = [
   {
     label: "File",

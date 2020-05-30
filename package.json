@@ -25,6 +25,9 @@
     "win": {
       "icon": "build/icon.png",
       "target": "portable"
+    },
+    "linux": {
+      "icon": "build/icon.png"
     }
   },
   "license": "MIT",

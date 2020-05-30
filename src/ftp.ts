@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 /* eslint-disable no-async-promise-executor */
+// TODO: Don't use async promise executors
 import * as Client from "ftp";
 import { existsSync, mkdirSync, createWriteStream, writeFile } from "fs";
 import { app, remote } from "electron";
@@ -78,7 +79,7 @@ export class IpAddress {
    * @param target_path Path to file on client to back up
    * @param backup_name Filename of the backup, which will be located in app_folder/backups/
    * @param port Port number to connect to with FTP
-   * @param connection Optional already-open connection object to use
+   * @param connection Optional connection object to use
    * @param connection_ready Optional: is the passed connection object already open?
    */
   async backup(
@@ -92,9 +93,9 @@ export class IpAddress {
     return new Promise(async (res, rej) => {
       if ((await that.is_valid()) === false) {
         rej(
-          "Ping IP address " +
-            that.parts.join(".") +
-            " failed (target doesn't exist or is dead)."
+          `Ping IP address ${that.parts.join(
+            "."
+          )} failed (target doesn't exist or is dead).`
         );
       }
       let client: Client;
@@ -227,9 +228,9 @@ export class IpAddress {
     return new Promise(async (res, rej) => {
       if ((await that.is_valid()) === false) {
         rej(
-          "Ping IP address " +
-            that.parts.join(".") +
-            " failed (target doesn't exist or is dead)."
+          `Ping IP address ${that.parts.join(
+            "."
+          )} failed (target doesn't exist or is dead).`
         );
       }
       const connection = new Client();
