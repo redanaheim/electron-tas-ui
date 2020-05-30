@@ -55,7 +55,11 @@ export async function create_menu(): Promise<Menu> {
               },
               label: "Show Compiler Errors",
               type: "checkbox",
-              checked: await Store.value_of("dialogs", "show_compiler_errors"),
+              checked: await Store.value_of(
+                "dialogs",
+                "show_compiler_errors",
+                store_defaults.dialogs
+              ),
             },
             {
               click: (
@@ -69,7 +73,11 @@ export async function create_menu(): Promise<Menu> {
               },
               label: "Show Compile Success",
               type: "checkbox",
-              checked: await Store.value_of("dialogs", "show_compile_success"),
+              checked: await Store.value_of(
+                "dialogs",
+                "show_compile_success",
+                store_defaults.dialogs
+              ),
             },
           ],
         },
@@ -88,7 +96,11 @@ export async function create_menu(): Promise<Menu> {
               },
               label: "Show Export Success",
               type: "checkbox",
-              checked: await Store.value_of("dialogs", "show_export_success"),
+              checked: await Store.value_of(
+                "dialogs",
+                "show_export_success",
+                store_defaults.dialogs
+              ),
             },
           ],
         },
