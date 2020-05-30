@@ -85,15 +85,19 @@ class ControllerState {
     )} ${this.rstick_pos.join(";")}`;
   }
   update(script_line: ParsedLine, throw_errors?: boolean): void {
-    this.frame = script_line.frame;
-    const pressed_keys = this.pressed_keys;
     if (throw_errors) {
-      for (const key of pressed_keys) {
-        if (ControllerState.valid_keys.includes(key) === false) {
+      for (const key of script_line.keys_on.concat(script_line.keys_off)) {
+        if (
+          ControllerState.valid_keys
+            .concat(["ALL", "NONE"])
+            .includes(key.toUpperCase()) === false
+        ) {
           throw new Error("Invalid key name: " + key);
         }
       }
     }
+    this.frame = script_line.frame;
+    const pressed_keys = this.pressed_keys;
     let new_pressed_keys: string[] = [];
     // Handle keys that should be on for this frame
     for (let i = 0; i < pressed_keys.length; i++) {
@@ -314,7 +318,9 @@ export const compile = function (
   const controller = new ControllerState();
   const file_lines = preprocess(script.split("\n"));
   if (file_lines.length === 0) {
-    if (throw_errors) throw new Error("No valid lines were found.");
+    if (throw_errors) {
+      throw new Error("No valid lines were found.");
+    }
     return script;
   }
   const update_frames: ParsedLine[] = [];
@@ -335,7 +341,7 @@ export const compile = function (
   let update_index = 0;
   for (let i = 1; i <= last_frame; i++) {
     if (next_update === i) {
-      controller.update(update_frames[update_index]);
+      controller.update(update_frames[update_index], throw_errors || false);
       update_index++;
       if (update_index < update_frames.length) {
         next_update = update_frames[update_index].frame;

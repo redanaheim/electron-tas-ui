@@ -1,15 +1,19 @@
-import { read_file_async, write_file_async, Store } from "../storing";
+import {
+  read_file_async,
+  write_file_async,
+  Store,
+  store_defaults,
+} from "../storing";
 import { existsSync } from "fs";
 import { compile } from "../assets/compile";
 // import { basename } from "path";
 const { dialog, BrowserWindow } = require("electron").remote;
 export const on_init = async function (): Promise<void> {
   // Set input values to ones from last time
-  const last_values = new Store("last_input_values", {
-    compiling_file_path: "",
-    compiling_save_path: "",
-    is_default: true,
-  });
+  const last_values = new Store(
+    "last_input_values",
+    store_defaults.last_input_values
+  );
   const { compiling_file_path, compiling_save_path } = await last_values.data;
   $("#file_path").val(compiling_file_path);
   $("#save_path").val(compiling_save_path);
@@ -41,11 +45,10 @@ export const compile_on_click = async function (): Promise<void> {
   const source_path = $("#file_path").val().toString();
 
   // Store input values from this and use them as defaults next time
-  const last_values = new Store("last_input_values", {
-    compiling_file_path: "",
-    compiling_save_path: "",
-    is_default: true,
-  });
+  const last_values = new Store(
+    "last_input_values",
+    store_defaults.last_input_values
+  );
   last_values.make({
     compiling_file_path: source_path,
     compiling_save_path: save_path,
@@ -63,7 +66,17 @@ export const compile_on_click = async function (): Promise<void> {
   }
   const file_content = (await read_file_async(source_path, "utf8")).toString();
   try {
-    await write_file_async(save_path, compile(file_content));
+    await write_file_async(
+      save_path,
+      compile(
+        file_content,
+        await Store.value_of(
+          "dialogs",
+          "show_compiler_errors",
+          store_defaults.dialogs
+        )
+      )
+    );
   } catch (err) {
     console.error(err);
     await dialog.showMessageBox(this_window, {
@@ -74,11 +87,10 @@ export const compile_on_click = async function (): Promise<void> {
     });
     return;
   }
-  const show_dialog_selections = await new Store("dialogs", {
-    show_compile_success: true,
-    show_export_success: true,
-    is_default: true,
-  });
+  const show_dialog_selections = await new Store(
+    "dialogs",
+    store_defaults.dialogs
+  );
   if (await show_dialog_selections.get("show_compile_success")) {
     const button = await dialog.showMessageBox(this_window, {
       message: "Sucessfully saved compiled script.",

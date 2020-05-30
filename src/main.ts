@@ -1,15 +1,7 @@
-import {
-  app,
-  BrowserWindow,
-  Menu,
-  shell,
-  dialog,
-  nativeTheme,
-  MenuItem,
-} from "electron";
+import { app, BrowserWindow, Menu, shell, dialog, nativeTheme } from "electron";
 import * as path from "path";
 import { readdir, unlink } from "fs";
-import { Store } from "./storing";
+import { Store, store_defaults } from "./storing";
 
 if (require("electron-squirrel-startup")) {
   app.quit();
@@ -17,11 +9,11 @@ if (require("electron-squirrel-startup")) {
 
 // TODO: Fix window size on windows
 const create_window = async (): Promise<void> => {
-  const db = new Store("config", {
-    theme: "dark",
-    is_default: true,
-  });
-  const current = await db.get("theme");
+  const current = await Store.value_of(
+    "config",
+    "theme",
+    store_defaults.config
+  );
   const main_window = new BrowserWindow({
     height: 600,
     width: 800,
@@ -34,11 +26,11 @@ const create_window = async (): Promise<void> => {
 };
 
 const create_editing_window = async (): Promise<void> => {
-  const db = new Store("config", {
-    theme: "dark",
-    is_default: true,
-  });
-  const current = await db.get("theme");
+  const current = await Store.value_of(
+    "config",
+    "theme",
+    store_defaults.config
+  );
   const main_window = new BrowserWindow({
     height: 600,
     width: 800,
@@ -51,11 +43,11 @@ const create_editing_window = async (): Promise<void> => {
 };
 
 const create_export_window = async (): Promise<void> => {
-  const db = new Store("config", {
-    theme: "dark",
-    is_default: true,
-  });
-  const current = await db.get("theme");
+  const current = await Store.value_of(
+    "config",
+    "theme",
+    store_defaults.config
+  );
   const popup = new BrowserWindow({
     height: 150,
     width: 330,
@@ -70,11 +62,11 @@ const create_export_window = async (): Promise<void> => {
 };
 
 const create_compile_window = async (): Promise<void> => {
-  const db = new Store("config", {
-    theme: "dark",
-    is_default: true,
-  });
-  const current = await db.get("theme");
+  const current = await Store.value_of(
+    "config",
+    "theme",
+    store_defaults.config
+  );
   const popup = new BrowserWindow({
     height: 125,
     width: 330,
@@ -89,11 +81,11 @@ const create_compile_window = async (): Promise<void> => {
 };
 
 const create_compile_export_window = async (): Promise<void> => {
-  const db = new Store("config", {
-    theme: "dark",
-    is_default: true,
-  });
-  const current = await db.get("theme");
+  const current = await Store.value_of(
+    "config",
+    "theme",
+    store_defaults.config
+  );
   const popup = new BrowserWindow({
     height: 150,
     width: 330,
@@ -108,10 +100,7 @@ const create_compile_export_window = async (): Promise<void> => {
 };
 
 const toggle_theme = async (): Promise<void> => {
-  const db = new Store("config", {
-    theme: "dark",
-    is_default: true,
-  });
+  const db = new Store("config", store_defaults.config);
   const current = await db.get("theme");
   if (current === "light") {
     db.set("theme", "dark");
@@ -125,10 +114,7 @@ const toggle_theme = async (): Promise<void> => {
 };
 
 const on_os_theme_update = async (is_dark: boolean): Promise<void> => {
-  const db = new Store("config", {
-    theme: "dark",
-    is_default: true,
-  });
+  const db = new Store("config", store_defaults.config);
   if (is_dark === true) {
     db.set("theme", "dark");
   } else {
@@ -174,6 +160,36 @@ const clear_backups = async (): Promise<void> => {
   }
 };
 
+const show_compiler_errors = async function (do_show: boolean): Promise<void> {
+  const show_dialog_selections = await new Store(
+    "dialogs",
+    store_defaults.dialogs
+  );
+  try {
+    await show_dialog_selections.set("show_compiler_errors", do_show);
+  } catch (err) {
+    console.error(err);
+    await dialog.showMessageBox(null, {
+      title: "Error",
+      message: err.toString(),
+      type: "error",
+      buttons: ["OK"],
+    });
+  }
+};
+
+// Export menu click events
+export const menu_click_handlers = {
+  create_editing_window: create_editing_window,
+  create_export_window: create_export_window,
+  create_compile_window: create_compile_window,
+  show_compiler_errors: show_compiler_errors,
+  create_compile_export_window: create_compile_export_window,
+  open_backups: open_backups,
+  clear_backups: clear_backups,
+  toggle_theme: toggle_theme,
+};
+
 // App events
 
 app.on("ready", create_window);
@@ -189,90 +205,10 @@ app.on("activate", () => {
 });
 
 // Menu items
-// TODO: Add in-app builtins function list
-let template: any = [
-  {
-    label: "File",
-    submenu: [
-      {
-        click: create_editing_window,
-        accelerator: "CmdOrCtrl+E",
-        label: "New Script",
-      },
-      {
-        click: create_export_window,
-        accelerator: "CmdOrCtrl+Shift+E",
-        label: "Export Existing Script",
-      },
-      { type: "separator" },
-      {
-        click: create_compile_window,
-        accelerator: "CmdOrCtrl+M",
-        label: "Compile Script",
-      },
-      {
-        click: create_compile_export_window,
-        accelerator: "CmdOrCtrl+Shift+M",
-        label: "Compile and Export Script",
-      },
-      { type: "separator" },
-      {
-        click: open_backups,
-        label: "Open Script Backups",
-      },
-      {
-        click: clear_backups,
-        label: "Delete All Script Backups",
-      },
-    ],
-  },
-  {
-    label: "View",
-    submenu: [
-      {
-        click: toggle_theme,
-        label: "Toggle Theme",
-      },
-      { type: "separator" },
-      {
-        click: (
-          menu_item: MenuItem,
-          browser_window: BrowserWindow,
-          _event: Event
-        ): void => {
-          browser_window.webContents.openDevTools();
-        },
-        accelerator:
-          process.platform === "darwin"
-            ? "CmdOrCtrl+Option+I"
-            : "CmdOrCtrl+Alt+I",
-        label: "Open Dev Tools",
-      },
-    ],
-  },
-];
-
-if (process.platform === "darwin") {
-  template = [
-    {
-      label: app.name,
-      submenu: [
-        { role: "about" },
-        { type: "separator" },
-        { role: "services" },
-        { type: "separator" },
-        { role: "hide" },
-        { role: "hideothers" },
-        { role: "unhide" },
-        { type: "separator" },
-        { role: "quit" },
-      ],
-    },
-  ].concat(template);
-}
-
-const menu = Menu.buildFromTemplate(template);
-Menu.setApplicationMenu(menu);
+import { create_menu } from "./menu";
+create_menu().then((value: Menu) => {
+  Menu.setApplicationMenu(value);
+});
 
 // Theme change handling
 

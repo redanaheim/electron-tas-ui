@@ -1,5 +1,10 @@
 import { IpAddress } from "../ftp";
-import { read_file_async, write_file_async, Store } from "../storing";
+import {
+  read_file_async,
+  write_file_async,
+  Store,
+  store_defaults,
+} from "../storing";
 import { compile } from "../assets/compile";
 import { existsSync } from "fs";
 import { join } from "path";
@@ -7,12 +12,10 @@ let path: any = null;
 const { app, dialog, BrowserWindow } = require("electron").remote;
 export const on_init = async function (): Promise<void> {
   // Set input values to ones from last time
-  const last_values = new Store("last_input_values", {
-    compiling_exporting_source_path: "",
-    compiling_exporting_export_name: "script1.txt",
-    compiling_exporting_switch_ip: "1.1.1.1",
-    is_default: true,
-  });
+  const last_values = new Store(
+    "last_input_values",
+    store_defaults.last_input_values
+  );
   const {
     compiling_exporting_source_path,
     compiling_exporting_export_name,
@@ -88,7 +91,17 @@ export const send = async function (
   // and where we want to get the file from before exporting to switch
   source_path = join(app.getPath("temp"), "compiled.txt");
   try {
-    await write_file_async(source_path, compile(file_content));
+    await write_file_async(
+      source_path,
+      compile(
+        file_content,
+        await Store.value_of(
+          "dialogs",
+          "show_compiler_errors",
+          store_defaults.dialogs
+        )
+      )
+    );
   } catch (err) {
     console.error(err);
     await dialog.showMessageBox(this_window, {
@@ -112,11 +125,10 @@ export const send = async function (
     });
     return;
   }
-  const show_dialog_selections = await new Store("dialogs", {
-    show_compile_success: true,
-    show_export_success: true,
-    is_default: true,
-  });
+  const show_dialog_selections = await new Store(
+    "dialogs",
+    store_defaults.dialogs
+  );
   if (await show_dialog_selections.get("show_export_success")) {
     const button = await dialog.showMessageBox(this_window, {
       message: result.did_succeed
@@ -145,12 +157,10 @@ export const send_on_click = async function (): Promise<void> {
   const export_name = $("#path_on_switch").val().toString();
   const switch_ip = $("#switch_ip").val().toString();
   // Store input values from this and use them as defaults next time
-  const last_values = new Store("last_input_values", {
-    compiling_exporting_source_path: "",
-    compiling_exporting_export_name: "script1.txt",
-    compiling_exporting_switch_ip: "1.1.1.1",
-    is_default: true,
-  });
+  const last_values = new Store(
+    "last_input_values",
+    store_defaults.last_input_values
+  );
   last_values.make({
     compiling_exporting_source_path: source_path,
     compiling_exporting_export_name: export_name,

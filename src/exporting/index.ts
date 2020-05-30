@@ -1,16 +1,14 @@
 import { IpAddress } from "../ftp";
-import { Store } from "../storing";
+import { Store, store_defaults } from "../storing";
 import { existsSync } from "fs";
 let path: any = null;
 const { dialog, BrowserWindow } = require("electron").remote;
 export const on_init = async function (): Promise<void> {
   // Set input values to ones from last time
-  const last_values = new Store("last_input_values", {
-    exporting_source_path: "",
-    exporting_export_name: "script1.txt",
-    exporting_switch_ip: "1.1.1.1",
-    is_default: true,
-  });
+  const last_values = new Store(
+    "last_input_values",
+    store_defaults.last_input_values
+  );
   const {
     exporting_source_path,
     exporting_export_name,
@@ -84,11 +82,10 @@ export const send = async function (
     });
     return;
   }
-  const show_dialog_selections = await new Store("dialogs", {
-    show_compile_success: true,
-    show_export_success: true,
-    is_default: true,
-  });
+  const show_dialog_selections = await new Store(
+    "dialogs",
+    store_defaults.dialogs
+  );
   if (await show_dialog_selections.get("show_export_success")) {
     const button = await dialog.showMessageBox(this_window, {
       message: result.did_succeed
@@ -129,12 +126,10 @@ export const send_on_click = async function (): Promise<void> {
   const export_name = $("#path_on_switch").val().toString();
   const switch_ip = $("#switch_ip").val().toString();
   // Store input values from this and use them as defaults next time
-  const last_values = new Store("last_input_values", {
-    exporting_source_path: "",
-    exporting_export_name: "script1.txt",
-    exporting_switch_ip: "1.1.1.1",
-    is_default: true,
-  });
+  const last_values = new Store(
+    "last_input_values",
+    store_defaults.last_input_values
+  );
   last_values.make({
     exporting_source_path: source_path,
     exporting_export_name: export_name,

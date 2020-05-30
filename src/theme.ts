@@ -1,14 +1,11 @@
-import { Store } from "./storing";
+import { Store, store_defaults } from "./storing";
 /**
  * Retrieves the theme from app_dir/config.json, then updates the `body` class to match.
  * @param doc Document object for the window
  */
 // TODO: Fix light mode look
 export async function set_theme(doc: Document): Promise<void> {
-  const theme = await new Store("config", {
-    theme: "dark",
-    is_default: true,
-  }).get("theme");
+  const theme = await Store.value_of("config", "theme", store_defaults.config);
   if (doc.body.classList.length === 0) {
     doc.body.classList.add(theme);
   } else {

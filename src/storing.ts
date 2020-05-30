@@ -61,6 +61,25 @@ export class Store {
   path: string;
   data: Promise<InternalData>;
   /**
+   * Gets the value of a property of a specific store.
+   * Used as shorthand for creating a whole new object then calling get.
+   */
+  static value_of = async function (
+    store_name: string,
+    property: keyof InternalData,
+    defaults?: InternalData
+  ): Promise<InternalData[keyof InternalData]> {
+    const instance = new Store(store_name, defaults || { is_default: false });
+    let data: Promise<InternalData[keyof InternalData]>;
+    try {
+      data = await instance.get(property);
+    } catch (err) {
+      console.error(err);
+      return undefined;
+    }
+    return data;
+  };
+  /**
    * Creates a database for storing persistent information
    * @param filename Path to the file that the JSON is stored in
    * @param defaults Object to set as the instance's internal data if it doesn't exist
@@ -79,7 +98,9 @@ export class Store {
    * Returns the value of the property as stored in the instance
    * @param property Property to return the value of
    */
-  async get(property: keyof InternalData): Promise<any> {
+  async get(
+    property: keyof InternalData
+  ): Promise<InternalData[keyof InternalData]> {
     return (await this.data)[property];
   }
   /**
@@ -132,3 +153,22 @@ export class Store {
     return res;
   }
 }
+
+export const store_defaults = {
+  config: {
+    theme: "dark",
+    is_default: true,
+  },
+  last_input_values: {
+    compiling_exporting_source_path: "",
+    compiling_exporting_export_name: "script1.txt",
+    compiling_exporting_switch_ip: "1.1.1.1",
+    is_default: true,
+  },
+  dialogs: {
+    show_compile_success: true,
+    show_compiler_errors: true,
+    show_export_success: true,
+    is_default: true,
+  },
+};
