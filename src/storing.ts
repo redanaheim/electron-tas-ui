@@ -160,9 +160,16 @@ export const store_defaults = {
     is_default: true,
   },
   last_input_values: {
+    compiling_file_path: "",
+    compiling_save_path: "",
+    js_compiling_file_path: "",
+    js_compiling_save_path: "",
     compiling_exporting_source_path: "",
     compiling_exporting_export_name: "script1.txt",
     compiling_exporting_switch_ip: "1.1.1.1",
+    js_compiling_exporting_source_path: "",
+    js_compiling_exporting_export_name: "script1.txt",
+    js_compiling_exporting_switch_ip: "1.1.1.1",
     is_default: true,
   },
   dialogs: {

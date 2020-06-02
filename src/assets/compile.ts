@@ -16,7 +16,7 @@ interface ScriptFunctionExports {
   functions: ScriptFunction[];
   new_file_content: string[];
 }
-interface ParsedLine {
+export interface ParsedLine {
   frame: number;
   keys_on: string[];
   keys_off: string[];
@@ -312,24 +312,34 @@ const parse_line = function (
 };
 export const compile = function (
   script: string,
-  throw_errors?: boolean
+  throw_errors: boolean,
+  no_script?: boolean,
+  premade_update_frames?: ParsedLine[]
 ): string {
   let compiled = "";
   const controller = new ControllerState();
-  const file_lines = preprocess(script.split("\n"));
-  if (file_lines.length === 0) {
-    if (throw_errors) {
-      throw new Error("No valid lines were found.");
-    }
-    return script;
-  }
-  const update_frames: ParsedLine[] = [];
+  let update_frames: ParsedLine[] = [];
   let current_frame = 1;
-  for (const line of file_lines) {
-    if (/^([0-9]+|\+) .+$/.test(line) === false) continue; // no valid frame number found, ignore
-    const parsed_line = parse_line(line, current_frame, throw_errors || false);
-    current_frame = parsed_line.frame;
-    update_frames.push(parsed_line);
+  if (!no_script) {
+    const file_lines = preprocess(script.split("\n"));
+    if (file_lines.length === 0) {
+      if (throw_errors) {
+        throw new Error("No valid lines were found.");
+      }
+      return script;
+    }
+    for (const line of file_lines) {
+      if (/^([0-9]+|\+) .+$/.test(line) === false) continue; // no valid frame number found, ignore
+      const parsed_line = parse_line(
+        line,
+        current_frame,
+        throw_errors || false
+      );
+      current_frame = parsed_line.frame;
+      update_frames.push(parsed_line);
+    }
+  } else {
+    update_frames = premade_update_frames;
   }
   if (update_frames.length === 0) {
     if (throw_errors) throw new Error("No valid lines were found.");

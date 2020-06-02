@@ -29,6 +29,17 @@ export async function create_menu(): Promise<Menu> {
         },
         { type: "separator" },
         {
+          click: menu_click_handlers.create_js_compile_window,
+          accelerator: "CmdOrCtrl+J",
+          label: "Compile JavaScript to TAS Script",
+        },
+        {
+          click: menu_click_handlers.create_js_compile_export_window,
+          accelerator: "CmdOrCtrl+Shift+J",
+          label: "Compile JavaScript to TAS Script and Export",
+        },
+        { type: "separator" },
+        {
           click: menu_click_handlers.open_backups,
           label: "Open Script Backups",
         },

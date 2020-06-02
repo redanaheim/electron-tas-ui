@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html style="font-size: 1px; padding: 0px;">
+  <head>
+    <title>Compile JS Script to nx-TAS format</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto"
+    />
+    <script>window.$ = window.jQuery = require('../assets/jquery.min.js');</script>
+    <script>
+        let index = require("./index.js");
+        const { pick_file, pick_save_path, compile_on_click, on_init } = index;
+        const { set_theme } = require("../theme.js");
+        $(document).ready(() => {
+            on_init();
+        });
+    </script>
+  </head>
+  <body>
+    <table>
+        <col id="captions"/>
+        <col id="sources"/>
+        <tr>
+            <td>
+                <input type="text" id="file_path"  class="path_field" placeholder="Select a script" style="width: 100%;"></input>
+            </td>
+            <td>
+                <button id="pick_file" onclick="pick_file()">
+                    Choose Script
+                </button>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input type="text" id="save_path"  class="path_field" placeholder="Select a save location" style="width: 100%;"></input>
+            </td>
+            <td>
+                <button id="pick_save_path" onclick="pick_save_path()">
+                    Save As...
+                </button>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <button id="export" onclick="compile_on_click()">Compile & Save</button>
+            </td>
+        </tr>
+    </table>
+  </body>
+</html>

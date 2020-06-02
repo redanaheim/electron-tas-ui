@@ -1,0 +1,95 @@
+:root {
+  --light-text: rgb(95, 95, 95);
+  --dark-text: rgb(159, 161, 167);
+  --light-btn-text: rgb(20, 20, 20);
+  --dark-btn-text: rgb(159, 161, 167);
+  --light-bg: white;
+  --dark-bg: #121212;
+  --light-btn-clicked-bg: rgb(21, 83, 191);
+  --dark-btn-clicked-bg: rgb(21, 83, 191);
+  --light-border: rgb(95, 194, 100);
+  --dark-border: rgb(88, 123, 238);
+  --light-input-bg: rgb(240, 240, 240);
+  --dark-input-bg: rgb(31, 31, 31);
+}
+.light {
+  --bg: var(--light-bg);
+  --text: var(--light-text);
+  --btn-clicked-bg: var(--light-button-clicked-bg);
+  --border: var(--light-border);
+  --btn-text: var(--light-button-text);
+  --input-bg: var(--light-input-bg);
+}
+.dark {
+  --bg: var(--dark-bg);
+  --text: var(--dark-text);
+  --btn-clicked-bg: var(--dark-btn-clicked-bg);
+  --border: var(--dark-border);
+  --btn-text: var(--dark-btn-text);
+  --input-bg: var(--dark-input-bg);
+}
+body {
+  font-family: -apple-system, "Roboto", BlinkMacSystemFont, "Segoe UI",
+    Helvetica, Arial, sans-serif;
+  font-size: 14rem;
+  color: var(--text);
+  background-color: var(--bg);
+  padding: 0px;
+  margin: 0px;
+}
+.header {
+  font-size: 18rem;
+}
+button {
+  color: var(--btn-text);
+  outline: none;
+}
+#pick_file:active,
+#export:active {
+  background-color: var(--btn-clicked-bg);
+}
+table {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+td {
+  height: 23px;
+}
+td:nth-child(even) {
+  padding-left: 10px;
+}
+input,
+textarea {
+  background-color: var(--input-bg);
+  color: var(--btn-text);
+  border: none;
+  border-radius: 3px;
+  padding: 3px;
+  height: 100%;
+  outline: none;
+  padding-left: 5px;
+}
+.path_field {
+  text-align: left;
+}
+.path_field:not(:focus) {
+  direction: rtl;
+}
+#pick_file {
+  width: 100%;
+  background-color: var(--bg);
+  color: var(--btn-text);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  height: 100%;
+}
+#export {
+  width: 100%;
+  background-color: var(--bg);
+  color: var(--btn-text);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  height: 23px;
+}
