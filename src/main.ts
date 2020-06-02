@@ -8,6 +8,18 @@ if (require("electron-squirrel-startup")) {
 }
 
 // TODO: Fix window size on windows
+const main_window_size = {
+  height: 600,
+  width: 800,
+};
+const compiling_window_size = {
+  height: 125,
+  width: 330,
+};
+const exporting_window_size = {
+  height: 150,
+  width: 330,
+};
 const create_window = async (): Promise<void> => {
   const current = await Store.value_of(
     "config",
@@ -15,8 +27,8 @@ const create_window = async (): Promise<void> => {
     store_defaults.config
   );
   const main_window = new BrowserWindow({
-    height: 600,
-    width: 800,
+    height: main_window_size.height,
+    width: main_window_size.width,
     webPreferences: {
       nodeIntegration: true,
     },
@@ -32,8 +44,8 @@ const create_editing_window = async (): Promise<void> => {
     store_defaults.config
   );
   const main_window = new BrowserWindow({
-    height: 600,
-    width: 800,
+    height: main_window_size.height,
+    width: main_window_size.width,
     webPreferences: {
       nodeIntegration: true,
     },
@@ -49,8 +61,8 @@ const create_export_window = async (): Promise<void> => {
     store_defaults.config
   );
   const popup = new BrowserWindow({
-    height: 150,
-    width: 330,
+    height: exporting_window_size.height,
+    width: exporting_window_size.width,
     resizable: process.platform === "darwin" ? false : true,
     webPreferences: {
       nodeIntegration: true,
@@ -68,8 +80,8 @@ const create_compile_window = async (): Promise<void> => {
     store_defaults.config
   );
   const popup = new BrowserWindow({
-    height: 125,
-    width: 330,
+    height: compiling_window_size.height,
+    width: compiling_window_size.width,
     resizable: process.platform === "darwin" ? false : true,
     webPreferences: {
       nodeIntegration: true,
@@ -87,8 +99,8 @@ const create_js_compile_window = async (): Promise<void> => {
     store_defaults.config
   );
   const popup = new BrowserWindow({
-    height: 125,
-    width: 330,
+    height: compiling_window_size.height,
+    width: compiling_window_size.width,
     resizable: process.platform === "darwin" ? false : true,
     webPreferences: {
       nodeIntegration: true,
@@ -106,8 +118,8 @@ const create_compile_export_window = async (): Promise<void> => {
     store_defaults.config
   );
   const popup = new BrowserWindow({
-    height: 150,
-    width: 330,
+    height: exporting_window_size.height,
+    width: exporting_window_size.width,
     resizable: process.platform === "darwin" ? false : true,
     webPreferences: {
       nodeIntegration: true,
@@ -125,8 +137,8 @@ const create_js_compile_export_window = async (): Promise<void> => {
     store_defaults.config
   );
   const popup = new BrowserWindow({
-    height: 150,
-    width: 330,
+    height: exporting_window_size.height,
+    width: exporting_window_size.width,
     resizable: process.platform === "darwin" ? false : true,
     webPreferences: {
       nodeIntegration: true,
