@@ -5,7 +5,7 @@ import {
   Store,
   store_defaults,
 } from "../storing";
-import { compile } from "../assets/compile";
+import { compile } from "../assets/compiling/compile";
 import { existsSync } from "fs";
 import { join } from "path";
 let path: any = null;

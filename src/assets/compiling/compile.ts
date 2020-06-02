@@ -11,7 +11,7 @@ export class ScriptFunction {
     return new ScriptFunction("", [], false);
   };
 }
-import { get_builtin } from "./compiling_builtins/builtin_names";
+import { get_builtin } from "../compiling_builtins/builtin_names";
 interface ScriptFunctionExports {
   functions: ScriptFunction[];
   new_file_content: string[];

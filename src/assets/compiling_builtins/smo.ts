@@ -1,4 +1,4 @@
-import { ScriptFunction } from "../compile";
+import { ScriptFunction } from "../compiling/compile";
 function repeat(script: any, reps: number): any[] {
   const buffer: any[] = [];
   for (let i = 0; i < reps; i++) {

@@ -1,7 +1,7 @@
 import { IpAddress } from "../ftp";
 import { write_file_async, Store, store_defaults } from "../storing";
-import { create_tas_from_script } from "../assets/js_maker";
-import { compile } from "../assets/compile";
+import { create_tas_from_script } from "../assets/compiling/js_maker";
+import { compile } from "../assets/compiling/compile";
 import { existsSync } from "fs";
 import { join } from "path";
 let path: any = null;

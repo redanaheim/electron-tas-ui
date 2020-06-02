@@ -5,7 +5,7 @@ import {
   store_defaults,
 } from "../storing";
 import { existsSync } from "fs";
-import { compile } from "../assets/compile";
+import { compile } from "../assets/compiling/compile";
 // import { basename } from "path";
 const { dialog, BrowserWindow } = require("electron").remote;
 export const on_init = async function (): Promise<void> {

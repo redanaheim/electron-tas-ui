@@ -1,3 +1,4 @@
+// TODO: Document usage of programmatic scripts
 import { ParsedLine } from "./compile";
 const last_index_of = function (array: any[]): number {
   return array.length - 1;

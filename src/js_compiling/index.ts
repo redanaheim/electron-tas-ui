@@ -1,7 +1,7 @@
 import { write_file_async, Store, store_defaults } from "../storing";
-import { create_tas_from_script } from "../assets/js_maker";
+import { create_tas_from_script } from "../assets/compiling/js_maker";
 import { existsSync } from "fs";
-import { compile } from "../assets/compile";
+import { compile } from "../assets/compiling/compile";
 // import { basename } from "path";
 const { dialog, BrowserWindow } = require("electron").remote;
 export const on_init = async function (): Promise<void> {
