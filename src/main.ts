@@ -1,6 +1,6 @@
 import { app, BrowserWindow, Menu, shell, dialog, nativeTheme } from "electron";
 import * as path from "path";
-import { readdir, unlink } from "fs";
+import { readdir, unlink, existsSync, mkdirSync } from "fs";
 import { Store, store_defaults } from "./storing";
 const is_mac = process.platform === "darwin";
 
@@ -180,6 +180,9 @@ const on_os_theme_update = async (is_dark: boolean): Promise<void> => {
 
 const open_backups = async (): Promise<void> => {
   const folder = path.join(app.getPath("userData"), "backups");
+  if (existsSync(folder) === false) {
+    mkdirSync(folder);
+  }
   shell.openItem(folder);
 };
 
