@@ -2,23 +2,23 @@ import { app, BrowserWindow, Menu, shell, dialog, nativeTheme } from "electron";
 import * as path from "path";
 import { readdir, unlink } from "fs";
 import { Store, store_defaults } from "./storing";
+const is_mac = process.platform === "darwin";
 
 if (require("electron-squirrel-startup")) {
   app.quit();
 }
 
-// TODO: Fix window size on windows
 const main_window_size = {
   height: 600,
   width: 800,
 };
 const compiling_window_size = {
-  height: 125,
-  width: 330,
+  height: is_mac ? 125 : 110,
+  width: is_mac ? 330 : 350,
 };
 const exporting_window_size = {
-  height: 150,
-  width: 330,
+  height: is_mac ? 150 : 120,
+  width: is_mac ? 330 : 430,
 };
 const create_window = async (): Promise<void> => {
   const current = await Store.value_of(
