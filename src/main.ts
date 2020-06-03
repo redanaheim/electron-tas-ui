@@ -8,6 +8,9 @@ if (require("electron-squirrel-startup")) {
   app.quit();
 }
 
+// https://github.com/electron/electron/issues/18397#
+app.allowRendererProcessReuse = true;
+
 const main_window_size = {
   height: 600,
   width: 800,
