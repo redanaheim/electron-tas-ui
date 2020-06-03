@@ -131,6 +131,17 @@ export async function create_menu(): Promise<Menu> {
             browser_window: BrowserWindow,
             _event: Event
           ): void => {
+            browser_window.reload();
+          },
+          accelerator: "CmdOrCtrl+R",
+          label: "Reload Window",
+        },
+        {
+          click: (
+            _menu_item: MenuItem,
+            browser_window: BrowserWindow,
+            _event: Event
+          ): void => {
             browser_window.webContents.openDevTools();
           },
           accelerator:

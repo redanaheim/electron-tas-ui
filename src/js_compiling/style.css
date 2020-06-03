@@ -11,6 +11,7 @@ body {
   font-size: 18rem;
 }
 button {
+  background-color: var(--btn-bg);
   color: var(--btn-text);
   outline: none;
 }
@@ -50,23 +51,18 @@ input {
 }
 #pick_file {
   width: 100%;
-  background-color: var(--bg);
-  color: var(--btn-text);
   border: 1px solid var(--border);
   border-radius: 2px;
   height: 100%;
 }
 #pick_save_path {
   width: 100%;
-  background-color: var(--bg);
-  color: var(--btn-text);
   border: 1px solid var(--border);
   border-radius: 2px;
   height: 100%;
 }
 #export {
   width: 100%;
-  background-color: var(--bg);
   color: var(--btn-text);
   border: 1px solid var(--border);
   border-radius: 3px;

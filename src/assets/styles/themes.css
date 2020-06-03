@@ -3,26 +3,34 @@
   --dark-text: rgb(159, 161, 167);
   --light-btn-text: rgb(20, 20, 20);
   --dark-btn-text: rgb(159, 161, 167);
+  --light-input-text: rgb(20, 20, 20);
+  --dark-input-text: rgb(159, 161, 167);
   --light-bg: white;
   --dark-bg: #121212;
-  --light-btn-clicked-bg: rgb(21, 83, 191);
+  --light-btn-bg: #acacac;
+  --dark-btn-bg: #121212;
+  --light-btn-clicked-bg: rgb(99, 99, 99);
   --dark-btn-clicked-bg: rgb(21, 83, 191);
-  --light-border: rgb(95, 194, 100);
+  --light-border: rgb(191, 191, 191);
   --dark-border: rgb(88, 123, 238);
   --light-input-bg: rgb(240, 240, 240);
-  --dark-input-bg: rgb(31, 31, 31);
+  --dark-input-bg: rgb(65, 41, 41);
 }
 .light {
   --bg: var(--light-bg);
   --text: var(--light-text);
-  --btn-clicked-bg: var(--light-button-clicked-bg);
+  --input-text: var(--light-input-text);
+  --btn-bg: var(--light-btn-bg);
+  --btn-clicked-bg: var(--light-btn-clicked-bg);
   --border: var(--light-border);
-  --btn-text: var(--light-button-text);
+  --btn-text: var(--light-btn-text);
   --input-bg: var(--light-input-bg);
 }
 .dark {
   --bg: var(--dark-bg);
   --text: var(--dark-text);
+  --input-text: var(--dark-input-text);
+  --btn-bg: var(--dark-btn-bg);
   --btn-clicked-bg: var(--dark-btn-clicked-bg);
   --border: var(--dark-border);
   --btn-text: var(--dark-btn-text);
@@ -36,4 +44,8 @@ body {
   background-color: var(--bg);
   padding: 0px;
   margin: 0px;
+}
+button:active {
+  box-shadow: 2px 2px 2px var(--btn-clicked-bg);
+  border: none !important;
 }

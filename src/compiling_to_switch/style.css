@@ -12,6 +12,7 @@ body {
 }
 button {
   color: var(--btn-text);
+  background-color: var(--btn-bg);
   outline: none;
 }
 #pick_file:active,
@@ -33,7 +34,7 @@ td:nth-child(even) {
 input,
 textarea {
   background-color: var(--input-bg);
-  color: var(--btn-text);
+  color: var(--input-text);
   border: none;
   border-radius: 3px;
   padding: 3px;
@@ -49,7 +50,6 @@ textarea {
 }
 #pick_file {
   width: 100%;
-  background-color: var(--bg);
   color: var(--btn-text);
   border: 1px solid var(--border);
   border-radius: 2px;
@@ -57,7 +57,6 @@ textarea {
 }
 #export {
   width: 100%;
-  background-color: var(--bg);
   color: var(--btn-text);
   border: 1px solid var(--border);
   border-radius: 3px;

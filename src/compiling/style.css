@@ -11,6 +11,7 @@ body {
   font-size: 18rem;
 }
 button {
+  background-color: var(--btn-bg);
   color: var(--btn-text);
   outline: none;
 }
@@ -34,7 +35,7 @@ td:nth-child(even) {
 }
 input {
   background-color: var(--input-bg);
-  color: var(--btn-text);
+  color: var(--input-text);
   border: none;
   border-radius: 3px;
   padding: 3px;
@@ -50,7 +51,6 @@ input {
 }
 #pick_file {
   width: 100%;
-  background-color: var(--bg);
   color: var(--btn-text);
   border: 1px solid var(--border);
   border-radius: 2px;
@@ -58,7 +58,6 @@ input {
 }
 #pick_save_path {
   width: 100%;
-  background-color: var(--bg);
   color: var(--btn-text);
   border: 1px solid var(--border);
   border-radius: 2px;
@@ -66,7 +65,6 @@ input {
 }
 #export {
   width: 100%;
-  background-color: var(--bg);
   color: var(--btn-text);
   border: 1px solid var(--border);
   border-radius: 3px;
