@@ -40,6 +40,23 @@ const create_window = async (): Promise<void> => {
   main_window.loadFile(path.join(__dirname, "../src/index.html"));
 };
 
+const create_help_window = async (html_path: string): Promise<void> => {
+  const current = await Store.value_of(
+    "config",
+    "theme",
+    store_defaults.config
+  );
+  const main_window = new BrowserWindow({
+    height: main_window_size.height,
+    width: main_window_size.width,
+    webPreferences: {
+      nodeIntegration: true,
+    },
+    backgroundColor: current === "dark" ? "#121212" : "#FFF",
+  });
+  main_window.loadFile(path.join(__dirname, html_path));
+};
+
 const create_editing_window = async (): Promise<void> => {
   const current = await Store.value_of(
     "config",
@@ -238,6 +255,7 @@ const show_compiler_errors = async function (do_show: boolean): Promise<void> {
 
 // Export menu click events
 export const menu_click_handlers = {
+  create_help_window: create_help_window,
   create_editing_window: create_editing_window,
   create_export_window: create_export_window,
   create_compile_window: create_compile_window,

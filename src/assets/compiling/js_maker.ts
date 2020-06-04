@@ -1,4 +1,3 @@
-// TODO: Document usage of programmatic scripts
 import { ParsedLine } from "./compile";
 const last_index_of = function (array: any[]): number {
   return array.length - 1;
@@ -331,25 +330,45 @@ export class VirtualController {
     }
   }
   press(list: Key[]): void {
-    list = list.map((x) => string_to_key(x));
-    this.queue_reference.data[
-      last_index_of(this.queue_reference.data)
-    ].inputs.on_keys.append_list(list);
-    this.queue_reference.data[
-      last_index_of(this.queue_reference.data)
-    ].inputs.off_keys.remove_list(list);
+    if (list instanceof Array) {
+      list = list.map((x) => string_to_key(x));
+      this.queue_reference.data[
+        last_index_of(this.queue_reference.data)
+      ].inputs.on_keys.append_list(list);
+      this.queue_reference.data[
+        last_index_of(this.queue_reference.data)
+      ].inputs.off_keys.remove_list(list);
+    } else if (typeof list === "string") {
+      const single_key = string_to_key(String(list));
+      this.queue_reference.data[
+        last_index_of(this.queue_reference.data)
+      ].inputs.on_keys.append(single_key);
+      this.queue_reference.data[
+        last_index_of(this.queue_reference.data)
+      ].inputs.off_keys.remove(single_key);
+    }
   }
   press_all(): void {
     this.press(KeysList.all_keys);
   }
   release(list: Key[]): void {
-    list = list.map((x) => string_to_key(x));
-    this.queue_reference.data[
-      last_index_of(this.queue_reference.data)
-    ].inputs.on_keys.remove_list(list);
-    this.queue_reference.data[
-      last_index_of(this.queue_reference.data)
-    ].inputs.off_keys.append_list(list);
+    if (list instanceof Array) {
+      list = list.map((x) => string_to_key(x));
+      this.queue_reference.data[
+        last_index_of(this.queue_reference.data)
+      ].inputs.on_keys.remove_list(list);
+      this.queue_reference.data[
+        last_index_of(this.queue_reference.data)
+      ].inputs.off_keys.append_list(list);
+    } else if (typeof list === "string") {
+      const single_key = string_to_key(String(list));
+      this.queue_reference.data[
+        last_index_of(this.queue_reference.data)
+      ].inputs.on_keys.remove(single_key);
+      this.queue_reference.data[
+        last_index_of(this.queue_reference.data)
+      ].inputs.off_keys.append(single_key);
+    }
   }
   release_all(): void {
     this.release(KeysList.all_keys);

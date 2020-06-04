@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html style="font-size: 1px; padding: 0px;">
+  <head>
+    <title>
+      Help - How to Use Better Scripts Format
+    </title>
+    <link rel="stylesheet" href="../../assets/styles/themes.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script>
+      // don't open links inside electron (!!!!!)
+      window.$ = window.jQuery = require("../../assets/jquery.min.js");
+      const { shell } = require("electron");
+      $(document).on("click", 'a[href^="https"]', function (e) {
+        e.preventDefault();
+        shell.openExternal(this.href);
+      });
+      const { set_theme } = require("../../theme.js");
+    </script>
+  </head>
+  <body>
+    <h2>
+      Overview
+    </h2>
+    <p>
+      Better Scripts aims to provide an easier way of writing TAS scripts for
+      the Switch by adding a few features. You can write a script in the Better
+      Scripts format (listed below), then compile it into an
+      <a href="https://github.com/hamhub7/nx-TAS">nx-TAS</a>- or
+      <a href="https://github.com/sorenbug/sys-script">sys-script</a>-readable
+      format using the <b>File → Compile Script</b> option.
+    </p>
+    <h3>
+      Line Formatting
+    </h3>
+    <p>
+      In a Better Scripts file, each line starts with the number of frames to
+      wait from the line before it. The exception is the first line, which
+      should start with <b>+</b>. After that, you can choose from a number of
+      parameters separated by spaces which will do different things to the
+      controller:<br /><br />
+      <b>ON</b>: This presses the buttons specified on the controller. They will
+      not be released until they are turned off by another parameter.<br />
+      <code class="block">
+        + ON{KEY_A,KEY_B}
+      </code>
+      Note that no spaces are allowed in between the brackets, as the compiler
+      uses spaces to decide what parameters there are.
+      <br />
+      <hr />
+      <b>OFF</b>: This works exactly the same as <b>ON</b>, but releases the
+      buttons instead.<br />
+      <code class="block">
+        + ON{KEY_ZL} <br />
+        1 ON{KEY_Y} <br />
+        5 OFF{KEY_ZL,KEY_Y}
+      </code>
+      The above script presses ZL, then presses Y the next frame, then waits 4
+      frames, then releases both of them.
+      <br />
+      <hr />
+      <b>RAW</b>: This parameter releases all other buttons on the controller,
+      only pressing the ones specified. They are still not turned off until you
+      release them, however.<br />
+      <code class="block">
+        + ON{KEY_X,KEY_Y,KEY_A,KEY_B} <br />
+        5 RAW{KEY_PLUS}
+      </code>
+      The script shown above will press X, Y, A, and B, wait 4 frames, then
+      release all of them and only press plus.
+      <br />
+      <hr />
+      <b>LSTICK/RSTICK</b>: This parameter sets the position of the control
+      stick (left or right). It takes two numbers: the angle from straight
+      forward (going clockwise), and how many units (from 0-32767, but the
+      compiler will coerce into that range).<br />
+      <code class="block">
+        + ON{KEY_A} LSTICK{0,15000} <br />
+        10 LSTICK{180,15000} RSTICK{0,32767}
+      </code>
+      The script shown above will press A and set the left control stick halfway
+      going forward, wait 9 frames, reverse the direction of the left stick,
+      then set the right stick all the way forward.
+    </p>
+    <h3>
+      Macros
+    </h3>
+    <p>
+      Macros are a feature that let you store repeated sequences of lines and
+      use them in an easier way. You can define a macro like this:
+      <code class="block">
+        DEF DIVE {<br />
+        1 ON{KEY_ZL}<br />
+        1 ON{KEY_Y}<br />
+        }
+      </code>
+      You should avoid using <b>RAW</b> in macros since it may interrupt the
+      script outside by turning all other keys off.<br />
+      You can invoke a macro simply by making the only contents of the line the
+      name of a macro, like so:
+      <code class="block">
+        + LSTICK{0,32767}<br />
+        DIVE
+      </code>
+      You must define a macro in the same file you use it in.<br /><br />
+      <b><em>NOTE:</em></b> When the compiler sees an invocation, it just
+      replaces the invocation with the contents of the macro, so be careful.
+    </p>
+    <h4>
+      Built-in Macros
+    </h4>
+    <p>
+      The compiler ships with built-in macros for certain games which you can
+      include like this:
+      <code class="block">
+        BUILTINS SMO
+      </code>
+      This line will import the built-in macros from Super Mario Odyssey for use
+      in your script. A list of built-in macros and examples for each game will
+      be available soon.
+    </p>
+    <h3>
+      More Help
+    </h3>
+    <p>
+      If there's something you don't understand, you should experiment and look
+      at the compiled output. If you're still confused about something, you can
+      contact the developer of this app on Discord (TigerGold59#8729) or Twitter
+      (@TigerGold59).
+    </p>
+  </body>
+</html>

@@ -1,0 +1,27 @@
+:root {
+  --light-text: black;
+  --dark-text: rgb(207, 207, 207);
+}
+body {
+  margin: 10px 20px 10px 20px;
+  font-size: 15rem;
+  line-height: 1.6;
+}
+h2,
+h3,
+h4 {
+  text-align: center;
+  margin-right: auto;
+  margin-left: auto;
+  padding-bottom: 3px;
+  border-bottom: 1px solid var(--text);
+}
+code {
+  border-radius: 4px;
+  line-height: normal;
+  font-size: 14rem;
+}
+hr {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html style="font-size: 1px; padding: 0px;">
+  <head>
+    <title>
+      Help - How to Use Programmatic Scripts
+    </title>
+    <link rel="stylesheet" href="../../assets/styles/themes.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script>
+      // don't open links inside electron (!!!!!)
+      window.$ = window.jQuery = require("../../assets/jquery.min.js");
+      const { shell } = require("electron");
+      $(document).on("click", 'a[href^="https"]', function (e) {
+        e.preventDefault();
+        shell.openExternal(this.href);
+      });
+      const { set_theme } = require("../../theme.js");
+    </script>
+  </head>
+  <body>
+    <h2>
+      Overview
+    </h2>
+    <p>
+      Programmatic Scripts lets you control a TAS with the JavaScript
+      programming language. You can then compile it into an
+      <a href="https://github.com/hamhub7/nx-TAS">nx-TAS</a>- or
+      <a href="https://github.com/sorenbug/sys-script">sys-script</a>-readable
+      format using the <b>File → Compile JavaScript to TAS Script</b> option.
+    </p>
+    <h3>
+      How to Use
+    </h3>
+    <p>
+      To start, create a JavaScript file. The script will be run using the
+      Node.js runtime, so you can do all the things you could normally do with that.
+      The file will need to have a function as its
+      <code>module.exports</code>.<br />
+      This function will take 1 argument (here we will call it controller, though
+      it can be named anything), and return the same controller object later.
+      Here are the methods the controller has, which will create your TAS
+      script:
+      <br /><br>
+      <code>controller.press(["list", "of", "btns", "KEY_A"])</code>: This will
+      press the listed buttons on the controller. It also accepts a single
+      button with no array wrapper.
+      <br /><hr>
+      <code>controller.release(["list", "of", "btns", "KEY_B"])</code>: This
+      method releases the listed buttons if they are pressed. It also accepts a
+      single button with no array wrapper.
+      <br /><br>
+      <em><b>NOTE</b></em
+      >: Both of the above functions have a variant (<code>press_all</code> or
+      <code>release_all</code>) that accepts no argument and presses or releases
+      all buttons. <br /><hr>
+      <code>controller.frames(integer)</code>: This advances the frame by the
+      number passed as an argument.
+      <br /><hr>
+      <code>controller.set_lstick/set_rstick(angle, magnitude)</code>: This sets
+      the stick position to the angle and magnitude specified. Both are forced
+      to integers and magnitude is coerced between -32767-32767.
+      <br />
+    </p>
+    <h3>
+      How it Works
+    </h3>
+    <p>
+      Inside the JavaScript to TAS compiler, the script you type is passed to <code>require()</code> which then gives the compiler the function which you made.
+      A controller object is then initialized and passed to that function. After that, the returned controller's method <code>controller.createUpdateFrames()</code> is run,
+      which converts the controller object's internal frame queue to the same format a Better Scripts file is parsed into. The compiler then runs the same
+      code it normally does to create the finished script.<br>
+      You can find the source code on GitHub <a href="https://github.com/TigerGold59/electron-tas-ui/blob/master/src/assets/compiling/js_maker.ts">here</a>.
+    </p>
+    <h3>
+      More Help
+    </h3>
+    <p>
+      If there's something you don't understand, you should experiment and look
+      at the compiled output. If you're still confused about something, you can
+      contact the developer of this app on Discord (TigerGold59#8729) or Twitter
+      (@TigerGold59).
+    </p>
+  </body>
+</html>

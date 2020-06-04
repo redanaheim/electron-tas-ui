@@ -1,5 +1,5 @@
 :root {
-  --light-text: rgb(95, 95, 95);
+  --light-text: rgb(73, 73, 73);
   --dark-text: rgb(159, 161, 167);
   --light-btn-text: rgb(20, 20, 20);
   --dark-btn-text: rgb(159, 161, 167);
@@ -15,6 +15,10 @@
   --dark-border: rgb(88, 123, 238);
   --light-input-bg: rgb(240, 240, 240);
   --dark-input-bg: rgb(65, 41, 41);
+  --light-code-bg: rgb(202, 202, 202);
+  --dark-code-bg: rgb(68, 68, 68);
+  --light-code-text: rgb(0, 0, 0);
+  --dark-code-text: rgb(255, 255, 255);
 }
 .light {
   --bg: var(--light-bg);
@@ -25,6 +29,8 @@
   --border: var(--light-border);
   --btn-text: var(--light-btn-text);
   --input-bg: var(--light-input-bg);
+  --code-bg: var(--light-code-bg);
+  --code-text: var(--light-code-text);
 }
 .dark {
   --bg: var(--dark-bg);
@@ -35,6 +41,8 @@
   --border: var(--dark-border);
   --btn-text: var(--dark-btn-text);
   --input-bg: var(--dark-input-bg);
+  --code-bg: var(--dark-code-bg);
+  --code-text: var(--dark-code-text);
 }
 body {
   font-family: -apple-system, "Roboto", BlinkMacSystemFont, "Segoe UI",
@@ -48,4 +56,19 @@ body {
 button:active {
   box-shadow: 2px 2px 2px var(--btn-clicked-bg);
   border-color: transparent !important;
+}
+code.block {
+  display: block;
+  margin-left: initial;
+  margin-right: initial;
+}
+code {
+  padding: 3px 5px 3px 5px;
+  background-color: var(--code-bg);
+  color: var(--code-text);
+  border-radius: 4px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-left: 3px;
+  margin-right: 3px;
 }

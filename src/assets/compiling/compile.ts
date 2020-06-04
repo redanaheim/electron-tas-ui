@@ -31,7 +31,8 @@ const make_stick_cartesian = function (
   // [90, 100] => (100, 0)
   // angle from positive y axis and magnitude => cartesian coordinates
   // outside 32767 is illegal on controller
-  if (polar_coords[1] > 32767) polar_coords[1] = 32767;
+  if (Math.abs(polar_coords[1]) > 32767)
+    polar_coords[1] = Math.sign(polar_coords[1]) * 32767;
   const angle = (polar_coords[0] * Math.PI) / 180;
   return [
     Math.round(polar_coords[1] * Math.sin(angle)),

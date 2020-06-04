@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html style="font-size: 1px; padding: 0px;">
+  <head>
+    <title>
+      Help - How to Export Scripts
+    </title>
+    <link rel="stylesheet" href="../../assets/styles/themes.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script>
+      // don't open links inside electron (!!!!!)
+      window.$ = window.jQuery = require("../../assets/jquery.min.js");
+      const { shell } = require("electron");
+      $(document).on("click", 'a[href^="https"]', function (e) {
+        e.preventDefault();
+        shell.openExternal(this.href);
+      });
+      const { set_theme } = require("../../theme.js");
+    </script>
+  </head>
+  <body>
+    <h2>
+      Overview
+    </h2>
+    <p>
+      By using the in-app <b>File → Export Existing Script</b> or any of the
+      options that include exporting, you can quickly and easily transfer TAS
+      script files from your computer to your Switch. This requires a few
+      things, though:<br /><br />
+      1. You must have
+      <a href="https://github.com/cathery/sys-ftpd-light">sys-ftpd-light</a>
+      installed and enabled, a sysmod for your Switch that turns it into an FTP
+      server. This is needed so that your computer can exchange files.<br />
+      2. Your Switch must be on the same Wi-Fi network as your computer.<br />
+      3. You must have a folder called "scripts" on the main directory of your
+      SD card.
+      <br /><br />
+      Once you have met these requirements, go to the
+      <b>Settings → Internet</b> menu on your Switch. Scroll down and find the
+      IP address field. This is what you must input on the "Switch's local IP
+      address" box in the export window. From here, you can export and the app
+      will backup whatever files it overwrites, in case you need them later.<br /><br />
+      <b><em>NOTE</em></b
+      >: Your Switch's IP address will probably change after restarting, and
+      will change any time you switch Wi-Fi networks.
+    </p>
+    <h3>
+      More Help
+    </h3>
+    <p>
+      If you are still confused or need help troubleshooting, you can contact me
+      on Discord (TigerGold59#8729) or Twitter (@TigerGold59).
+    </p>
+  </body>
+</html>
