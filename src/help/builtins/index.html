@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html style="font-size: 1px; padding: 0px;">
+  <head>
+    <title>
+      Help - Search Built-in Macros
+    </title>
+    <link rel="stylesheet" href="../../assets/styles/themes.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script>
+      // don't open links inside electron (!!!!!)
+      window.$ = window.jQuery = require("../../assets/jquery.min.js");
+      const { set_theme } = require("../../theme.js");
+      const { set_contents } = require("./index.js");
+      $(document).ready(() => {
+        set_contents($("#builtin_search").val());
+        $("#builtin_search").change(() => {
+          set_contents($("#builtin_search").val());
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <h3>
+      List of Currently Available Built-in Macros
+    </h3>
+    <p>1. <code>SMO</code> - alias <code>SuperMarioOdyssey</code></p>
+    <h3>Show Contents</h3>
+    <p>Show contents of: <input id="builtin_search" value="SMO" /></p>
+    <hr />
+    <div id="contents_box"></div>
+  </body>
+</html>

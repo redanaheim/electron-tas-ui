@@ -168,6 +168,18 @@ export async function create_menu(): Promise<Menu> {
           },
         },
         {
+          label: "Built-in Macros Help",
+          click: (
+            _menu_item: MenuItem,
+            _browser_window: BrowserWindow,
+            _event: Event
+          ): void => {
+            menu_click_handlers.create_help_window(
+              "../src/help/builtins/index.html"
+            );
+          },
+        },
+        {
           label: "Programmatic Scripts Help",
           click: (
             _menu_item: MenuItem,
