@@ -329,7 +329,9 @@ export const compile = function (
   let update_frames: ParsedLine[] = [];
   let current_frame = 1;
   if (!no_script) {
-    const file_lines = preprocess(script.split("\n"));
+    const file_lines = preprocess(
+      script.split("\n").map((x) => x.replace(/[\r\n]/g, ""))
+    );
     if (file_lines.length === 0) {
       if (throw_errors) {
         throw new Error("No valid lines were found.");

@@ -6,7 +6,7 @@
   "main": "src/main.js",
   "scripts": {
     "start": "tsc; electron .",
-    "make": "electron-builder build; electron-builder build -w; electron-builder build -l",
+    "make": "tsc; electron-builder build; electron-builder build -w; electron-builder build -l",
     "lint": "eslint --ext .ts ."
   },
   "keywords": [],

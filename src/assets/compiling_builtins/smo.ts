@@ -46,7 +46,7 @@ const builtin_data = [
   {
     name: "BACKFLIP",
     description:
-      "Performs a backflip. This can also be used while rolling to long jump.",
+      "Performs a backflip. This can also be used while rolling or walking to long jump.",
     internal_actions: ["1 ON{KEY_ZL}", "1 ON{KEY_A}"],
   },
 ];
