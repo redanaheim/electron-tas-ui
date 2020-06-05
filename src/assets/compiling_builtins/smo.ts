@@ -23,16 +23,31 @@ const builtin_data = [
   {
     name: "SPIN",
     description:
-      "Spins the control stick around 13 times, going to 4 positions each time.",
+      "Spins the control stick around a single time, going to 3 positions.",
+    internal_actions: [
+      "1 LSTICK{0,32767}",
+      "1 LSTICK{120,32767}",
+      "1 LSTICK{240,32767}",
+    ],
+  },
+  {
+    name: "MASH",
+    description: "Alternates pressing A and B for 10 frames.",
     internal_actions: repeat(
-      [
-        "1 LSTICK{0,30000}",
-        "1 LSTICK{90,30000}",
-        "1 LSTICK{180,30000}",
-        "1 LSTICK{270,30000}",
-      ],
-      13
+      ["1 ON{KEY_A} OFF{KEY_B}", "1 OFF{KEY_A} ON{KEY_B}"],
+      5
     ),
+  },
+  {
+    name: "MASHPLUS",
+    description: "Alternates pressing the + button for 10 frames.",
+    internal_actions: repeat(["1 ON{KEY_PLUS}", "1 OFF{KEY_PLUS}"], 5),
+  },
+  {
+    name: "BACKFLIP",
+    description:
+      "Performs a backflip. This can also be used while rolling to long jump.",
+    internal_actions: ["1 ON{KEY_ZL}", "1 ON{KEY_A}"],
   },
 ];
 const construct_builtins = function (): ScriptFunction[] {
