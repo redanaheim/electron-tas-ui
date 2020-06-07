@@ -311,6 +311,7 @@ const parse_line = function (
         break;
       }
       default: {
+        if (!parameter) continue;
         if (throw_errors) throw new Error(`Invalid parameter - '${parameter}'`);
         continue;
       }
