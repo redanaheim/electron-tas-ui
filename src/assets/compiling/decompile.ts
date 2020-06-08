@@ -69,8 +69,8 @@ class PureInputLine {
     if (used_to_clear) this.used_to_clear = true;
     line = line.trim();
     if (
-      PureInputLine.line_regex.test(line) === false ||
-      (line === "" && throw_errors)
+      (PureInputLine.line_regex.test(line) === false || line === "") &&
+      throw_errors
     ) {
       throw new Error(`Invalid line "${line}", cannot parse`);
     }
