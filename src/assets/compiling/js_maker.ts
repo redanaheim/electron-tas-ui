@@ -1,11 +1,11 @@
 import { ParsedLine } from "./compile";
-const last_index_of = function (array: any[]): number {
+export const last_index_of = function (array: any[]): number {
   return array.length - 1;
 };
-const Int = function (float: number): number {
+export const Int = function (float: number): number {
   return Math[float >= 0 ? "floor" : "ceil"](float);
 };
-const FifteenBitInt = function (float: number): number {
+export const FifteenBitInt = function (float: number): number {
   return Math.abs(float) > 32767 ? Math.sign(float) * 32767 : Int(float);
 };
 export enum Key {
@@ -26,7 +26,7 @@ export enum Key {
   LSTICK = "KEY_LSTICK",
   RSTICK = "KEY_RSTICK",
 }
-const key_to_string = function (key: Key): string {
+export const key_to_string = function (key: Key): string {
   switch (key) {
     case Key.A: {
       return "KEY_A";
@@ -81,7 +81,7 @@ const key_to_string = function (key: Key): string {
     }
   }
 };
-const string_to_key = function (key: string): Key {
+export const string_to_key = function (key: string): Key {
   if (typeof key !== "string") {
     return key;
   }
@@ -192,13 +192,27 @@ export class KeysList {
   get_array(): string[] {
     return this.internal_array.map((x) => key_to_string(x));
   }
+  equals(other: KeysList): boolean {
+    for (const key of this.internal_array) {
+      if (other.get_array().includes(key) === false) return false;
+    }
+    return other.get_array().length === this.internal_array.length;
+  }
 }
-class StickPos {
+export class StickPos {
   readonly angle: number;
   readonly magnitude: number;
   constructor(angle: number, magnitude: number) {
     this.angle = Int(angle);
     this.magnitude = FifteenBitInt(magnitude);
+  }
+  stringify(is_lstick: boolean): string {
+    return `${
+      is_lstick ? "LSTICK" : "RSTICK"
+    }{${this.angle.toString()},${this.magnitude.toString()}`;
+  }
+  equals(other: StickPos): boolean {
+    return this.angle === other.angle && this.magnitude === other.magnitude;
   }
 }
 class VirtualControllerFrame {

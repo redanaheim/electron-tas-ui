@@ -27,6 +27,11 @@ export async function create_menu(): Promise<Menu> {
           accelerator: "CmdOrCtrl+Shift+M",
           label: "Compile and Export Script",
         },
+        {
+          click: menu_click_handlers.create_decompile_window,
+          accelerator: "CmdOrCtrl+Shift+Z",
+          label: "Decompile Script",
+        },
         { type: "separator" },
         {
           click: menu_click_handlers.create_js_compile_window,
@@ -69,6 +74,23 @@ export async function create_menu(): Promise<Menu> {
               checked: await Store.value_of(
                 "dialogs",
                 "show_compiler_errors",
+                store_defaults.dialogs
+              ),
+            },
+            {
+              click: (
+                menu_item: MenuItem,
+                _browser_window: BrowserWindow,
+                _event: Event
+              ): Promise<void> => {
+                menu_click_handlers.show_decompiler_errors(menu_item.checked);
+                return;
+              },
+              label: "Show Decompiler Errors",
+              type: "checkbox",
+              checked: await Store.value_of(
+                "dialogs",
+                "show_decompiler_errors",
                 store_defaults.dialogs
               ),
             },

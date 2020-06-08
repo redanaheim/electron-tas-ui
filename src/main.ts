@@ -112,6 +112,25 @@ const create_compile_window = async (): Promise<void> => {
   popup.loadFile(path.join(__dirname, "../src/compiling/index.html"));
 };
 
+const create_decompile_window = async (): Promise<void> => {
+  const current = await Store.value_of(
+    "config",
+    "theme",
+    store_defaults.config
+  );
+  const popup = new BrowserWindow({
+    height: compiling_window_size.height,
+    width: compiling_window_size.width,
+    resizable: process.platform === "darwin" ? false : true,
+    webPreferences: {
+      nodeIntegration: true,
+    },
+    backgroundColor: current === "dark" ? "#121212" : "#FFF",
+  });
+  popup.setMenuBarVisibility(false);
+  popup.loadFile(path.join(__dirname, "../src/decompiling/index.html"));
+};
+
 const create_js_compile_window = async (): Promise<void> => {
   const current = await Store.value_of(
     "config",
@@ -253,14 +272,36 @@ const show_compiler_errors = async function (do_show: boolean): Promise<void> {
   }
 };
 
+const show_decompiler_errors = async function (
+  do_show: boolean
+): Promise<void> {
+  const show_dialog_selections = await new Store(
+    "dialogs",
+    store_defaults.dialogs
+  );
+  try {
+    await show_dialog_selections.set("show_decompiler_errors", do_show);
+  } catch (err) {
+    console.error(err);
+    await dialog.showMessageBox(null, {
+      title: "Error",
+      message: err.toString(),
+      type: "error",
+      buttons: ["OK"],
+    });
+  }
+};
+
 // Export menu click events
 export const menu_click_handlers = {
   create_help_window: create_help_window,
   create_editing_window: create_editing_window,
   create_export_window: create_export_window,
   create_compile_window: create_compile_window,
+  create_decompile_window: create_decompile_window,
   create_js_compile_window: create_js_compile_window,
   show_compiler_errors: show_compiler_errors,
+  show_decompiler_errors: show_decompiler_errors,
   create_compile_export_window: create_compile_export_window,
   create_js_compile_export_window: create_js_compile_export_window,
   open_backups: open_backups,

@@ -162,6 +162,8 @@ export const store_defaults = {
   last_input_values: {
     compiling_file_path: "",
     compiling_save_path: "",
+    decompiling_file_path: "",
+    decompiling_save_path: "",
     js_compiling_file_path: "",
     js_compiling_save_path: "",
     compiling_exporting_source_path: "",
@@ -176,6 +178,8 @@ export const store_defaults = {
     show_compile_success: true,
     show_compiler_errors: true,
     show_export_success: true,
+    show_decompiler_success: true,
+    show_decompiler_errors: true,
     is_default: true,
   },
 };
