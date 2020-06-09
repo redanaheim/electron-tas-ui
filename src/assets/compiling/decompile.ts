@@ -3,7 +3,6 @@ import {
   StickPos,
   Key,
   FifteenBitInt,
-  Int,
   string_to_key,
   last_index_of,
 } from "./js_maker";
@@ -15,14 +14,14 @@ const calc_angle = function (x: number, y: number): number {
   const base = (Math.atan(x / y) * 180) / Math.PI;
   if (x >= 0 && y >= 0) return base;
   if (x >= 0 && y < 0) return 180 + base;
-  if (x < 0 && y < 0) return 270 - base;
+  if (x < 0 && y < 0) return 180 + base;
   if (x <= 0 && y > 0) return 360 + base;
   if (x < 0 && y === 0) return 270;
 };
 
 const cartesian_to_polar = (x: number, y: number): StickPos => {
   return new StickPos(
-    Int(calc_angle(x, y)),
+    Math.round(calc_angle(x, y) * 100000000000) / 100000000000,
     FifteenBitInt(Math.sqrt(x ** 2 + y ** 2))
   );
 };

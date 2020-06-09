@@ -32,6 +32,10 @@ export interface ParsedLine {
   lstick_changes: boolean;
   rstick_changes: boolean;
 }
+const sign_independent_ceil = function (float: number): number {
+  if (Math.abs(float) < 1) return 0;
+  else return Math.sign(float) * Math.ceil(Math.abs(float));
+};
 const make_stick_cartesian = function (
   polar_coords: [number, number]
 ): [number, number] {
@@ -41,10 +45,9 @@ const make_stick_cartesian = function (
   if (Math.abs(polar_coords[1]) > 32767)
     polar_coords[1] = Math.sign(polar_coords[1]) * 32767;
   const angle = (polar_coords[0] * Math.PI) / 180;
-  return [
-    Math.round(polar_coords[1] * Math.sin(angle)),
-    Math.round(polar_coords[1] * Math.cos(angle)),
-  ];
+  const x = polar_coords[1] * Math.sin(angle);
+  const y = polar_coords[1] * Math.cos(angle);
+  return [sign_independent_ceil(x), sign_independent_ceil(y)];
 };
 const opposite_keys = function (raw: string[], valid_keys: string[]): string[] {
   // invert keys: get every key except the ones passed to the "raw" argument
