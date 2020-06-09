@@ -68,6 +68,11 @@ export const decompile_on_click = async function (): Promise<void> {
     return;
   }
   const file_content = (await read_file_async(source_path, "utf8")).toString();
+  const decimals_allowed = await Store.value_of(
+    "preferences",
+    "decompiling_perfect_decimal_match",
+    store_defaults.preferences
+  );
   try {
     await write_file_async(
       save_path,
@@ -77,7 +82,8 @@ export const decompile_on_click = async function (): Promise<void> {
           "dialogs",
           "show_decompiler_errors",
           store_defaults.dialogs
-        )
+        ),
+        decimals_allowed
       )
     );
   } catch (err) {

@@ -189,4 +189,8 @@ export const store_defaults = {
     all_exporting_show_replace: true,
     is_default: true,
   },
+  preferences: {
+    decompiling_perfect_decimal_match: true,
+    is_default: true,
+  },
 };

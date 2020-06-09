@@ -117,6 +117,30 @@ export async function create_menu(): Promise<Menu> {
                 store_defaults.dialogs
               ),
             },
+            {
+              click: (
+                menu_item: MenuItem,
+                _browser_window: BrowserWindow,
+                _event: Event
+              ): Promise<void> => {
+                const dialogs = new Store(
+                  "preferences",
+                  store_defaults.preferences
+                );
+                dialogs.set(
+                  "decompiling_perfect_decimal_match",
+                  menu_item.checked
+                );
+                return;
+              },
+              label: "Allow Decimals on Stick Angles",
+              type: "checkbox",
+              checked: await Store.value_of(
+                "preferences",
+                "decompiling_perfect_decimal_match",
+                store_defaults.preferences
+              ),
+            },
           ],
         },
         {

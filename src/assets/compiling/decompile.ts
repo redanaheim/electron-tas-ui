@@ -19,9 +19,15 @@ const calc_angle = function (x: number, y: number): number {
   if (x < 0 && y === 0) return 270;
 };
 
-const cartesian_to_polar = (x: number, y: number): StickPos => {
+const cartesian_to_polar = (
+  x: number,
+  y: number,
+  allow_decimals?: boolean
+): StickPos => {
   return new StickPos(
-    Math.round(calc_angle(x, y) * 100000000000) / 100000000000,
+    allow_decimals
+      ? Math.round(calc_angle(x, y) * 100000000000) / 100000000000
+      : Math.round(calc_angle(x, y)),
     FifteenBitInt(Math.sqrt(x ** 2 + y ** 2))
   );
 };
@@ -65,7 +71,12 @@ class PureInputLine {
   static empty = ((): PureInputLine => {
     return new PureInputLine("0 NONE 0;0 0;0");
   })();
-  constructor(line: string, used_to_clear?: boolean, throw_errors?: boolean) {
+  constructor(
+    line: string,
+    used_to_clear?: boolean,
+    throw_errors?: boolean,
+    allow_decimals?: boolean
+  ) {
     this.on_keys = new KeysList();
     this.off_keys = new KeysList();
     if (used_to_clear) this.used_to_clear = true;
@@ -95,7 +106,8 @@ class PureInputLine {
     ];
     this.lstick_pos = cartesian_to_polar(
       this.lstick_pos_cartesian[0],
-      this.lstick_pos_cartesian[1]
+      this.lstick_pos_cartesian[1],
+      allow_decimals
     );
     this.rstick_pos_cartesian = [
       Number(parts[3].split(";")[0]),
@@ -103,7 +115,8 @@ class PureInputLine {
     ];
     this.rstick_pos = cartesian_to_polar(
       this.rstick_pos_cartesian[0],
-      this.rstick_pos_cartesian[1]
+      this.rstick_pos_cartesian[1],
+      allow_decimals
     );
   }
   compare_to(previous: PureInputLine): void {
@@ -169,7 +182,8 @@ class PureInputLine {
 
 export const decompile = function (
   script: string | Buffer,
-  throw_errors?: boolean
+  throw_errors?: boolean,
+  allow_decimals?: boolean
 ): string {
   let buffer = "";
   script = typeof script === "string" ? script : "";
@@ -177,7 +191,12 @@ export const decompile = function (
   const queue = [PureInputLine.empty];
   let last_updated_frame = 0;
   for (const line of lines) {
-    const obj = new PureInputLine(line);
+    const obj = new PureInputLine(
+      line,
+      false,
+      throw_errors || false,
+      allow_decimals
+    );
     let added_clear = false;
     // Compare the current line to the last item in the queue
     obj.compare_to(queue[last_index_of(queue)]);
@@ -186,7 +205,8 @@ export const decompile = function (
       added_clear = true;
       const new_empty_obj = new PureInputLine(
         `${last_updated_frame + 1} NONE 0;0 0;0`,
-        true
+        true,
+        allow_decimals
       );
       new_empty_obj.compare_to(obj.previous);
       if (new_empty_obj.equals_last() === false) {
@@ -195,7 +215,9 @@ export const decompile = function (
     }
     // If it's equal to the last one in the queue anyway, why bother?
     if (obj.equals_last() === false || added_clear) {
-      queue.push(new PureInputLine(line, false, throw_errors || false));
+      queue.push(
+        new PureInputLine(line, false, throw_errors || false, allow_decimals)
+      );
     }
     last_updated_frame = obj.frame;
   }
