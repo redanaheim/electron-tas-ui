@@ -83,23 +83,6 @@ export async function create_menu(): Promise<Menu> {
                 _browser_window: BrowserWindow,
                 _event: Event
               ): Promise<void> => {
-                menu_click_handlers.show_decompiler_errors(menu_item.checked);
-                return;
-              },
-              label: "Show Decompiler Errors",
-              type: "checkbox",
-              checked: await Store.value_of(
-                "dialogs",
-                "show_decompiler_errors",
-                store_defaults.dialogs
-              ),
-            },
-            {
-              click: (
-                menu_item: MenuItem,
-                _browser_window: BrowserWindow,
-                _event: Event
-              ): Promise<void> => {
                 const dialogs = new Store("dialogs", store_defaults.dialogs);
                 dialogs.set("show_compile_success", menu_item.checked);
                 return;
@@ -109,6 +92,28 @@ export async function create_menu(): Promise<Menu> {
               checked: await Store.value_of(
                 "dialogs",
                 "show_compile_success",
+                store_defaults.dialogs
+              ),
+            },
+          ],
+        },
+        {
+          label: "Decompiling",
+          submenu: [
+            {
+              click: (
+                menu_item: MenuItem,
+                _browser_window: BrowserWindow,
+                _event: Event
+              ): Promise<void> => {
+                menu_click_handlers.show_decompiler_errors(menu_item.checked);
+                return;
+              },
+              label: "Show Decompiler Errors",
+              type: "checkbox",
+              checked: await Store.value_of(
+                "dialogs",
+                "show_decompiler_errors",
                 store_defaults.dialogs
               ),
             },
@@ -132,6 +137,24 @@ export async function create_menu(): Promise<Menu> {
               checked: await Store.value_of(
                 "dialogs",
                 "show_export_success",
+                store_defaults.dialogs
+              ),
+            },
+            {
+              click: (
+                menu_item: MenuItem,
+                _browser_window: BrowserWindow,
+                _event: Event
+              ): Promise<void> => {
+                const dialogs = new Store("dialogs", store_defaults.dialogs);
+                dialogs.set("all_exporting_show_replace", menu_item.checked);
+                return;
+              },
+              label: "Show Warning When Replacing Scripts",
+              type: "checkbox",
+              checked: await Store.value_of(
+                "dialogs",
+                "all_exporting_show_replace",
                 store_defaults.dialogs
               ),
             },

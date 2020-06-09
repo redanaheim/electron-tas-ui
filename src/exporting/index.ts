@@ -59,14 +59,21 @@ export const send = async function (
     return;
   }
   if (is_replacing) {
-    const should_replace = await dialog.showMessageBox(this_window, {
-      message: `This will overwrite /scripts/${export_name} on the Switch. The current file will be backed up, however do you still want to proceed?`,
-      type: "question",
-      buttons: ["Cancel", "Replace"],
-    });
-    if (should_replace.response === 0) {
-      // User clicked cancel
-      return;
+    const show_replace_dialog = await Store.value_of(
+      "dialogs",
+      "all_exporting_show_replace",
+      store_defaults.dialogs
+    );
+    if (show_replace_dialog) {
+      const should_replace = await dialog.showMessageBox(this_window, {
+        message: `This will overwrite /scripts/${export_name} on the Switch. The current file will be backed up, however do you still want to proceed?`,
+        type: "question",
+        buttons: ["Cancel", "Replace"],
+      });
+      if (should_replace.response === 0) {
+        // User clicked cancel
+        return;
+      }
     }
   }
   let result;

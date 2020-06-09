@@ -72,7 +72,7 @@ export class Store {
     const instance = new Store(store_name, defaults || { is_default: false });
     let data: Promise<InternalData[keyof InternalData]>;
     try {
-      data = await instance.get(property);
+      data = await instance.get(property, defaults);
     } catch (err) {
       console.error(err);
       return undefined;
@@ -99,9 +99,12 @@ export class Store {
    * @param property Property to return the value of
    */
   async get(
-    property: keyof InternalData
+    property: keyof InternalData,
+    defaults?: InternalData
   ): Promise<InternalData[keyof InternalData]> {
-    return (await this.data)[property];
+    const data = await this.data;
+    if (!defaults) return data[property];
+    return data[property] === undefined ? defaults[property] : data[property];
   }
   /**
    * Changes the value of a property as stored in the instance
@@ -172,6 +175,9 @@ export const store_defaults = {
     js_compiling_exporting_source_path: "",
     js_compiling_exporting_export_name: "script1.txt",
     js_compiling_exporting_switch_ip: "1.1.1.1",
+    exporting_source_path: "",
+    exporting_export_name: "script1.txt",
+    exporting_switch_ip: "1.1.1.1",
     is_default: true,
   },
   dialogs: {
@@ -180,6 +186,7 @@ export const store_defaults = {
     show_export_success: true,
     show_decompiler_success: true,
     show_decompiler_errors: true,
+    all_exporting_show_replace: true,
     is_default: true,
   },
 };

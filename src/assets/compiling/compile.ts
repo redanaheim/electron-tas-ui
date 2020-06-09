@@ -117,10 +117,17 @@ class ControllerState {
       }
     }
     for (let i = 0; i < script_line.keys_on.length; i++) {
-      if (
-        pressed_keys.includes(script_line.keys_on[i]) === false &&
-        ControllerState.valid_keys.includes(script_line.keys_on[i])
-      ) {
+      if (pressed_keys.includes(script_line.keys_on[i])) {
+        if (throw_errors) {
+          throw new Error(
+            `Frame ${script_line.frame.toString()}: cannot press ${
+              script_line.keys_on[i]
+            } as it is already pressed.`
+          );
+        } else {
+          continue;
+        }
+      } else if (ControllerState.valid_keys.includes(script_line.keys_on[i])) {
         new_pressed_keys.push(script_line.keys_on[i]);
       }
     }
