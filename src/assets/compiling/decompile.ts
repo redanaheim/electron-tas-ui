@@ -126,7 +126,7 @@ class PureInputLine {
         this.off_keys.append(key);
       }
     }
-    console.log("this: ", this);
+
     this.are_keys_same =
       this.on_keys.equals(this.previous.on_keys) &&
       this.off_keys.equals(this.previous.off_keys);
@@ -205,6 +205,5 @@ export const decompile = function (
     element.compare_to(queue[i - 1]);
     buffer += `${element.print()}\n`;
   }
-  console.log("queue: ", queue);
   return buffer;
 };
