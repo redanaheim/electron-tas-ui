@@ -11,6 +11,7 @@ todo.txt
 on_hold
 !src/assets/jquery.min.js
 !src/assets/lodash.min.js
+src/editing/inputs.ts
 
 # Logs
 logs

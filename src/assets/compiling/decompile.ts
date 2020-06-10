@@ -5,7 +5,7 @@ import {
   FifteenBitInt,
   string_to_key,
   last_index_of,
-} from "./js_maker";
+} from "./classes";
 
 const calc_angle = function (x: number, y: number): number {
   if (x === 0 && y === 0) {

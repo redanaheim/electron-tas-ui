@@ -1,3 +1,5 @@
+import { ParsedLine } from "./classes";
+
 export class ScriptFunction {
   name: string;
   internal_actions: string[];
@@ -23,15 +25,7 @@ interface ScriptFunctionExports {
   functions: ScriptFunction[];
   new_file_content: string[];
 }
-export interface ParsedLine {
-  frame: number;
-  keys_on: string[];
-  keys_off: string[];
-  lstick_pos_polar: [number, number];
-  rstick_pos_polar: [number, number];
-  lstick_changes: boolean;
-  rstick_changes: boolean;
-}
+
 const sign_independent_ceil = function (float: number): number {
   if (Math.abs(float) < 1) return 0;
   else return Math.sign(float) * Math.ceil(Math.abs(float));
