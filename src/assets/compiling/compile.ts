@@ -141,6 +141,24 @@ class ControllerState {
     if (script_line.rstick_changes === true) this.rstick_pos = rstick_pos;
   }
 }
+const as_key = function (x: string): string {
+  x = x.toUpperCase();
+  switch (x) {
+    case "ALL": {
+      return x;
+    }
+    case "NONE": {
+      return x;
+    }
+    default: {
+      if (/^KEY_/.test(x)) {
+        return x;
+      } else {
+        return `KEY_${x}`;
+      }
+    }
+  }
+};
 const separate_brackets = function (parameter: any): Array<typeof parameter> {
   // ON{KEY,KEY,KEY} => ["KEY", "KEY", "KEY"]
   return parameter
@@ -149,7 +167,7 @@ const separate_brackets = function (parameter: any): Array<typeof parameter> {
     .join("")
     .split("}")[0]
     .split(",")
-    .map((x: string) => x.toUpperCase());
+    .map((x: string) => as_key(x));
 };
 const separate_brackets_stick = function (parameter: any): [number, number] {
   // purely for the purpose of returning a dual number tuple
