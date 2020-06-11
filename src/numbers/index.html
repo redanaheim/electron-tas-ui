@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html style="font-size: 1px;">
+  <head>
+    <title>Narrow Down Numeric Values</title>
+    <link rel="stylesheet" href="../assets/styles/themes.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto"
+    />
+    <link rel="stylesheet" href="./style.css" />
+    <script>
+      window.$ = window.jQuery = require("../assets/jquery.min.js");
+      const { set_theme } = require("../theme.js");
+      const { on_change, change_range } = require("./index.js");
+      $(document).ready(() => {
+        $("input").change(on_change);
+      });
+    </script>
+  </head>
+  <body>
+    <table>
+      <tr>
+        <td><input id="lower" type="number" value="-1" /></td>
+      </tr>
+      <tr>
+        <td>
+          <img
+            src="../assets/ui_buttons/arrow.svg"
+            onclick="change_range(false)"
+          />
+          <span id="out">0</span>
+          <img
+            src="../assets/ui_buttons/arrow.svg"
+            onclick="change_range(true)"
+            id="reversed"
+          />
+        </td>
+      </tr>
+      <tr>
+        <td><input id="upper" type="number" value="1" /></td>
+      </tr>
+    </table>
+  </body>
+</html>

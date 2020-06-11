@@ -112,6 +112,25 @@ const create_compile_window = async (): Promise<void> => {
   popup.loadFile(path.join(__dirname, "../src/compiling/index.html"));
 };
 
+const create_numeric_value_window = async (): Promise<void> => {
+  const current = await Store.value_of(
+    "config",
+    "theme",
+    store_defaults.config
+  );
+  const popup = new BrowserWindow({
+    height: 95,
+    width: 300,
+    resizable: true,
+    webPreferences: {
+      nodeIntegration: true,
+    },
+    backgroundColor: current === "dark" ? "#121212" : "#FFF",
+  });
+  popup.setMenuBarVisibility(false);
+  popup.loadFile(path.join(__dirname, "../src/numbers/index.html"));
+};
+
 const create_decompile_window = async (): Promise<void> => {
   const current = await Store.value_of(
     "config",
@@ -298,6 +317,7 @@ export const menu_click_handlers = {
   create_editing_window: create_editing_window,
   create_export_window: create_export_window,
   create_compile_window: create_compile_window,
+  create_numeric_value_window: create_numeric_value_window,
   create_decompile_window: create_decompile_window,
   create_js_compile_window: create_js_compile_window,
   show_compiler_errors: show_compiler_errors,

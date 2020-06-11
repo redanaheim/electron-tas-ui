@@ -55,6 +55,15 @@ export async function create_menu(): Promise<Menu> {
       ],
     },
     {
+      label: "Utilities",
+      submenu: [
+        {
+          click: menu_click_handlers.create_numeric_value_window,
+          label: "Narrow Down Numeric Value",
+        },
+      ],
+    },
+    {
       label: "Options",
       submenu: [
         {
