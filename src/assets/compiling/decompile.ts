@@ -153,22 +153,32 @@ class PureInputLine {
       this.are_keys_same
     );
   }
-  print(): string {
+  print(is_last?: boolean): string {
     let buffer = `${this.frame === 1 ? "+" : this.frame - this.previous.frame}`;
     // Should we add anything to the line regarding the keys?
+    let added_keys = false;
     if (this.are_keys_same === false) {
       const on_keys = this.on_keys.get_array();
       const off_keys = this.off_keys.get_array();
       if (this.pressed_keys.get_array().length === 0) {
         buffer += " OFF{ALL}";
+        added_keys = true;
       } else if (this.clone_keys.get_array().length === 0) {
         buffer += ` RAW{${this.pressed_keys.get_array().join(",")}}`;
+        added_keys = true;
       } else {
-        if (on_keys.length > 0) buffer += ` ON{${on_keys.join(",")}}`;
+        if (on_keys.length > 0) {
+          buffer += ` ON{${on_keys.join(",")}}`;
+          added_keys = true;
+        }
         if (off_keys.length > 0) {
           buffer += ` OFF{${off_keys.join(",")}}`;
+          added_keys = true;
         }
       }
+    }
+    if (!added_keys && is_last) {
+      buffer += " ON{NONE}";
     }
     if (this.lstick_changes) {
       buffer += ` ${this.lstick_pos.stringify(true)}}`;
@@ -214,7 +224,11 @@ export const decompile = function (
       }
     }
     // If it's equal to the last one in the queue anyway, why bother?
-    if (obj.equals_last() === false || added_clear) {
+    if (
+      obj.equals_last() === false ||
+      added_clear ||
+      line === lines[last_index_of(lines)]
+    ) {
       queue.push(
         new PureInputLine(line, false, throw_errors || false, allow_decimals)
       );
@@ -224,7 +238,7 @@ export const decompile = function (
   for (let i = 1; i < queue.length; i++) {
     const element = queue[i];
     element.compare_to(queue[i - 1]);
-    buffer += `${element.print()}\n`;
+    buffer += `${element.print(i === last_index_of(queue))}\n`;
   }
   return buffer;
 };
