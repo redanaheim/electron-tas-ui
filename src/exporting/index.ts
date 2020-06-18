@@ -25,10 +25,10 @@ export const send = async function (
 ): Promise<void> {
   const this_window = BrowserWindow.getFocusedWindow();
 
-  if (/^[0-9a-zA-Z.]+$/.test(export_name) === false) {
+  if (/^[0-9a-zA-Z.-]+$/.test(export_name) === false) {
     await dialog.showMessageBox(this_window, {
       message: "Invalid Export Name",
-      details: "You can only use '.' and alphanumeric characters.",
+      details: "You can only use '.', '-', and alphanumeric characters.",
       type: "error",
       buttons: ["OK"],
     });
