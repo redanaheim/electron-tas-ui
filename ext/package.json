@@ -3,6 +3,10 @@
   "displayName": "better-scripts-tas",
   "description": "Adds grammar for Better Scripts TAS format",
   "version": "0.0.1",
+  "publisher": "tigergold59",
+  "repository": {
+    "url": "https://github.com/tigergold59/electron-tas-ui"
+  },
   "engines": {
     "vscode": "^1.46.0"
   },
