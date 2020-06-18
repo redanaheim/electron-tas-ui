@@ -16,7 +16,7 @@
       "name": "comment.line.double-slash.better-scripts"
     },
     {
-      "match": "(?<=(\\,|\\{))(?i:KEY_)?(?i:A|B|X|Y|LSTICK|RSTICK|L|R|ZL|ZR|DUP|DDOWN|DLEFT|DRIGHT|PLUS|MINUS)(?=(\\,|\\}))",
+      "match": "(?<=(\\,|\\{))(?i:KEY_)?(?i:A|B|X|Y|LSTICK|RSTICK|L|R|ZL|ZR|DUP|DDOWN|DLEFT|DRIGHT|PLUS|MINUS|NONE|ALL)(?=(\\,|\\}))",
       "name": "string.other.keyname.better-scripts"
     },
     {
