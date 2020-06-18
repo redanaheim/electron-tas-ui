@@ -1,0 +1,40 @@
+{
+  "on": {
+    "prefix": ["on", "ON"],
+    "body": ["ON{${1:A}\\}"],
+    "description": "Presses the keys inside."
+  },
+  "off": {
+    "prefix": ["off", "OFF"],
+    "body": ["OFF{${1:A}\\}"],
+    "description": "Releases the keys inside."
+  },
+  "raw": {
+    "prefix": ["raw", "RAW"],
+    "body": ["RAW{${1:A}\\}"],
+    "description": "Presses the keys inside and releases all others."
+  },
+  "lstick": {
+    "prefix": ["lstick", "left", "ls"],
+    "body": ["LSTICK{${1:angle},${2:magnitude}\\}"],
+    "description": "Sets the left stick position."
+  },
+  "rstick": {
+    "prefix": ["rstick", "right", "rs"],
+    "body": ["RSTICK{${1:angle,${2:magnitude}\\}"],
+    "description": "Sets the right stick position."
+  },
+  "macro": {
+    "prefix": ["macro", "func"],
+    "body": ["DEF ${1:name} {", "$0", "\\}"],
+    "description": "Creates a macro."
+  },
+  "repeat": {
+    "prefix": ["rep", "repeat"],
+    "body": ["REP ${1:name} ${2:times}"]
+  },
+  "line": {
+    "prefix": ["line"],
+    "body": ["${1:delay} ON{${2:A}\\} OFF{${3:B}\\}"]
+  }
+}

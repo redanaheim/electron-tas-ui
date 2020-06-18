@@ -1,0 +1,41 @@
+{
+  "name": "better-scripts-tas",
+  "displayName": "better-scripts-tas",
+  "description": "Adds grammar for Better Scripts TAS format",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.46.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Snippets"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "better-scripts",
+        "aliases": [
+          "Better Scripts",
+          "better-scripts"
+        ],
+        "extensions": [
+          ".tig"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "better-scripts",
+        "scopeName": "text.better-scripts",
+        "path": "./better-scripts.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "better-scripts",
+        "path": "./snippets.json"
+      }
+    ]
+  }
+}

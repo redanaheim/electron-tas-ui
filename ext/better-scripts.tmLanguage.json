@@ -1,0 +1,50 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Better Scripts",
+  "patterns": [
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#constants"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "match": "^//.*",
+      "name": "comment.line.double-slash.better-scripts"
+    },
+    {
+      "match": "(?<=(\\,|\\{))(?i:KEY_)?(?i:A|B|X|Y|LSTICK|RSTICK|L|R|ZL|ZR|DUP|DDOWN|DLEFT|DRIGHT|PLUS|MINUS)(?=(\\,|\\}))",
+      "name": "string.other.keyname.better-scripts"
+    },
+    {
+      "match": "(?<=(L|R)STICK\\{[0-9]+.?[0-9]*\\,)[0-9]+(?=\\})",
+      "name": "constant.numeric.magnitude.better-scripts"
+    },
+    {
+      "match": "(?<=(L|R)STICK\\{)[0-9]+.?[0-9]*(?=\\,)",
+      "name": "constant.numeric.angle.better-scripts"
+    }
+  ],
+  "repository": {
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.parameters.better-scripts",
+          "match": "\\b(?i:ON|OFF|RAW|LSTICK|RSTICK)\\b"
+        },
+        {
+          "match": "(?i:DEF)",
+          "name": "keyword.macros.def.better-scripts"
+        },
+        {
+          "match": "(?i:REP)",
+          "name": "keyword.macros.rep.better-scripts"
+        }
+      ]
+    }
+  },
+  "scopeName": "text.better-scripts"
+}
