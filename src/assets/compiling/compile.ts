@@ -1,4 +1,4 @@
-import { ParsedLine } from "./classes";
+import { ParsedLine, repeat } from "./classes";
 
 export class ScriptFunction {
   name: string;
@@ -234,6 +234,25 @@ const preprocess = function (file_lines: string[]): string[] {
       }
       if (matching_function !== null) {
         for (const function_line of matching_function.internal_actions) {
+          return_lines.push(function_line);
+        }
+      } else {
+        continue;
+      }
+    } else if (/^REP [a-zA-Z]+ [1-9][0-9]*$/.test(line)) {
+      let matching_function: ScriptFunction | null = null;
+      const name = line.split(" ")[1].toLowerCase();
+      const times = Number(line.split(" ")[2]);
+      for (const script_function of script_functions) {
+        if (script_function.name.toLowerCase() === name) {
+          matching_function = script_function;
+        }
+      }
+      if (matching_function !== null) {
+        for (const function_line of repeat(
+          matching_function.internal_actions,
+          times
+        )) {
           return_lines.push(function_line);
         }
       } else {

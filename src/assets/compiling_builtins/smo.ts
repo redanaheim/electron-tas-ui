@@ -1,13 +1,5 @@
 import { ScriptFunction } from "../compiling/compile";
-function repeat(script: any, reps: number): any[] {
-  const buffer: any[] = [];
-  for (let i = 0; i < reps; i++) {
-    for (const line of script) {
-      buffer.push(line);
-    }
-  }
-  return buffer;
-}
+import { repeat } from "../compiling/classes";
 const builtin_data = [
   {
     name: "CAPDIVE",
