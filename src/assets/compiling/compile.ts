@@ -1,30 +1,6 @@
-import { ParsedLine, repeat } from "./classes";
+import { ParsedLine } from "./classes";
 
-export class ScriptFunction {
-  name: string;
-  internal_actions: string[];
-  active: boolean;
-  description?: string;
-  constructor(
-    name: string,
-    internal_actions: string[],
-    active: boolean,
-    description?: string
-  ) {
-    this.name = name;
-    this.internal_actions = internal_actions;
-    this.active = active;
-    if (description) this.description = description;
-  }
-  static de_init = function (): ScriptFunction {
-    return new ScriptFunction("", [], false);
-  };
-}
-import { get_builtin } from "../compiling_builtins/builtin_names";
-interface ScriptFunctionExports {
-  functions: ScriptFunction[];
-  new_file_content: string[];
-}
+import { Preprocessor } from "./preprocess";
 
 const sign_independent_ceil = function (float: number): number {
   if (Math.abs(float) < 1) return 0;
@@ -43,6 +19,7 @@ const make_stick_cartesian = function (
   const y = polar_coords[1] * Math.cos(angle);
   return [sign_independent_ceil(x), sign_independent_ceil(y)];
 };
+
 const opposite_keys = function (raw: string[], valid_keys: string[]): string[] {
   // invert keys: get every key except the ones passed to the "raw" argument
   const to_return: string[] = [];
@@ -180,91 +157,7 @@ const separate_brackets_stick = function (parameter: any): [number, number] {
     .slice(0, 2)
     .map((x: string) => Number(x));
 };
-const get_script_functions = function (
-  file_lines: string[]
-): ScriptFunctionExports {
-  // Loop through lines; find definition of functions and replace all instances of them
-  let in_definition = false;
-  let script_functions: ScriptFunction[] = [];
-  let current_function = new ScriptFunction("", [], false);
-  const new_file_content = [];
-  for (let line of file_lines) {
-    if (/^BUILTINS [a-zA-Z]+$/i.test(line)) {
-      // Get name of requested builtin and then add all of those functions to script_functions
-      script_functions = script_functions.concat(
-        get_builtin(line.trim().toLowerCase().split("builtins ")[1])
-      );
-    }
-    if (/^DEF [a-zA-Z]+ \{$/i.test(line)) {
-      in_definition = true;
-      current_function = new ScriptFunction(
-        line.toLowerCase().split("def ")[1].split("{")[0].trim(),
-        [],
-        true
-      );
-    } else if (/^\}$/.test(line) && in_definition) {
-      in_definition = false;
-      if (current_function.active) {
-        script_functions.push(current_function);
-        current_function = ScriptFunction.de_init();
-      }
-    } else if (in_definition === true && current_function.active) {
-      line = line.trim();
-      if (/^([0-9]+|\+) .+$/.test(line) === false) continue; // ignore invalid lines
-      current_function.internal_actions.push(line);
-    } else if ((in_definition || current_function.active) === false) {
-      new_file_content.push(line);
-    }
-  }
-  return { functions: script_functions, new_file_content: new_file_content };
-};
-const preprocess = function (file_lines: string[]): string[] {
-  const script_function_processed = get_script_functions(file_lines);
-  const script_functions = script_function_processed.functions;
-  const new_lines = script_function_processed.new_file_content;
-  const return_lines: string[] = [];
 
-  for (const line of new_lines) {
-    if (/^[a-zA-Z]+$/.test(line)) {
-      let matching_function: ScriptFunction | null = null;
-      for (const script_function of script_functions) {
-        if (script_function.name.toLowerCase() === line.toLowerCase()) {
-          matching_function = script_function;
-        }
-      }
-      if (matching_function !== null) {
-        for (const function_line of matching_function.internal_actions) {
-          return_lines.push(function_line);
-        }
-      } else {
-        continue;
-      }
-    } else if (/^REP [a-zA-Z]+ [1-9][0-9]*$/.test(line)) {
-      let matching_function: ScriptFunction | null = null;
-      const name = line.split(" ")[1].toLowerCase();
-      const times = Number(line.split(" ")[2]);
-      for (const script_function of script_functions) {
-        if (script_function.name.toLowerCase() === name) {
-          matching_function = script_function;
-        }
-      }
-      if (matching_function !== null) {
-        for (const function_line of repeat(
-          matching_function.internal_actions,
-          times
-        )) {
-          return_lines.push(function_line);
-        }
-      } else {
-        continue;
-      }
-    } else {
-      if (/^([0-9]+|\+) .+$/.test(line) === false) continue; // ignore invalid lines
-      return_lines.push(line);
-    }
-  }
-  return return_lines;
-};
 const parse_line = function (
   line: string,
   last_frame: number,
@@ -371,9 +264,10 @@ export const compile = function (
   let update_frames: ParsedLine[] = [];
   let current_frame = 1;
   if (!no_script) {
-    const file_lines = preprocess(
-      script.split("\n").map((x) => x.replace(/[\r\n]/g, ""))
-    );
+    const lines = script.split("\n").map((x) => x.replace(/[\r\n]/g, ""));
+    const contents = new Preprocessor(lines);
+    contents.do_all();
+    const file_lines = contents.current_content;
     if (file_lines.length === 0) {
       if (throw_errors) {
         throw new Error("No valid lines were found.");

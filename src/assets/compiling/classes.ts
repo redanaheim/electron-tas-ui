@@ -5,6 +5,31 @@ export const FifteenBitInt = function (float: number): number {
   return Math.abs(float) > 32767 ? Math.sign(float) * 32767 : Int(float);
 };
 
+export interface ScriptFunctionExports {
+  functions: ScriptFunction[];
+}
+
+export class ScriptFunction {
+  name: string;
+  internal_actions: string[];
+  active: boolean;
+  description?: string;
+  constructor(
+    name: string,
+    internal_actions: string[],
+    active: boolean,
+    description?: string
+  ) {
+    this.name = name;
+    this.internal_actions = internal_actions;
+    this.active = active;
+    if (description) this.description = description;
+  }
+  static de_init = function (): ScriptFunction {
+    return new ScriptFunction("", [], false);
+  };
+}
+
 export function repeat(script: any, reps: number): any[] {
   const buffer: any[] = [];
   for (let i = 0; i < reps; i++) {

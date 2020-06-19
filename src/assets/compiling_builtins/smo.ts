@@ -1,5 +1,5 @@
-import { ScriptFunction } from "../compiling/compile";
-import { repeat } from "../compiling/classes";
+import { ScriptFunction, repeat } from "../compiling/classes";
+
 const builtin_data = [
   {
     name: "CAPDIVE",

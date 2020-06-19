@@ -42,6 +42,10 @@
         {
           "match": "(?i:REP)",
           "name": "keyword.macros.rep.better-scripts"
+        },
+        {
+          "match": "(?i:VAL)",
+          "name": "keyword.variables.val.better-scripts"
         }
       ]
     }

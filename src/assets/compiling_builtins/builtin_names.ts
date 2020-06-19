@@ -1,5 +1,5 @@
 import { SMOBuiltins } from "./smo";
-import { ScriptFunction } from "../compiling/compile";
+import { ScriptFunction } from "../compiling/classes";
 export const get_builtin = function (name: string): ScriptFunction[] {
   switch (name.toLowerCase()) {
     case "smo": {
