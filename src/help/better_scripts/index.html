@@ -82,6 +82,20 @@
       then set the right stick all the way forward.
     </p>
     <h3>
+      Variables
+    </h3>
+    <p>
+      You can declare a variable like this:
+      <code class="block">
+        VAL FORWARD = 0,32767
+      </code>
+      Then, later in the code, you can get the variable value by using <code>$</code> before the name of the variable:
+      <code class="block">
+        + LSTICK{$FORWARD}
+      </code>
+      The compiler will evaluate macros before it evaluates variables.
+    </p>
+    <h3>
       Macros
     </h3>
     <p>
@@ -101,6 +115,13 @@
         + LSTICK{0,32767}<br />
         DIVE
       </code>
+      You can also invoke a macro with a more complicated syntax, which allows you to add things to the contents. It goes like this:
+      <code class="block">
+        + LSTICK{0,32767}<br />
+        DIVE&lt1:LSTICK{180,32767}&gt
+      </code>
+      The first thing inside the arrows is the line number and the second is the content to add.
+      If you want to add things on multiple lines, you can do multiple by separating the sets with <code>-</code>.
       You must define a macro in the same file you use it in.<br /><br />
       <b><em>NOTE:</em></b> When the compiler sees an invocation, it just
       replaces the invocation with the contents of the macro, so be careful.
