@@ -10,17 +10,19 @@ const macro_modify = function (
   macro: ScriptFunction,
   matches: string[]
 ): string[] | false {
-  const modifiers: any = {};
+  const modifiers: any = {}; // keys: line number to add to, values: what to add
   if (matches.length % 2 === 1 || matches.length < 4) {
     return false;
   }
   for (let i = 2; i < matches.length; i += 2) {
-    modifiers[Number(matches[i])] = matches[i + 1];
+    // start at 3rd element; first two are irrelevant
+    modifiers[Number(matches[i])] = matches[i + 1]; // the contents to add to the line are in odd indexes
   }
   const to_return = [];
   for (let i = 0; i < macro.internal_actions.length; i++) {
     let current_line = macro.internal_actions[i];
     for (const key of Object.keys(modifiers)) {
+      // iterate through modifiers
       if (i + 1 === Number(key)) {
         current_line += " " + modifiers[Number(key)];
       }
@@ -74,7 +76,7 @@ export class Preprocessor {
           ); // replace invocations of
           // this specific variable with its value
         }
-        this.current_content.splice(i, 1, new_line);
+        this.current_content.splice(i, 1, new_line); // replace line
       }
     }
   }
@@ -127,8 +129,10 @@ export class Preprocessor {
     for (let i = 0; i < this.current_content.length; i++) {
       const line = this.current_content[i];
       if (Preprocessor.macro_invocation_regex.test(line)) {
+        // is the line maybe invoking a macro?
         let matching_function: ScriptFunction | null = null;
         for (const script_function of this.macros.functions) {
+          // check for matching macros
           if (script_function.name.toLowerCase() === line.toLowerCase()) {
             matching_function = script_function;
           }
@@ -165,7 +169,7 @@ export class Preprocessor {
         }
       } else if (Preprocessor.loop_regex.test(line)) {
         const contents = Preprocessor.loop_regex.exec(line);
-        const macro_name = contents[1];
+        const macro_name = contents[1]; // first index is entire matching object, we only care about the captured groups
         const reps = Number(contents[2]);
         let matching_function: ScriptFunction | null = null;
         for (const script_function of this.macros.functions) {

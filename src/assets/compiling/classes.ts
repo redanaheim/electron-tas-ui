@@ -1,3 +1,7 @@
+/**
+ * Truncates number before the decimal
+ * @param float Number to take in and convert to integer
+ */
 export const Int = function (float: number): number {
   return Math[float >= 0 ? "floor" : "ceil"](float);
 };
@@ -9,6 +13,9 @@ export interface ScriptFunctionExports {
   functions: ScriptFunction[];
 }
 
+/**
+ * Represents a macro in a Better Scripts script
+ */
 export class ScriptFunction {
   name: string;
   internal_actions: string[];
@@ -30,7 +37,12 @@ export class ScriptFunction {
   };
 }
 
-export function repeat(script: any, reps: number): any[] {
+/**
+ * Repeats an array
+ * @param script Array of lines
+ * @param reps Number of times to repeat
+ */
+export function repeat(script: string[], reps: number): any[] {
   const buffer: any[] = [];
   for (let i = 0; i < reps; i++) {
     for (const line of script) {
@@ -40,6 +52,9 @@ export function repeat(script: any, reps: number): any[] {
   return buffer;
 }
 
+/**
+ * Represents the actions that should be taken from a specific line in a Better Scripts script
+ */
 export interface ParsedLine {
   frame: number;
   keys_on: string[];

@@ -1,4 +1,4 @@
-import { ParsedLine } from "./classes";
+import { ParsedLine, last_index_of } from "./classes";
 
 import { Preprocessor } from "./preprocess";
 
@@ -201,7 +201,9 @@ const parse_line = function (
         // turn off all others besides the ones included in brackets
         const included_keys = separate_brackets(parameter);
         if (included_keys.map((x) => x.toLowerCase()).join("_") === "none") {
+          // turn no keys on
           to_return.keys_on = [];
+          // opposite of [] is all keys; since raw{none} should leave no keys on, turn them all off
           to_return.keys_off = opposite_keys([], ControllerState.valid_keys);
         } else if (included_keys.map((x) => x.toLowerCase()) === ["all"]) {
           to_return.keys_on = opposite_keys([], ControllerState.valid_keys);
@@ -265,8 +267,8 @@ export const compile = function (
   let current_frame = 1;
   if (!no_script) {
     const lines = script.split("\n").map((x) => x.replace(/[\r\n]/g, ""));
-    const contents = new Preprocessor(lines);
-    contents.do_all();
+    const contents = new Preprocessor(lines); // just initializing object
+    contents.do_all(); // actually preprocess
     const file_lines = contents.current_content;
     if (file_lines.length === 0) {
       if (throw_errors) {
@@ -275,6 +277,7 @@ export const compile = function (
       return script;
     }
     for (const line of file_lines) {
+      // create list of frames where we need to update the controller, and what to do
       if (/^([0-9]+|\+) .+$/.test(line) === false) continue; // no valid frame number found, ignore
       const parsed_line = parse_line(
         line,
@@ -285,25 +288,27 @@ export const compile = function (
       update_frames.push(parsed_line);
     }
   } else {
-    update_frames = premade_update_frames;
+    update_frames = premade_update_frames; // passed by programmatic scripts
   }
   if (update_frames.length === 0) {
     if (throw_errors) throw new Error("No valid lines were found.");
     return script;
   }
-  const last_frame = update_frames[update_frames.length - 1].frame;
+  const last_frame = update_frames[last_index_of(update_frames)].frame;
   // We use this instead of shift()ing because shift is very inefficient
   let next_update = update_frames[0].frame;
   let update_index = 0;
   for (let i = 1; i <= last_frame; i++) {
     if (next_update === i) {
+      // are we on a frame where changes should be made?
       controller.update(update_frames[update_index], throw_errors || false);
-      update_index++;
+      update_index++; // wait for next update frame
       if (update_index < update_frames.length) {
         next_update = update_frames[update_index].frame;
       }
     }
     const printed_line = controller.print(i);
+    // TODO: quicker way of checking if line is empty.
     if (/^[0-9]+ NONE 0;0 0;0$/i.test(printed_line) && i > 1) continue; // don't print empty lines, nx-TAS already ignores them
     compiled += printed_line + "\r\n";
   }

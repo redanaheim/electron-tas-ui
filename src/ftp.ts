@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 /* eslint-disable no-async-promise-executor */
 // TODO: Don't use async promise executors
+// TODO: Find out why connection sometimes never closes
 import * as Client from "ftp";
 import { existsSync, mkdirSync, createWriteStream, writeFile } from "fs";
 import { app, remote } from "electron";
@@ -68,7 +69,7 @@ export class IpAddress {
    * Gets the connections object to pass to FTP module.
    * @param port Optional port number, default is 5000 which almost always works for Switches.
    */
-  get_connnect_obj(port?: number): any {
+  get_connect_obj(port?: number): any {
     return {
       host: this.parts.join("."),
       port: port || 5000,
@@ -100,6 +101,7 @@ export class IpAddress {
       }
       let client: Client;
       if (connection) {
+        // have we been passed a connection
         client = connection;
       } else {
         client = new Client();
@@ -110,6 +112,7 @@ export class IpAddress {
             rej(err);
           }
           let app_path: string;
+          // Back up in app directory
           if (app) {
             app_path = app.getPath("userData");
           } else {
@@ -150,7 +153,7 @@ export class IpAddress {
       }
       if (!connection) {
         try {
-          client.connect(this.get_connnect_obj(port));
+          client.connect(this.get_connect_obj(port));
         } catch (err) {
           rej(err);
         }
@@ -188,6 +191,7 @@ export class IpAddress {
         client = new Client();
       }
       const on_ready = function (): void {
+        // list all files in given directory, iterate to see if any match
         client.list(directory, (err: any, dir: any[]) => {
           if (err) {
             rej(err);
@@ -210,7 +214,7 @@ export class IpAddress {
       }
       if (!connection) {
         try {
-          client.connect(this.get_connnect_obj(port));
+          client.connect(this.get_connect_obj(port));
         } catch (err) {
           rej(err);
         }
@@ -279,7 +283,7 @@ export class IpAddress {
       };
       connection.on("ready", on_ready);
       try {
-        connection.connect(that.get_connnect_obj(5000));
+        connection.connect(that.get_connect_obj(5000));
       } catch (err) {
         rej(err);
       }
