@@ -205,7 +205,9 @@ const parse_line = function (
           to_return.keys_on = [];
           // opposite of [] is all keys; since raw{none} should leave no keys on, turn them all off
           to_return.keys_off = opposite_keys([], ControllerState.valid_keys);
-        } else if (included_keys.map((x) => x.toLowerCase()) === ["all"]) {
+        } else if (
+          included_keys.map((x) => x.toLowerCase()).join("_") === "all"
+        ) {
           to_return.keys_on = opposite_keys([], ControllerState.valid_keys);
           to_return.keys_off = [];
         } else {
