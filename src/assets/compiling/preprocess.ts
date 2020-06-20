@@ -39,7 +39,7 @@ export class Preprocessor {
   static macro_regex = /^DEF ?([A-Z]+) ?\{$/i;
   static macro_invocation_regex = /^([A-Z]+)$/i;
   static macro_parameter_regex = /^([A-Z]+) ?<(?:([1-9][0-9]*):([^-]+))(?:-([1-9][0-9]*):([^-]+))*>$/i;
-  static variable_regex = /^VAL ([A-Z]+) ?= ?(.+)$/i;
+  static variable_regex = /^VA[LR] ([A-Z]+) ?= ?(.+)$/i;
   static action_line_regex = /^([0-9]+|\+) .+$/i;
   static variable_invocation_regex = /\$([A-Z]+)/i;
   vars?: InternalVariables = {};

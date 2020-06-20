@@ -28,6 +28,11 @@ export async function create_menu(): Promise<Menu> {
           label: "Compile and Export Script",
         },
         {
+          click: menu_click_handlers.create_preprocessor_window,
+          accelerator: "CmdOrCtrl+P",
+          label: "Preprocess Script",
+        },
+        {
           click: menu_click_handlers.create_decompile_window,
           accelerator: "CmdOrCtrl+Shift+Z",
           label: "Decompile Script",

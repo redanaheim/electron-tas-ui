@@ -150,6 +150,25 @@ const create_decompile_window = async (): Promise<void> => {
   popup.loadFile(path.join(__dirname, "../src/decompiling/index.html"));
 };
 
+const create_preprocessor_window = async (): Promise<void> => {
+  const current = await Store.value_of(
+    "config",
+    "theme",
+    store_defaults.config
+  );
+  const popup = new BrowserWindow({
+    height: compiling_window_size.height,
+    width: compiling_window_size.width,
+    resizable: process.platform === "darwin" ? false : true,
+    webPreferences: {
+      nodeIntegration: true,
+    },
+    backgroundColor: current === "dark" ? "#121212" : "#FFF",
+  });
+  popup.setMenuBarVisibility(false);
+  popup.loadFile(path.join(__dirname, "../src/preprocessing/index.html"));
+};
+
 const create_js_compile_window = async (): Promise<void> => {
   const current = await Store.value_of(
     "config",
@@ -319,6 +338,7 @@ export const menu_click_handlers = {
   create_compile_window: create_compile_window,
   create_numeric_value_window: create_numeric_value_window,
   create_decompile_window: create_decompile_window,
+  create_preprocessor_window: create_preprocessor_window,
   create_js_compile_window: create_js_compile_window,
   show_compiler_errors: show_compiler_errors,
   show_decompiler_errors: show_decompiler_errors,

@@ -167,6 +167,8 @@ export const store_defaults = {
     compiling_save_path: "",
     decompiling_file_path: "",
     decompiling_save_path: "",
+    preprocessing_file_path: "",
+    preprocessing_save_path: "",
     js_compiling_file_path: "",
     js_compiling_save_path: "",
     compiling_exporting_source_path: "",

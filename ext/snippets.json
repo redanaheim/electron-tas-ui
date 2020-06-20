@@ -25,13 +25,17 @@
     "description": "Sets the right stick position."
   },
   "macro": {
-    "prefix": ["macro", "func"],
+    "prefix": ["macro", "func", "def"],
     "body": ["DEF ${1:name} {", "$0", "\\}"],
     "description": "Creates a macro."
   },
   "repeat": {
     "prefix": ["rep", "repeat"],
     "body": ["REP ${1:name} ${2:times}"]
+  },
+  "variable": {
+    "prefix": ["val", "var"],
+    "body": ["VAL ${1:name} = ${2:content}"]
   },
   "line": {
     "prefix": ["line"],
