@@ -2,6 +2,12 @@
   "comments": {
     "lineComment": "//"
   },
-  "brackets": [["{", "}"]],
-  "autoClosingPairs": [["{", "}"]]
+  "brackets": [
+    ["{", "}"],
+    ["<", ">"]
+  ],
+  "autoClosingPairs": [
+    ["{", "}"],
+    ["<", ">"]
+  ]
 }
