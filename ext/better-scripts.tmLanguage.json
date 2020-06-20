@@ -44,7 +44,7 @@
           "name": "keyword.macros.rep.better-scripts"
         },
         {
-          "match": "(?i:VAL|\\$)",
+          "match": "(?i:VAL|\\$|VAR)",
           "name": "keyword.variables.val.better-scripts"
         }
       ]
