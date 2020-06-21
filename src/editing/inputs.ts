@@ -41,7 +41,8 @@ const create_stick_element = function (is_left: boolean): JQuery<HTMLElement> {
         .addClass("stick_icon")
         .attr("src", `../assets/buttons/svg/${is_left ? "l" : "r"}stick.svg`)
     )
-    .data("is_left", is_left);
+    .data("is_left", is_left)
+    .data("value", is_left ? Key.LSTICK : Key.RSTICK);
 };
 
 interface KeyToReferenceStore {
@@ -150,18 +151,23 @@ export class PianoRollRow {
       row.append(key_el);
       this.key_references[key_to_string(key)] = key_el;
     }
-    row.append(create_stick_element(true)).append(create_stick_element(false));
+    const lstick = create_stick_element(true);
+    const rstick = create_stick_element(false);
+    this.key_references["KEY_LSTICK"] = lstick;
+    this.key_references["KEY_RSTICK"] = rstick;
+    row.append(lstick).append(rstick);
     row.data("object", this);
     return row;
   }
-  toggle_key(key: Key, previous: PianoRollRow): void {
+  toggle_key(key: Key): void {
     if (this.active_keys.has(key)) {
       this.active_keys.remove(key);
     } else {
       this.active_keys.append(key);
     }
-    this.reeval_keys(previous);
     if (this.reference) {
+      console.log("this.key_references: ", this.key_references);
+      console.log("key_to_string(key): ", key_to_string(key));
       this.key_references[key_to_string(key)].toggleClass("active");
     }
   }
@@ -249,8 +255,9 @@ export class PianoRoll {
     }
   }
   initiate_events(): void {
-    $(".key").click(function (e) {
-      $(e.target).parent().data("object").toggleKey($(e.target).data("value")); // get the clicked element's parent,
+    $(".key").click(function () {
+      console.log($(this).parent().data("object"));
+      $(this).parent().data("object").toggle_key($(this).data("value")); // get the clicked element's parent,
       // get the PianoRollRow object corresponding to that, then toggle the corresponding key
     });
   }

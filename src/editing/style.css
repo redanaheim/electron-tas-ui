@@ -59,7 +59,7 @@ table {
   filter: var(--key-filter);
   vertical-align: bottom;
 }
-.key_icon.active {
+.key.active > .key_icon {
   filter: var(--key-filter-pressed);
 }
 .stick_icon {

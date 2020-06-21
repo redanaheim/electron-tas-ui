@@ -74,8 +74,10 @@ export class Store {
     try {
       data = await instance.get(property, defaults);
     } catch (err) {
+      data = new Promise((res, _rej) => {
+        res(defaults);
+      });
       console.error(err);
-      return undefined;
     }
     return data;
   };
