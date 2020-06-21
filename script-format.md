@@ -48,3 +48,22 @@ CENTER_CAMERA
 ```
 
 The preprocessor will replace all the `CENTER_CAMERA` lines with the contents of the definition.
+
+You can also invoke a function like this:
+```
++ ON{KEY_B} LSTICK{0,32767}
+CENTER_CAMERA<1:OFF{KEY_B}>
+1 OFF{ALL}
+```
+This will add the contents after the semicolon to the specified line of the macro.
+
+### Third - Variables
+
+You can define a variable using either the `VAL` or `VAR` keywords, like this:
+```
+VAL BUTTON = KEY_X
+```
+Then, use a $ before the variable name. The preprocessor will replace that reference with the variable's contents.
+You can re-declare a variable the same way as you do in the first place.
+
+Keep in mind, the preprocessor expands macros before it replaces variables.
