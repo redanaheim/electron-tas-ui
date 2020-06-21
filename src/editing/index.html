@@ -2,17 +2,19 @@
 <html style="font-size: 1px; padding: 0px;">
   <head>
     <title>Editing nx-TAS Script</title>
-    <script>window.$ = window.jQuery = require('../assets/jquery.min.js');</script>
+    <script>
+      window.$ = window.jQuery = require("../assets/jquery.min.js");
+    </script>
     <link rel="stylesheet" href="style.css" />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css?family=Roboto"
     />
     <script>
-      let { key_click } = require("./index.js");
+      let { on_init } = require("./index.js");
       require("../theme.js");
       $(document).ready(() => {
-        $(".key_icon").click(key_click);
+        on_init();
       });
     </script>
   </head>
@@ -24,27 +26,7 @@
         <td id="frame_header">Frame</td>
         <th id="button_header" colspan="15">Buttons</th>
       </tr>
-      <tbody id="script_rows">
-        <tr>
-          <td class="frame_number">1</td>
-          <td class="key"><img class="key_icon" src="../assets/buttons/svg/a.svg"></img></td>
-          <td class="key"><img class="key_icon" src="../assets/buttons/svg/b.svg"></img></td>
-          <td class="key"><img class="key_icon" src="../assets/buttons/svg/x.svg"></img></td>
-          <td class="key"><img class="key_icon" src="../assets/buttons/svg/y.svg"></img></td>
-          <td class="key"><img class="key_icon" src="../assets/buttons/svg/dleft.svg"></img></td>
-          <td class="key"><img class="key_icon" src="../assets/buttons/svg/dup.svg"></img></td>
-          <td class="key"><img class="key_icon" src="../assets/buttons/svg/ddown.svg"></img></td>
-          <td class="key"><img class="key_icon" src="../assets/buttons/svg/dright.svg"></img></td>
-          <td class="key"><img class="key_icon" src="../assets/buttons/svg/l.svg"></img></td>
-          <td class="key"><img class="key_icon" src="../assets/buttons/svg/r.svg"></img></td>
-          <td class="key"><img class="key_icon" src="../assets/buttons/svg/zl.svg"></img></td>
-          <td class="key"><img class="key_icon" src="../assets/buttons/svg/zr.svg"></img></td>
-          <td class="key"><img class="key_icon" src="../assets/buttons/svg/plus.svg"></img></td>
-          <td class="key"><img class="key_icon" src="../assets/buttons/svg/minus.svg"></img></td>
-          <td class="key"><img class="stick_icon key_icon" src="../assets/buttons/svg/lstick.svg"></img></td>
-          <td class="key"><img class="stick_icon key_icon" src="../assets/buttons/svg/rstick.svg"></img></td>
-        </tr>
-      </tbody>
+      <tbody id="script_rows"></tbody>
     </table>
   </body>
 </html>

@@ -2,7 +2,7 @@
   "name": "better-scripts-tas",
   "displayName": "better-scripts-tas",
   "description": "Adds grammar for Better Scripts TAS format",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "publisher": "tigergold59",
   "repository": {
     "url": "https://github.com/tigergold59/electron-tas-ui"
