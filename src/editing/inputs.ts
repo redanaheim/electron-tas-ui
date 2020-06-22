@@ -70,12 +70,14 @@ export class PianoRollRow {
   ];
   // is this the first line?
   has_previous: boolean;
+  owner?: PianoRoll;
+  previous?: PianoRollRow | null;
   reference: JQuery<HTMLElement> | null;
   current_frame: number;
   active_keys: KeysList; // all keys pressed on this frame
   on_keys: KeysList; // keys newly pressed on this frame
   off_keys: KeysList; // keys released on this frame
-  clone_keys: KeysList; // keys that are inherited from the frame before
+  cloned_on_keys: KeysList; // keys that are on and inherited from the frame before
   lstick_pos: StickPos;
   rstick_pos: StickPos;
   // is the stick position inherited from previous frame?
@@ -116,13 +118,13 @@ export class PianoRollRow {
       this.lstick_pos = new StickPos(lstick_pos.angle, lstick_pos.magnitude);
       this.rstick_pos = new StickPos(rstick_pos.angle, rstick_pos.magnitude);
       // clone calculation
-      this.clone_keys = new KeysList();
+      this.cloned_on_keys = new KeysList();
       // iterating over every key pressed in the previous frame, if it is pressed here too, it's a clone key
       for (const key of PianoRollRow.all_keys) {
         const this_has = this.active_keys.has(key);
         const prev_has = previous.active_keys.has(key);
         if (this_has === prev_has) {
-          this.clone_keys.append(key);
+          this.cloned_on_keys.append(key);
         } else if (this_has) {
           this.on_keys.append(key);
         } else {
@@ -136,7 +138,7 @@ export class PianoRollRow {
       this.is_clone =
         this.is_lstick_clone &&
         this.is_rstick_clone &&
-        this.clone_keys.length() === Object.keys(Key).length;
+        this.cloned_on_keys.length() === Object.keys(Key).length;
     }
   }
   create_element(): JQuery<HTMLElement> {
@@ -161,44 +163,77 @@ export class PianoRollRow {
   }
   toggle_key(key: Key): void {
     if (this.active_keys.has(key)) {
-      this.active_keys.remove(key);
+      this.off_keys.append(key);
     } else {
+      this.on_keys.append(key);
+      this.off_keys.remove(key);
       this.active_keys.append(key);
     }
     if (this.reference) {
-      console.log("this.key_references: ", this.key_references);
-      console.log("key_to_string(key): ", key_to_string(key));
       this.key_references[key_to_string(key)].toggleClass("active");
+    }
+    if (this.owner) {
+      this.owner.refresh();
+    } else {
+      this.reeval_keys(this.previous, false);
+    }
+  }
+  show_key(key: Key, pressed?: boolean): void {
+    if (this.reference) {
+      const key_reference = this.key_references[key_to_string(key)];
+      if (key_reference.hasClass("active") && !pressed) {
+        key_reference.removeClass("active");
+      } else if (pressed && !key_reference.hasClass("active")) {
+        key_reference.addClass("active");
+      }
     }
   }
   set_stick(is_lstick: boolean, pos: StickPos): void {
     this[is_lstick ? "lstick_pos" : "rstick_pos"] = pos;
   }
-  reeval_keys(previous: PianoRollRow): KeysList {
+  reeval_keys(previous?: PianoRollRow, set_previous?: boolean): KeysList {
     // for updating the object when some previous line changes
-    this.clone_keys = new KeysList();
-    this.on_keys = new KeysList();
-    this.off_keys = new KeysList();
+    this.cloned_on_keys = new KeysList();
+    if (!previous) previous = this.previous || null;
+    if (set_previous) {
+      // update this object's previous row
+      this.previous = previous;
+    }
+    // check which keys are inherited
     for (const key of PianoRollRow.all_keys) {
-      const this_has = this.active_keys.has(key);
-      const prev_has = previous.active_keys.has(key);
-      if (this_has === prev_has) {
-        this.clone_keys.append(key);
-      } else if (this_has) {
-        this.on_keys.append(key);
-      } else {
-        this.off_keys.append(key);
+      if (this.previous.active_keys.has(key) && !this.off_keys.has(key)) {
+        this.cloned_on_keys.append(key);
+        this.active_keys.append(key);
+        this.on_keys.remove(key);
+        this.show_key(key, true);
+      } else if (this.previous.active_keys.has(key)) {
+        this.cloned_on_keys.remove(key);
+        this.active_keys.remove(key);
+        this.on_keys.remove(key);
+        this.show_key(key, false);
+      } else if (this.on_keys.has(key)) {
+        this.active_keys.append(key);
+        this.show_key(key, true);
+      } else if (!this.on_keys.has(key)) {
+        this.show_key(key, false);
+        this.active_keys.remove(key);
       }
     }
-    return this.clone_keys;
+    return this.cloned_on_keys;
   }
-  reeval_sticks(previous: PianoRollRow): void {
+  reeval_sticks(previous: PianoRollRow, set_previous?: boolean): void {
+    if (!previous) previous = this.previous || null;
+    if (set_previous) {
+      this.previous = previous;
+    }
     this.is_lstick_clone = this.lstick_pos.equals(previous.lstick_pos);
     this.is_rstick_clone = this.lstick_pos.equals(previous.rstick_pos);
   }
   reeval(previous: PianoRollRow): void {
-    this.reeval_keys(previous);
-    this.reeval_sticks(previous);
+    if (!previous) previous = this.previous || null;
+    this.previous = previous;
+    this.reeval_keys(previous, false);
+    this.reeval_sticks(previous, false);
   }
 }
 
@@ -223,6 +258,7 @@ export class PianoRoll {
           ? this.contents[last_index_of(this.contents)].current_frame + 1
           : 1,
     });
+    input_line.owner = this;
     if (!element) {
       element = input_line.create_element();
       input_line.reference = element;
@@ -256,7 +292,6 @@ export class PianoRoll {
   }
   initiate_events(): void {
     $(".key").click(function () {
-      console.log($(this).parent().data("object"));
       $(this).parent().data("object").toggle_key($(this).data("value")); // get the clicked element's parent,
       // get the PianoRollRow object corresponding to that, then toggle the corresponding key
     });

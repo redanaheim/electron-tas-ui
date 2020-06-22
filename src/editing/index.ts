@@ -5,5 +5,12 @@ export const on_init = function (): void {
   const piano = new PianoRoll([], main_table);
   piano.add(null, 0);
   piano.add(null);
+  piano.add(null);
+  piano.add(null);
+  piano.add(null);
+  piano.add(null);
+  piano.add(null);
+  piano.add(null);
+  piano.refresh();
   piano.initiate_events();
 };
