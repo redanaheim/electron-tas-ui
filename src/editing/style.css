@@ -9,12 +9,14 @@
   --text: var(--light-text);
   --key-filter: invert(0.2);
   --key-filter-pressed: invert(0.8);
+  --ui-btn-filter: invert(0);
 }
 .dark {
   --bg: var(--dark-bg);
   --text: var(--dark-text);
   --key-filter: invert(0);
   --key-filter-pressed: invert(0.8);
+  --ui-btn-filter: invert(1);
 }
 body {
   font-family: -apple-system, "Roboto", BlinkMacSystemFont, "Segoe UI",
@@ -69,4 +71,25 @@ table {
 .key {
   text-align: center;
   vertical-align: bottom;
+}
+.add_btn_img {
+  width: 15px;
+  height: 15px;
+  filter: var(--ui-btn-filter);
+}
+.add_button {
+  width: 20px;
+  height: 20px;
+  background-color: transparent;
+  border: none;
+  vertical-align: bottom;
+  outline: none;
+  border-radius: 4px;
+}
+.row_btn_container {
+  vertical-align: bottom;
+}
+.remove_button {
+  width: 20px;
+  height: 20px;
 }

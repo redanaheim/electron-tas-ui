@@ -14,7 +14,7 @@
       let { on_init } = require("./index.js");
       let { set_theme } = require("../theme.js");
       $(document).ready(() => {
-        on_init();
+        window.piano = on_init();
       });
     </script>
   </head>
@@ -25,6 +25,7 @@
       <tr class="header">
         <td id="frame_header">Frame</td>
         <th id="button_header" colspan="15">Buttons</th>
+        <th id="add_remove_header" colspan="2"></th>
       </tr>
       <tbody id="script_rows"></tbody>
     </table>

@@ -84,6 +84,7 @@ export class PianoRollRow {
   is_lstick_clone: boolean;
   is_rstick_clone: boolean;
   is_clone: boolean; // is everthing about the frame the same as the previous?
+  frozen = false; // should we stop evaluating keys?
   key_references: KeyToReferenceStore = {};
   constructor(options?: PianoRollRowConstructorOptions) {
     if (!options) {
@@ -158,11 +159,50 @@ export class PianoRollRow {
     this.key_references["KEY_LSTICK"] = lstick;
     this.key_references["KEY_RSTICK"] = rstick;
     row.append(lstick).append(rstick);
+    // Add and remove row buttons
+    row.append(
+      $("<td/>")
+        .append(
+          $("<button/>")
+            .addClass("add_button")
+            .click(function () {
+              const row = $(this).parents("tr").data("object");
+              row.owner.add(null, row.owner.get_position(row) + 1);
+            })
+            .append(
+              $("<img/>")
+                .attr("src", "../assets/ui_buttons/row.svg")
+                .addClass("add_btn_img")
+            )
+        )
+        .addClass("row_btn_container")
+    );
+    /*
+      .append(
+        $("<td/>").append(
+          $("<button/>")
+            .addClass("remove_button")
+            .click(function () {
+              const row = $(this).parents("tr").data("object");
+              row.owner.remove(row.owner.get_position(row));
+            })
+        )
+      );*/
     row.data("object", this);
     return row;
   }
+  get_next(): PianoRollRow {
+    return this.owner.get(this.owner.get_position(this) + 1);
+  }
+  freeze(): void {
+    this.frozen = true;
+  }
+  unfreeze(): void {
+    this.frozen = false;
+  }
   toggle_key(key: Key): void {
     if (this.active_keys.has(key)) {
+      this.on_keys.remove(key);
       this.off_keys.append(key);
     } else {
       this.on_keys.append(key);
@@ -191,7 +231,8 @@ export class PianoRollRow {
   set_stick(is_lstick: boolean, pos: StickPos): void {
     this[is_lstick ? "lstick_pos" : "rstick_pos"] = pos;
   }
-  reeval_keys(previous?: PianoRollRow, set_previous?: boolean): KeysList {
+  reeval_keys(previous?: PianoRollRow, set_previous?: boolean): void {
+    if (this.frozen) return;
     // for updating the object when some previous line changes
     this.cloned_on_keys = new KeysList();
     if (!previous) previous = this.previous || null;
@@ -213,15 +254,18 @@ export class PianoRollRow {
         this.show_key(key, false);
       } else if (this.on_keys.has(key)) {
         this.active_keys.append(key);
+        this.off_keys.remove(key);
         this.show_key(key, true);
-      } else if (!this.on_keys.has(key)) {
+      } else {
         this.show_key(key, false);
         this.active_keys.remove(key);
+        this.off_keys.remove(key);
       }
     }
-    return this.cloned_on_keys;
+    return;
   }
   reeval_sticks(previous: PianoRollRow, set_previous?: boolean): void {
+    if (this.frozen) return;
     if (!previous) previous = this.previous || null;
     if (set_previous) {
       this.previous = previous;
@@ -234,29 +278,65 @@ export class PianoRollRow {
     this.previous = previous;
     this.reeval_keys(previous, false);
     this.reeval_sticks(previous, false);
+    // Update whether this row is a clone
+    if (this.on_keys.length() + this.off_keys.length() === 0) {
+      this.is_clone = this.is_lstick_clone && this.is_rstick_clone;
+    }
+    // Update frame number in case elements have been removed.
+    this.current_frame = this.previous.current_frame + 1;
+    this.reference.children(".frame_number").text(this.current_frame);
   }
+}
+
+interface PianoRollKeyState {
+  [key: string]: boolean;
 }
 
 export class PianoRoll {
   readonly contents: PianoRollRow[];
   readonly reference: JQuery<HTMLElement>;
-  constructor(contents: PianoRollRow[], reference: JQuery<HTMLElement>) {
+  readonly key_state: PianoRollKeyState = {}; // for keeping track of pressed keys
+  constructor(
+    contents: PianoRollRow[],
+    reference: JQuery<HTMLElement>,
+    jquery_document?: JQuery<Document>
+  ) {
     this.contents = contents;
     this.reference = reference;
     this.reference.data("object", this);
+    // Create keys listener to see when shift is pressed (for key toggles)
+    if (jquery_document) {
+      // copy this.key_state because the this context changes in the handler function
+      const state = this.key_state;
+      // listen for keyup and keydown, then set whether shift is pressed or not
+      jquery_document.keydown(function (e) {
+        state.shift = e.shiftKey;
+      });
+      jquery_document.keyup(function (e) {
+        state.shift = e.shiftKey;
+      });
+    }
+  }
+  get(position: number): PianoRollRow {
+    if (!this.contents[position]) {
+      return null;
+    }
+    return this.contents[position];
+  }
+  get_position(row: PianoRollRow): number {
+    return this.contents.indexOf(row);
   }
   add(element: JQuery<HTMLElement> | null, position?: number): void {
+    position = position !== undefined ? position : last_index_of(this.contents);
+
     const input_line = new PianoRollRow({
-      previous:
-        this.contents[last_index_of(this.contents)] || new PianoRollRow(),
+      previous: this.get(position) || new PianoRollRow(),
       active_keys: new KeysList(),
       lstick_pos: new StickPos(0, 0),
       rstick_pos: new StickPos(0, 0),
       reference: element,
       frame:
-        this.contents.length > 0
-          ? this.contents[last_index_of(this.contents)].current_frame + 1
-          : 1,
+        this.contents.length > 0 ? this.get(position).current_frame + 1 : 1,
     });
     input_line.owner = this;
     if (!element) {
@@ -265,9 +345,7 @@ export class PianoRoll {
       if (this.contents.length === 0) {
         this.reference.append(element);
       } else {
-        this.contents[position || last_index_of(this.contents)].reference.after(
-          element
-        );
+        this.get(position > 0 ? position - 1 : 0).reference.after(element);
       }
     }
     if (!position) {
@@ -278,16 +356,16 @@ export class PianoRoll {
     this.refresh();
   }
   remove(position: number): void {
-    this.contents[position].reference.remove();
+    this.get(position).reference.remove();
     this.contents.splice(position, 1);
     this.refresh();
   }
   refresh(): void {
     // EXTREMELY INTENSIVE
     // TODO: web worker?
-    this.contents[0].reeval(new PianoRollRow());
+    this.get(0).reeval(new PianoRollRow());
     for (let i = 1; i < this.contents.length; i++) {
-      this.contents[i].reeval(this.contents[i - 1]);
+      this.get(i).reeval(this.get(i - 1));
     }
   }
   initiate_events(): void {
@@ -299,19 +377,18 @@ export class PianoRoll {
   make_update_frames(): ParsedLine[] {
     const to_return: ParsedLine[] = [];
     for (const line of this.contents) {
-      to_return.push({
-        frame: line.current_frame,
-        keys_on: line.on_keys.get_array(),
-        keys_off: line.off_keys.get_array(),
-        lstick_pos_polar: [line.lstick_pos.angle, line.lstick_pos.magnitude],
-        rstick_pos_polar: [line.rstick_pos.angle, line.rstick_pos.magnitude],
-        lstick_changes: !line.is_lstick_clone,
-        rstick_changes: !line.is_rstick_clone,
-      });
+      if (!line.is_clone) {
+        to_return.push({
+          frame: line.current_frame,
+          keys_on: line.on_keys.get_array(),
+          keys_off: line.off_keys.get_array(),
+          lstick_pos_polar: [line.lstick_pos.angle, line.lstick_pos.magnitude],
+          rstick_pos_polar: [line.rstick_pos.angle, line.rstick_pos.magnitude],
+          lstick_changes: !line.is_lstick_clone,
+          rstick_changes: !line.is_rstick_clone,
+        });
+      }
     }
     return to_return;
-  }
-  log(): void {
-    console.log(this);
   }
 }
