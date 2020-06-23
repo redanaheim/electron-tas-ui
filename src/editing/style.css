@@ -77,6 +77,11 @@ table {
   height: 15px;
   filter: var(--ui-btn-filter);
 }
+.remove_btn_img {
+  width: 15px;
+  height: 15px;
+  filter: var(--ui-btn-filter);
+}
 .add_button {
   width: 20px;
   height: 20px;
@@ -91,5 +96,11 @@ table {
 }
 .remove_button {
   width: 20px;
+  background-color: transparent;
   height: 20px;
+  border: none;
+  padding-bottom: 19px;
+  vertical-align: bottom;
+  outline: none;
+  border-radius: 4px;
 }

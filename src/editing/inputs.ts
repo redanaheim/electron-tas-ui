@@ -177,6 +177,23 @@ export class PianoRollRow {
         )
         .addClass("row_btn_container")
     );
+    row.append(
+      $("<td/>")
+        .append(
+          $("<button/>")
+            .addClass("remove_button")
+            .click(function () {
+              const row = $(this).parents("tr").data("object");
+              row.owner.remove(row.owner.get_position(row));
+            })
+            .append(
+              $("<img/>")
+                .attr("src", "../assets/ui_buttons/remove_row.svg")
+                .addClass("remove_btn_img")
+            )
+        )
+        .addClass("row_btn_container")
+    );
     /*
       .append(
         $("<td/>").append(
@@ -371,6 +388,7 @@ export class PianoRoll {
     for (let i = 1; i < this.contents.length; i++) {
       this.get(i).reeval(this.get(i - 1));
     }
+    // re-bind click events for new elements
     $(".key").off("click");
     $(".key").click(PianoRoll.click_handler_func);
   }
