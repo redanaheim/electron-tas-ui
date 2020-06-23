@@ -296,6 +296,10 @@ export class PianoRoll {
   readonly contents: PianoRollRow[];
   readonly reference: JQuery<HTMLElement>;
   readonly key_state: PianoRollKeyState = {}; // for keeping track of pressed keys
+  static click_handler_func = function (): void {
+    $(this).parent().data("object").toggle_key($(this).data("value")); // get the clicked element's parent,
+    // get the PianoRollRow object corresponding to that, then toggle the corresponding key
+  };
   constructor(
     contents: PianoRollRow[],
     reference: JQuery<HTMLElement>,
@@ -328,15 +332,15 @@ export class PianoRoll {
   }
   add(element: JQuery<HTMLElement> | null, position?: number): void {
     position = position !== undefined ? position : last_index_of(this.contents);
-
+    const previous_in_position = this.get(position) || new PianoRollRow();
     const input_line = new PianoRollRow({
-      previous: this.get(position) || new PianoRollRow(),
-      active_keys: new KeysList(),
-      lstick_pos: new StickPos(0, 0),
-      rstick_pos: new StickPos(0, 0),
+      previous: previous_in_position,
+      active_keys: previous_in_position.active_keys.clone() || new KeysList(),
+      lstick_pos: previous_in_position.lstick_pos.clone() || new StickPos(0, 0),
+      rstick_pos: previous_in_position.rstick_pos.clone() || new StickPos(0, 0),
       reference: element,
       frame:
-        this.contents.length > 0 ? this.get(position).current_frame + 1 : 1,
+        this.contents.length > 0 ? previous_in_position.current_frame + 1 : 1,
     });
     input_line.owner = this;
     if (!element) {
@@ -367,12 +371,11 @@ export class PianoRoll {
     for (let i = 1; i < this.contents.length; i++) {
       this.get(i).reeval(this.get(i - 1));
     }
+    $(".key").off("click");
+    $(".key").click(PianoRoll.click_handler_func);
   }
   initiate_events(): void {
-    $(".key").click(function () {
-      $(this).parent().data("object").toggle_key($(this).data("value")); // get the clicked element's parent,
-      // get the PianoRollRow object corresponding to that, then toggle the corresponding key
-    });
+    $(".key").click(PianoRoll.click_handler_func);
   }
   make_update_frames(): ParsedLine[] {
     const to_return: ParsedLine[] = [];

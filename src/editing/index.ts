@@ -13,6 +13,5 @@ export const on_init = function (): PianoRoll {
   piano.add(null);
   piano.remove(3);
   piano.refresh();
-  piano.initiate_events();
   return piano;
 };

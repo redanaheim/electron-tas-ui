@@ -203,7 +203,7 @@ export const string_to_key = function (key: string): Key {
 };
 
 export class KeysList {
-  private internal_array: Key[];
+  private internal_array: Key[] = [];
   static all_keys: Key[] = [
     Key.A,
     Key.B,
@@ -222,8 +222,12 @@ export class KeysList {
     Key.LSTICK,
     Key.RSTICK,
   ];
-  constructor() {
-    this.internal_array = [];
+  constructor(internal_array?: Key[]) {
+    if (internal_array) {
+      for (const key of internal_array) {
+        this.internal_array.push(key);
+      }
+    }
   }
   append(key: Key): void {
     if (this.internal_array.includes(key)) return;
@@ -267,6 +271,9 @@ export class KeysList {
   has(key: Key): boolean {
     return this.internal_array.includes(key);
   }
+  clone(): KeysList {
+    return new KeysList(this.internal_array);
+  }
 }
 export class StickPos {
   readonly angle: number;
@@ -282,5 +289,8 @@ export class StickPos {
   }
   equals(other: StickPos): boolean {
     return this.angle === other.angle && this.magnitude === other.magnitude;
+  }
+  clone(): StickPos {
+    return new StickPos(this.angle, this.magnitude);
   }
 }
