@@ -259,6 +259,9 @@ export class KeysList {
   length(): number {
     return this.internal_array.length;
   }
+  empty(): boolean {
+    return this.internal_array.length === 0;
+  }
   get_array(): string[] {
     return this.internal_array.map((x) => key_to_string(x));
   }
@@ -289,6 +292,9 @@ export class StickPos {
   }
   equals(other: StickPos): boolean {
     return this.angle === other.angle && this.magnitude === other.magnitude;
+  }
+  empty(): boolean {
+    return this.magnitude === 0;
   }
   clone(): StickPos {
     return new StickPos(this.angle, this.magnitude);

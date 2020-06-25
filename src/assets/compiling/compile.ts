@@ -59,6 +59,14 @@ class ControllerState {
     this.rstick_pos = [0, 0];
     this.pressed_keys = [];
   }
+  empty(): boolean {
+    // For checking if we should print the frame or not
+    return (
+      this.pressed_keys.length === 0 &&
+      !this.lstick_pos.some((x) => x !== 0) &&
+      !this.rstick_pos.some((x) => x !== 0)
+    );
+  }
   print(frame: number): string {
     const keys_string =
       this.pressed_keys.length === 0 ? "NONE" : this.pressed_keys.join(";");
@@ -309,10 +317,8 @@ export const compile = function (
         next_update = update_frames[update_index].frame;
       }
     }
-    const printed_line = controller.print(i);
-    // TODO: quicker way of checking if line is empty.
-    if (/^[0-9]+ NONE 0;0 0;0$/i.test(printed_line) && i > 1) continue; // don't print empty lines, nx-TAS already ignores them
-    compiled += printed_line + "\r\n";
+    if (controller.empty()) continue;
+    compiled += controller.print(i) + "\r\n";
   }
-  return compiled;
+  return compiled.trim();
 };
