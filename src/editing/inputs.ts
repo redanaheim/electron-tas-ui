@@ -172,7 +172,11 @@ export class PianoRollRow {
             .append(
               $("<img/>")
                 .attr("src", "../assets/ui_buttons/row.svg")
-                .addClass("add_btn_img")
+                .addClass("add_btn_img row_btn")
+                .hover(function () {
+                  $(this).addClass("animate");
+                  $(this).off("mouseenter");
+                })
             )
         )
         .addClass("row_btn_container")
@@ -189,7 +193,10 @@ export class PianoRollRow {
             .append(
               $("<img/>")
                 .attr("src", "../assets/ui_buttons/remove_row.svg")
-                .addClass("remove_btn_img")
+                .addClass("remove_btn_img row_btn")
+                .hover(function () {
+                  $(this).addClass("animate").off("mouseenter");
+                })
             )
         )
         .addClass("row_btn_container")
@@ -206,6 +213,15 @@ export class PianoRollRow {
         )
       );*/
     row.data("object", this);
+    row.hover(
+      function () {
+        $(".row_btn_container").stop(false, true);
+        $(this).children(".row_btn_container").fadeTo(200, 1);
+      },
+      function () {
+        $(this).children(".row_btn_container").fadeTo(200, 0);
+      }
+    );
     return row;
   }
   get_next(): PianoRollRow {
@@ -383,7 +399,6 @@ export class PianoRoll {
   }
   refresh(): void {
     // EXTREMELY INTENSIVE
-    // TODO: web worker?
     this.get(0).reeval(new PianoRollRow());
     for (let i = 1; i < this.contents.length; i++) {
       this.get(i).reeval(this.get(i - 1));

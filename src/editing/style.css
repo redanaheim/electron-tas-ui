@@ -75,12 +75,30 @@ table {
 .add_btn_img {
   width: 15px;
   height: 15px;
+  border-radius: 4px;
   filter: var(--ui-btn-filter);
 }
 .remove_btn_img {
   width: 15px;
   height: 15px;
+  border-radius: 4px;
   filter: var(--ui-btn-filter);
+}
+@keyframes btn_bg_fade_in {
+  from {
+    background-color: transparent;
+  }
+  to {
+    background-color: rgba(150, 150, 150, 0.397);
+  }
+}
+@keyframes btn_bg_fade_out {
+  from {
+    background-color: rgba(150, 150, 150, 0.397);
+  }
+  to {
+    background-color: transparent;
+  }
 }
 .add_button {
   width: 20px;
@@ -89,10 +107,6 @@ table {
   border: none;
   vertical-align: bottom;
   outline: none;
-  border-radius: 4px;
-}
-.row_btn_container {
-  vertical-align: bottom;
 }
 .remove_button {
   width: 20px;
@@ -102,5 +116,18 @@ table {
   padding-bottom: 19px;
   vertical-align: bottom;
   outline: none;
-  border-radius: 4px;
+}
+.row_btn.animate {
+  animation-name: btn_bg_fade_out;
+  animation-duration: 300ms;
+  background-color: transparent;
+}
+.row_btn.animate:hover {
+  animation-name: btn_bg_fade_in;
+  animation-duration: 300ms;
+  background-color: rgba(150, 150, 150, 0.397);
+}
+.row_btn_container {
+  vertical-align: bottom;
+  opacity: 0;
 }
