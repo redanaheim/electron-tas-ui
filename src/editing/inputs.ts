@@ -526,6 +526,7 @@ export class PianoRoll {
             )
             .addClass("navbar_button")
         )
+        .append($("<td/>").addClass("navbar_spacer"))
     );
   }
   create_navbar(): void {

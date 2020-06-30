@@ -170,6 +170,7 @@ td * {
   width: 100%;
   margin: 0px 0px;
   background-color: var(--navbar-bg);
+  text-align: left;
 }
 .navbar_element {
   background-color: transparent;
@@ -179,6 +180,12 @@ td * {
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
   color: var(--text);
+}
+#navbar > tr > td {
+  white-space: nowrap;
+}
+.navbar_spacer {
+  width: 99%;
 }
 .navbar_element:hover {
   border-left: var(--navbar-btn-hover-border);
