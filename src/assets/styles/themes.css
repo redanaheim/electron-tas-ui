@@ -19,6 +19,13 @@
   --dark-code-bg: rgb(68, 68, 68);
   --light-code-text: rgb(0, 0, 0);
   --dark-code-text: rgb(255, 255, 255);
+  --navbar-btn-hover-border: 1px solid rgba(206, 206, 206, 0.7);
+  --light-navbar-bg: rgb(131, 168, 255);
+  --dark-navbar-bg: rgb(66, 117, 235);
+  --light-navbar-btn-hover-bg: rgb(116, 149, 228);
+  --dark-navbar-btn-hover-bg: rgb(60, 104, 207);
+  --light-btn-hover-bg: rgba(173, 173, 173, 0.452);
+  --dark-btn-hover-bg: rgba(116, 116, 116, 0.514);
 }
 .light {
   --bg: var(--light-bg);
@@ -31,6 +38,9 @@
   --input-bg: var(--light-input-bg);
   --code-bg: var(--light-code-bg);
   --code-text: var(--light-code-text);
+  --navbar-bg: var(--light-navbar-bg);
+  --navbar-btn-hover-bg: var(--light-navbar-btn-hover-bg);
+  --btn-hover-bg: var(--light-btn-hover-bg);
 }
 .dark {
   --bg: var(--dark-bg);
@@ -43,6 +53,9 @@
   --input-bg: var(--dark-input-bg);
   --code-bg: var(--dark-code-bg);
   --code-text: var(--dark-code-text);
+  --navbar-bg: var(--dark-navbar-bg);
+  --navbar-btn-hover-bg: var(--dark-navbar-btn-hover-bg);
+  --btn-hover-bg: var(--dark-btn-hover-bg);
 }
 body {
   font-family: -apple-system, "Roboto", BlinkMacSystemFont, "Segoe UI",
@@ -52,6 +65,10 @@ body {
   background-color: var(--bg);
   padding: 0px;
   margin: 0px;
+}
+button {
+  -webkit-tap-highlight-color: transparent;
+  outline: none !important;
 }
 button:active {
   box-shadow: 2px 2px 2px var(--btn-clicked-bg);

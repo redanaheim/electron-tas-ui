@@ -16,6 +16,11 @@ interface PianoRollRowConstructorOptions {
   frame?: number;
 }
 
+const add_animate_first_hover = function (): void {
+  $(this).addClass("animate");
+  $(this).off("mouseenter");
+};
+
 const create_key_element = function (key: Key): JQuery<HTMLElement> {
   return $("<td/>")
     .addClass("key")
@@ -70,7 +75,13 @@ export class PianoRollRow {
   ];
   // is this the first line?
   has_previous: boolean;
+  // root PianoRoll element
   owner?: PianoRoll;
+  // if this element is a clone row, this is a reference to the source
+  row_owner?: PianoRollRow;
+  is_row_owner?: boolean;
+  // is the button for expanding clones clicked
+  expand_clones = false;
   previous?: PianoRollRow | null;
   reference: JQuery<HTMLElement> | null;
   current_frame: number;
@@ -144,7 +155,38 @@ export class PianoRollRow {
   }
   create_element(): JQuery<HTMLElement> {
     const row = $("<tr/>").append(
-      $("<td/>").addClass("frame_number").text(String(this.current_frame))
+      $("<td/>")
+        .addClass("frame_number_container")
+        .append(
+          $("<span/>")
+            .addClass("frame_number")
+            .text(String(this.current_frame))
+            .data("owner_row", this)
+            .hover(
+              function () {
+                const row: PianoRollRow = $(this).data("owner_row");
+                if (row.is_row_owner) {
+                  $(this)
+                    .stop(false, true)
+                    .removeClass("bg_fade_out")
+                    .addClass("bg_fade_in");
+                }
+              },
+              function () {
+                const row: PianoRollRow = $(this).data("owner_row");
+                if (row.is_row_owner) {
+                  $(this)
+                    .stop(false, true)
+                    .removeClass("bg_fade_in")
+                    .addClass("bg_fade_out");
+                }
+              }
+            )
+            .click(function () {
+              const row: PianoRollRow = $(this).data("owner_row");
+              row.toggle_expand();
+            })
+        )
     );
     for (const key of PianoRollRow.all_keys) {
       if (key === Key.LSTICK || key === Key.RSTICK) {
@@ -160,66 +202,51 @@ export class PianoRollRow {
     this.key_references["KEY_RSTICK"] = rstick;
     row.append(lstick).append(rstick);
     // Add and remove row buttons
-    row.append(
-      $("<td/>")
-        .append(
-          $("<button/>")
-            .addClass("add_button")
-            .click(function () {
-              const row = $(this).parents("tr").data("object");
-              row.owner.add(null, row.owner.get_position(row) + 1);
-            })
-            .append(
-              $("<img/>")
-                .attr("src", "../assets/ui_buttons/row.svg")
-                .addClass("add_btn_img row_btn")
-                .hover(function () {
-                  $(this).addClass("animate");
-                  $(this).off("mouseenter");
-                })
-            )
-        )
-        .addClass("row_btn_container")
-    );
-    row.append(
-      $("<td/>")
-        .append(
-          $("<button/>")
-            .addClass("remove_button")
-            .click(function () {
-              const row = $(this).parents("tr").data("object");
-              row.owner.remove(row.owner.get_position(row));
-            })
-            .append(
-              $("<img/>")
-                .attr("src", "../assets/ui_buttons/remove_row.svg")
-                .addClass("remove_btn_img row_btn")
-                .hover(function () {
-                  $(this).addClass("animate").off("mouseenter");
-                })
-            )
-        )
-        .addClass("row_btn_container")
-    );
-    /*
+    row
       .append(
-        $("<td/>").append(
-          $("<button/>")
-            .addClass("remove_button")
-            .click(function () {
-              const row = $(this).parents("tr").data("object");
-              row.owner.remove(row.owner.get_position(row));
-            })
-        )
-      );*/
+        $("<td/>")
+          .append(
+            $("<button/>")
+              .addClass("add_button")
+              .click(function () {
+                const row = $(this).parents("tr").data("object");
+                row.owner.add(null, row.owner.get_position(row) + 1);
+              })
+              .append(
+                $("<img/>")
+                  .attr("src", "../assets/ui_buttons/row.svg")
+                  .addClass("add_btn_img row_btn bg_appear_hover")
+                  .hover(add_animate_first_hover)
+              )
+          )
+          .addClass("row_btn_container")
+      )
+      .append(
+        $("<td/>")
+          .append(
+            $("<button/>")
+              .addClass("remove_button")
+              .click(function () {
+                const row = $(this).parents("tr").data("object");
+                row.owner.remove(row.owner.get_position(row));
+              })
+              .append(
+                $("<img/>")
+                  .attr("src", "../assets/ui_buttons/remove_row.svg")
+                  .addClass("remove_btn_img row_btn bg_appear_hover")
+                  .hover(add_animate_first_hover)
+              )
+          )
+          .addClass("row_btn_container")
+      );
     row.data("object", this);
     row.hover(
       function () {
         $(".row_btn_container").stop(false, true);
-        $(this).children(".row_btn_container").fadeTo(200, 1);
+        $(this).children(".row_btn_container").fadeTo(400, 1);
       },
       function () {
-        $(this).children(".row_btn_container").fadeTo(200, 0);
+        $(this).children(".row_btn_container").fadeTo(400, 0);
       }
     );
     return row;
@@ -232,6 +259,21 @@ export class PianoRollRow {
   }
   unfreeze(): void {
     this.frozen = false;
+  }
+  toggle_expand(): void {
+    if (this.expand_clones && this.owner && !this.owner.show_clones) {
+      // if we're not currently showing clones as a whole
+      // AND we are showing them currently on this element
+      this.show_children(false);
+      this.expand_clones = !this.expand_clones;
+    } else if (this.owner && this.owner.show_clones) {
+      // if we are currently showing clones as a whole
+      this.show_children();
+    } else if (!this.expand_clones && this.owner && !this.owner.show_clones) {
+      // if we are currently not showing clones as a whole and we are also not showing them here
+      this.show_children();
+      this.expand_clones = !this.expand_clones;
+    }
   }
   toggle_key(key: Key): void {
     if (this.active_keys.has(key)) {
@@ -263,6 +305,10 @@ export class PianoRollRow {
   }
   set_stick(is_lstick: boolean, pos: StickPos): void {
     this[is_lstick ? "lstick_pos" : "rstick_pos"] = pos;
+  }
+  set_bg(color?: string): void {
+    if (!this.reference) return;
+    this.reference.css("background-color", color);
   }
   reeval_keys(previous?: PianoRollRow, set_previous?: boolean): void {
     if (this.frozen) return;
@@ -306,18 +352,71 @@ export class PianoRollRow {
     this.is_lstick_clone = this.lstick_pos.equals(previous.lstick_pos);
     this.is_rstick_clone = this.lstick_pos.equals(previous.rstick_pos);
   }
-  reeval(previous: PianoRollRow): void {
+  reeval(previous: PianoRollRow, hide_clones?: boolean): void {
     if (!previous) previous = this.previous || null;
     this.previous = previous;
     this.reeval_keys(previous, false);
     this.reeval_sticks(previous, false);
     // Update whether this row is a clone
-    if (this.on_keys.length() + this.off_keys.length() === 0) {
+    if (this.on_keys.length() === 0 && this.off_keys.length() === 0) {
       this.is_clone = this.is_lstick_clone && this.is_rstick_clone;
+      if (this.is_clone) {
+        let potential_owner = this.previous;
+        while (potential_owner.is_clone) {
+          if (potential_owner.previous.has_previous) {
+            potential_owner = potential_owner.previous;
+          } else {
+            break;
+          }
+        }
+        this.row_owner = potential_owner;
+        potential_owner.is_row_owner = true;
+      }
+    } else {
+      this.is_clone = false;
+    }
+    if (
+      hide_clones &&
+      this.is_clone &&
+      this.row_owner &&
+      !this.row_owner.expand_clones
+    ) {
+      this.reference.fadeOut(500);
+    } else if (
+      (hide_clones && !this.is_clone) ||
+      (this.row_owner && this.row_owner.expand_clones) ||
+      !hide_clones
+    ) {
+      this.reference.fadeIn(500);
     }
     // Update frame number in case elements have been removed.
     this.current_frame = this.previous.current_frame + 1;
-    this.reference.children(".frame_number").text(this.current_frame);
+    this.reference.find(".frame_number").text(this.current_frame);
+  }
+  show(should_show = true): void {
+    this.reference[should_show ? "fadeIn" : "fadeOut"](500);
+  }
+  get_row_children(): PianoRollRow[] {
+    const children: PianoRollRow[] = [];
+    if (!this.is_row_owner) {
+      return children;
+    } else {
+      for (
+        let next = this.get_next();
+        next && next.is_clone;
+        next = next.get_next()
+      ) {
+        children.push(next);
+      }
+    }
+    return children;
+  }
+  show_children(should_show = true): void {
+    if (this.is_row_owner) {
+      this.get_row_children().forEach((child: PianoRollRow): void => {
+        child.show(should_show);
+      });
+    }
   }
 }
 
@@ -329,30 +428,66 @@ export class PianoRoll {
   readonly contents: PianoRollRow[];
   readonly reference: JQuery<HTMLElement>;
   readonly key_state: PianoRollKeyState = {}; // for keeping track of pressed keys
+  navbar?: JQuery<HTMLElement>;
+  show_clones = true;
   static click_handler_func = function (): void {
     $(this).parent().data("object").toggle_key($(this).data("value")); // get the clicked element's parent,
     // get the PianoRollRow object corresponding to that, then toggle the corresponding key
   };
-  constructor(
-    contents: PianoRollRow[],
-    reference: JQuery<HTMLElement>,
-    jquery_document?: JQuery<Document>
-  ) {
-    this.contents = contents;
-    this.reference = reference;
+  constructor(options: {
+    contents: PianoRollRow[];
+    reference: JQuery<HTMLElement>;
+    jquery_document?: JQuery<Document>;
+    navbar?: JQuery<HTMLElement>;
+  }) {
+    this.contents = options.contents;
+    this.reference = options.reference;
     this.reference.data("object", this);
     // Create keys listener to see when shift is pressed (for key toggles)
-    if (jquery_document) {
+    if (options.jquery_document) {
       // copy this.key_state because the this context changes in the handler function
       const state = this.key_state;
       // listen for keyup and keydown, then set whether shift is pressed or not
-      jquery_document.keydown(function (e) {
+      options.jquery_document.keydown(function (e) {
         state.shift = e.shiftKey;
       });
-      jquery_document.keyup(function (e) {
+      options.jquery_document.keyup(function (e) {
         state.shift = e.shiftKey;
       });
     }
+    if (options.navbar) {
+      this.navbar = options.navbar;
+      this.bind_navbar(this.navbar);
+    }
+    $(".key").click(PianoRoll.click_handler_func);
+  }
+  toggle_clones(): void {
+    this.show_clones = !this.show_clones;
+    this.refresh();
+  }
+  bind_navbar(navbar: JQuery<HTMLElement>): void {
+    this.navbar = navbar || this.navbar;
+    this.create_navbar();
+    this.navbar.data("owner", this); // table element
+    this.navbar.append(
+      $("<tr/>").append(
+        $("<td/>")
+          .append(
+            $("<button/>")
+              .addClass("toggle_clones navbar_element")
+              .click(function () {
+                const owner_piano: PianoRoll = $(this).data("owner");
+                owner_piano.toggle_clones();
+              })
+              .data("owner", this)
+              .text("Toggle Identical Lines")
+          )
+          .addClass("navbar_button")
+      )
+    );
+  }
+  create_navbar(): void {
+    this.navbar.html("");
   }
   get(position: number): PianoRollRow {
     if (!this.contents[position]) {
@@ -401,13 +536,10 @@ export class PianoRoll {
     // EXTREMELY INTENSIVE
     this.get(0).reeval(new PianoRollRow());
     for (let i = 1; i < this.contents.length; i++) {
-      this.get(i).reeval(this.get(i - 1));
+      this.get(i).reeval(this.get(i - 1), !this.show_clones);
     }
     // re-bind click events for new elements
     $(".key").off("click");
-    $(".key").click(PianoRoll.click_handler_func);
-  }
-  initiate_events(): void {
     $(".key").click(PianoRoll.click_handler_func);
   }
   make_update_frames(): ParsedLine[] {

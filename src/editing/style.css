@@ -4,6 +4,9 @@
   --light-bg: white;
   --dark-bg: rgb(0, 0, 0);
 }
+button:active {
+  box-shadow: none;
+}
 .light {
   --bg: var(--light-bg);
   --text: var(--light-text);
@@ -53,7 +56,22 @@ table {
 .frame_number {
   text-align: center;
   font-size: 17rem;
+  border-radius: 4px;
+  width: 50%;
+  padding: 3px 5px;
+}
+.frame_number_container {
   vertical-align: bottom;
+}
+.frame_number.bg_fade_in {
+  animation-name: btn_bg_fade_in;
+  animation-duration: 300ms;
+  background-color: var(--btn-hover-bg);
+}
+.frame_number.bg_fade_out {
+  animation-name: btn_bg_fade_out;
+  animation-duration: 300ms;
+  background-color: transparent;
 }
 .key_icon {
   height: 20px;
@@ -73,14 +91,14 @@ table {
   vertical-align: bottom;
 }
 .add_btn_img {
-  width: 15px;
-  height: 15px;
+  width: 17px;
+  height: 17px;
   border-radius: 4px;
   filter: var(--ui-btn-filter);
 }
 .remove_btn_img {
-  width: 15px;
-  height: 15px;
+  width: 17px;
+  height: 17px;
   border-radius: 4px;
   filter: var(--ui-btn-filter);
 }
@@ -89,16 +107,26 @@ table {
     background-color: transparent;
   }
   to {
-    background-color: rgba(150, 150, 150, 0.397);
+    background-color: var(--btn-hover-bg);
   }
 }
 @keyframes btn_bg_fade_out {
   from {
-    background-color: rgba(150, 150, 150, 0.397);
+    background-color: var(--btn-hover-bg);
   }
   to {
     background-color: transparent;
   }
+}
+.bg_appear_hover.animate {
+  animation-name: btn_bg_fade_out;
+  animation-duration: 300ms;
+  background-color: transparent;
+}
+.bg_appear_hover.animate:hover {
+  animation-name: btn_bg_fade_in;
+  animation-duration: 300ms;
+  background-color: var(--btn-hover-bg);
 }
 .add_button {
   width: 20px;
@@ -117,17 +145,29 @@ table {
   vertical-align: bottom;
   outline: none;
 }
-.row_btn.animate {
-  animation-name: btn_bg_fade_out;
-  animation-duration: 300ms;
-  background-color: transparent;
-}
-.row_btn.animate:hover {
-  animation-name: btn_bg_fade_in;
-  animation-duration: 300ms;
-  background-color: rgba(150, 150, 150, 0.397);
-}
 .row_btn_container {
   vertical-align: bottom;
   opacity: 0;
+}
+#navbar {
+  position: fixed;
+  bottom: 0px;
+  height: 15px;
+  width: 100%;
+  margin: 0px 0px;
+  background-color: var(--navbar-bg);
+}
+.navbar_element {
+  background-color: transparent;
+  padding-left: 6px;
+  padding-right: 6px;
+  border: none;
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
+  color: var(--text);
+}
+.navbar_element:hover {
+  border-left: var(--navbar-btn-hover-border);
+  border-right: var(--navbar-btn-hover-border);
+  background-color: var(--navbar-btn-hover-bg);
 }

@@ -291,7 +291,10 @@ export class StickPos {
     }{${this.angle.toString()},${this.magnitude.toString()}`;
   }
   equals(other: StickPos): boolean {
-    return this.angle === other.angle && this.magnitude === other.magnitude;
+    return (
+      (this.angle === other.angle && this.magnitude === other.magnitude) ||
+      (this.empty() && other.empty())
+    );
   }
   empty(): boolean {
     return this.magnitude === 0;
