@@ -3,9 +3,13 @@ import {
   StickPos,
   Key,
   last_index_of,
-  ParsedLine,
   key_to_string,
+  ParsedLine,
 } from "../assets/compiling/classes";
+
+import { script_from_parsed_lines } from "../assets/compiling/decompile";
+
+import { compile } from "../assets/compiling/compile";
 
 interface PianoRollRowConstructorOptions {
   previous: PianoRollRow;
@@ -432,6 +436,20 @@ interface PianoRollKeyState {
   [key: string]: boolean;
 }
 
+class FileLike {
+  is_string = false;
+  contents: string | string[] = [];
+  constructor(data: string | string[]) {
+    if (typeof data === "string") {
+      this.is_string = true;
+      this.contents = data;
+    } else if (data instanceof Array) {
+      this.is_string = false;
+      this.contents = data;
+    }
+  }
+}
+
 export class PianoRoll {
   readonly contents: PianoRollRow[];
   readonly reference: JQuery<HTMLElement>;
@@ -566,5 +584,19 @@ export class PianoRoll {
       }
     }
     return to_return;
+  }
+  make_better_scripts(array?: boolean): FileLike {
+    if (array) {
+      return new FileLike(script_from_parsed_lines(this.make_update_frames()));
+    } else {
+      return new FileLike(
+        script_from_parsed_lines(this.make_update_frames()).join("\n")
+      );
+    }
+  }
+  make_nx_tas(throw_errors?: boolean): FileLike {
+    return new FileLike(
+      compile("", throw_errors, true, this.make_update_frames())
+    );
   }
 }

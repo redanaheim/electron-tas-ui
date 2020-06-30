@@ -5,6 +5,7 @@ import {
   FifteenBitInt,
   string_to_key,
   last_index_of,
+  ParsedLine,
 } from "./classes";
 
 const calc_angle = function (x: number, y: number): number {
@@ -189,6 +190,39 @@ class PureInputLine {
     return buffer;
   }
 }
+
+export const script_from_parsed_lines = function (
+  update_frames: ParsedLine[]
+): string[] {
+  const buffer: string[] = [];
+  let current_frame = 0;
+  let current_line = "";
+  for (const update_frame of update_frames) {
+    if (update_frame.frame === 1) {
+      current_line += "+";
+    } else {
+      current_line += update_frame.frame - current_frame;
+    }
+    current_frame = update_frame.frame;
+    if (update_frame.keys_on.length > 0) {
+      current_line += ` ON{${update_frame.keys_on.join(",")}}`;
+    }
+    if (update_frame.keys_off.length > 0) {
+      current_line += ` OFF{${update_frame.keys_off.join(",")}}`;
+    }
+    if (update_frame.lstick_changes) {
+      current_line += ` LSTICK{${update_frame.lstick_pos_polar.join(",")}}`;
+    }
+    if (update_frame.rstick_changes) {
+      current_line += ` RSTICK{${update_frame.rstick_pos_polar.join(",")}}`;
+    }
+    if (current_line.length > 0) {
+      buffer.push(current_line);
+    }
+    current_line = "";
+  }
+  return buffer;
+};
 
 export const decompile = function (
   script: string | Buffer,
