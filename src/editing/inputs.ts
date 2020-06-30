@@ -154,40 +154,44 @@ export class PianoRollRow {
     }
   }
   create_element(): JQuery<HTMLElement> {
-    const row = $("<tr/>").append(
-      $("<td/>")
-        .addClass("frame_number_container")
-        .append(
-          $("<span/>")
-            .addClass("frame_number")
-            .text(String(this.current_frame))
-            .data("owner_row", this)
-            .hover(
-              function () {
-                const row: PianoRollRow = $(this).data("owner_row");
-                if (row.is_row_owner) {
-                  $(this)
-                    .stop(false, true)
-                    .removeClass("bg_fade_out")
-                    .addClass("bg_fade_in");
+    const row = $("<tr/>")
+      .addClass("piano_roll_row")
+      .append($("<td/>").addClass("spacer"))
+      .append(
+        $("<td/>")
+          .addClass("frame_number_container")
+          .append(
+            $("<span/>")
+              .addClass("frame_number")
+              .text(String(this.current_frame))
+              .data("owner_row", this)
+              .hover(
+                function () {
+                  const row: PianoRollRow = $(this).data("owner_row");
+                  if (row.is_row_owner) {
+                    $(this)
+                      .stop(false, true)
+                      .removeClass("bg_fade_out")
+                      .addClass("bg_fade_in");
+                  }
+                },
+                function () {
+                  const row: PianoRollRow = $(this).data("owner_row");
+                  if (row.is_row_owner) {
+                    $(this)
+                      .stop(false, true)
+                      .removeClass("bg_fade_in")
+                      .addClass("bg_fade_out");
+                  }
                 }
-              },
-              function () {
+              )
+              .click(function () {
                 const row: PianoRollRow = $(this).data("owner_row");
-                if (row.is_row_owner) {
-                  $(this)
-                    .stop(false, true)
-                    .removeClass("bg_fade_in")
-                    .addClass("bg_fade_out");
-                }
-              }
-            )
-            .click(function () {
-              const row: PianoRollRow = $(this).data("owner_row");
-              row.toggle_expand();
-            })
-        )
-    );
+                row.toggle_expand();
+              })
+          )
+      )
+      .append($("<td/>").addClass("spacer"));
     for (const key of PianoRollRow.all_keys) {
       if (key === Key.LSTICK || key === Key.RSTICK) {
         continue;
@@ -394,7 +398,11 @@ export class PianoRollRow {
     this.reference.find(".frame_number").text(this.current_frame);
   }
   show(should_show = true): void {
-    this.reference[should_show ? "fadeIn" : "fadeOut"](500);
+    if (should_show) {
+      this.reference.fadeIn(400);
+    } else {
+      this.reference.fadeOut(400);
+    }
   }
   get_row_children(): PianoRollRow[] {
     const children: PianoRollRow[] = [];

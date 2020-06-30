@@ -36,7 +36,14 @@ body {
 table {
   border-collapse: collapse;
   width: 90%;
-  table-layout: fixed;
+  /*table-layout: fixed;*/
+}
+#script_rows > tr > td {
+  width: 5.55%;
+}
+td,
+td * {
+  max-height: inherit !important;
 }
 #editing {
   border-radius: 5px;
@@ -62,6 +69,13 @@ table {
 }
 .frame_number_container {
   vertical-align: bottom;
+  text-align: center;
+}
+#frame_header {
+  text-align: center;
+}
+.spacer {
+  width: 10px !important;
 }
 .frame_number.bg_fade_in {
   animation-name: btn_bg_fade_in;
