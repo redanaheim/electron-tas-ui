@@ -381,13 +381,13 @@ export class PianoRollRow {
       this.row_owner &&
       !this.row_owner.expand_clones
     ) {
-      this.reference.fadeOut(500);
+      this.show(false);
     } else if (
       (hide_clones && !this.is_clone) ||
       (this.row_owner && this.row_owner.expand_clones) ||
       !hide_clones
     ) {
-      this.reference.fadeIn(500);
+      this.show();
     }
     // Update frame number in case elements have been removed.
     this.current_frame = this.previous.current_frame + 1;
