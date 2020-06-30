@@ -9,6 +9,23 @@ export const FifteenBitInt = function (float: number): number {
   return Math.abs(float) > 32767 ? Math.sign(float) * 32767 : Int(float);
 };
 
+export class FileLike {
+  is_string = false;
+  contents: any = [];
+  constructor(data: string | string[]) {
+    if (typeof data === "string") {
+      this.is_string = true;
+      this.contents = data;
+    } else if (data instanceof Array) {
+      this.is_string = false;
+      this.contents = data;
+    }
+  }
+  as_string(): string {
+    return this.is_string ? this.contents : this.contents.join("\n");
+  }
+}
+
 export interface ScriptFunctionExports {
   functions: ScriptFunction[];
 }

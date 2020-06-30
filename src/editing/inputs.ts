@@ -5,6 +5,7 @@ import {
   last_index_of,
   key_to_string,
   ParsedLine,
+  FileLike,
 } from "../assets/compiling/classes";
 
 import { script_from_parsed_lines } from "../assets/compiling/decompile";
@@ -436,20 +437,6 @@ interface PianoRollKeyState {
   [key: string]: boolean;
 }
 
-class FileLike {
-  is_string = false;
-  contents: string | string[] = [];
-  constructor(data: string | string[]) {
-    if (typeof data === "string") {
-      this.is_string = true;
-      this.contents = data;
-    } else if (data instanceof Array) {
-      this.is_string = false;
-      this.contents = data;
-    }
-  }
-}
-
 export class PianoRoll {
   readonly contents: PianoRollRow[];
   readonly reference: JQuery<HTMLElement>;
@@ -496,20 +483,49 @@ export class PianoRoll {
     this.create_navbar();
     this.navbar.data("owner", this); // table element
     this.navbar.append(
-      $("<tr/>").append(
-        $("<td/>")
-          .append(
-            $("<button/>")
-              .addClass("toggle_clones navbar_element")
-              .click(function () {
-                const owner_piano: PianoRoll = $(this).data("owner");
-                owner_piano.toggle_clones();
-              })
-              .data("owner", this)
-              .text("Toggle Identical Lines")
-          )
-          .addClass("navbar_button")
-      )
+      $("<tr/>")
+        .append(
+          $("<td/>")
+            .append(
+              $("<button/>")
+                .addClass("toggle_clones navbar_element")
+                .click(function () {
+                  const owner_piano: PianoRoll = $(this).data("owner");
+                  owner_piano.toggle_clones();
+                })
+                .data("owner", this)
+                .text("Toggle Identical Lines")
+            )
+            .addClass("navbar_button")
+        )
+        .append(
+          $("<td/>")
+            .append(
+              $("<button/>")
+                .addClass("export_better_scripts navbar_element")
+                .click(function () {
+                  const owner_piano: PianoRoll = $(this).data("owner");
+                  console.log(owner_piano.make_better_scripts(true));
+                })
+                .data("owner", this)
+                .text("Export as Better Scripts Script")
+            )
+            .addClass("navbar_button")
+        )
+        .append(
+          $("<td/>")
+            .append(
+              $("<button/>")
+                .addClass("export_better_scripts navbar_element")
+                .click(function () {
+                  const owner_piano: PianoRoll = $(this).data("owner");
+                  console.log(owner_piano.make_nx_tas(false));
+                })
+                .data("owner", this)
+                .text("Export as nx-TAS Script")
+            )
+            .addClass("navbar_button")
+        )
     );
   }
   create_navbar(): void {
