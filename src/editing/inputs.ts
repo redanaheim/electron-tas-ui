@@ -44,7 +44,7 @@ const create_key_element = function (key: Key): JQuery<HTMLElement> {
 
 const create_stick_element = function (is_left: boolean): JQuery<HTMLElement> {
   return $("<td/>")
-    .addClass("key")
+    .addClass(`key ${is_left ? "lstick_el" : "rstick_el"}`)
     .append(
       $("<img/>")
         .addClass("key_icon stick_icon")
@@ -439,8 +439,14 @@ export class PianoRollRow {
   show(should_show = true): void {
     if (should_show) {
       this.reference.fadeIn(400);
+      if (this.associated_spacer) {
+        this.associated_spacer.fadeIn(400);
+      }
     } else {
       this.reference.fadeOut(400);
+      if (this.associated_spacer) {
+        this.associated_spacer.fadeOut(400);
+      }
     }
   }
   get_row_children(): PianoRollRow[] {
@@ -471,10 +477,111 @@ interface PianoRollKeyState {
   [key: string]: boolean;
 }
 
+class StickChangeDialogue {
+  reference: JQuery<HTMLElement>;
+  pointing_to: JQuery<HTMLElement>;
+  pointing_to_lstick = false;
+  in_row: PianoRollRow;
+  owner: PianoRoll;
+  constructor(owner: PianoRoll) {
+    this.owner = owner;
+    const element: JQuery<HTMLElement> = $("<div/>")
+      .addClass("stick_change_dialogue")
+      .css("display", "none")
+      .css("z-index", 100)
+      .append(
+        $("<table/>")
+          .addClass("stick_change_table")
+          .append(
+            $("<tr/>")
+              .addClass("stick_change_labels")
+              .append($("<td/>").addClass("stick_change_label").text("Angle:"))
+              .append(
+                $("<td/>").addClass("stick_change_label").text("Magnitude:")
+              )
+          )
+          .append(
+            $("<tr/>")
+              .addClass("stick_change_inputs")
+              .append(
+                $("<td/>").append(
+                  $("<input/>")
+                    .addClass("stick_change_input angle")
+                    .text("0")
+                    .data("object", this)
+                    .change(function () {
+                      const self = $(this);
+                      const object: StickChangeDialogue = self.data("object");
+                      let old_stick_pos: StickPos;
+                      if (object.pointing_to_lstick) {
+                        // get old stick position
+                        old_stick_pos = object.in_row.lstick_pos.clone();
+                      } else {
+                        old_stick_pos = object.in_row.rstick_pos.clone();
+                      }
+                      // Set the position to a new position with the angle typed and the old magnitude
+                      object.in_row.set_stick(
+                        object.pointing_to_lstick,
+                        new StickPos(
+                          Number(self.val()),
+                          old_stick_pos.magnitude
+                        )
+                      );
+                    })
+                )
+              )
+              .append(
+                $("<td/>").append(
+                  $("<input/>")
+                    .addClass("stick_change_input magnitude")
+                    .text("0")
+                    .data("object", this)
+                    .change(function () {
+                      const self = $(this);
+                      const object: StickChangeDialogue = self.data("object");
+                      let old_stick_pos: StickPos;
+                      if (object.pointing_to_lstick) {
+                        old_stick_pos = object.in_row.lstick_pos.clone();
+                      } else {
+                        old_stick_pos = object.in_row.rstick_pos.clone();
+                      }
+                      // Set the position to a new position with the angle typed and the old magnitude
+                      object.in_row.set_stick(
+                        object.pointing_to_lstick,
+                        new StickPos(old_stick_pos.angle, Number(self.val()))
+                      );
+                    })
+                )
+              )
+          )
+      )
+      .focusout(function () {
+        $(this).fadeOut();
+      });
+    this.reference = element;
+    this.owner.reference.append(element);
+  }
+  point_to(row: PianoRollRow, point_to_lstick: boolean): void {
+    this.in_row = row;
+    this.pointing_to = row.reference.find(
+      point_to_lstick ? ".lstick_el" : ".rstick_el"
+    );
+    this.reference.find("angle").text(row.lstick_pos.angle);
+    this.reference.find("magnitude").text(row.lstick_pos.magnitude);
+    const coordinates = this.pointing_to.offset();
+    coordinates.top += this.pointing_to.height() + 5;
+    this.reference
+      .offset(coordinates)
+      .css("transform", "translate(-50%, 0%)")
+      .fadeIn(400);
+  }
+}
+
 export class PianoRoll {
   readonly contents: PianoRollRow[];
   readonly reference: JQuery<HTMLElement>;
   readonly key_state: PianoRollKeyState = {}; // for keeping track of pressed keys
+  private stick_change_dialogue: StickChangeDialogue;
   navbar?: JQuery<HTMLElement>;
   show_clones = true;
   static click_handler_func = function (): void {
@@ -510,6 +617,7 @@ export class PianoRoll {
       this.bind_navbar(this.navbar);
     }
     $(".key").click(PianoRoll.click_handler_func);
+    this.stick_change_dialogue = new StickChangeDialogue(this);
   }
   toggle_clones(): void {
     this.show_clones = !this.show_clones;
