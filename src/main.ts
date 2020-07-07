@@ -15,6 +15,10 @@ const main_window_size = {
   height: 600,
   width: 800,
 };
+const editing_window_size = {
+  height: 900,
+  width: 1000,
+};
 const compiling_window_size = {
   height: is_mac ? 125 : 110,
   width: is_mac ? 330 : 350,
@@ -64,8 +68,8 @@ const create_editing_window = async (): Promise<void> => {
     store_defaults.config
   );
   const main_window = new BrowserWindow({
-    height: main_window_size.height,
-    width: main_window_size.width,
+    height: editing_window_size.height,
+    width: editing_window_size.width,
     webPreferences: {
       nodeIntegration: true,
     },

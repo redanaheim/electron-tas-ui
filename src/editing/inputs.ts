@@ -47,12 +47,39 @@ const create_stick_element = function (is_left: boolean): JQuery<HTMLElement> {
     .addClass("key")
     .append(
       $("<img/>")
-        .addClass("key_icon")
-        .addClass("stick_icon")
+        .addClass("key_icon stick_icon")
         .attr("src", `../assets/buttons/svg/${is_left ? "l" : "r"}stick.svg`)
     )
     .data("is_left", is_left)
     .data("value", is_left ? Key.LSTICK : Key.RSTICK);
+};
+
+const create_joystick_element = function (
+  is_left: boolean
+): JQuery<HTMLElement> {
+  return $("<td/>")
+    .addClass("joystick")
+    .append(
+      $("<img/>")
+        .addClass("joystick_icon")
+        .attr("src", `../assets/sticks/svg/${is_left ? "l" : "r"}stick.svg`)
+        .hover(
+          function () {
+            $(this)
+              .stop(false, true) // stop animations already playing
+              .removeClass("bg_fade_out")
+              .addClass("bg_fade_in animate");
+          },
+          function () {
+            $(this)
+              .stop(false, true)
+              .removeClass("bg_fade_in")
+              .addClass("bg_fade_out");
+          }
+        )
+    )
+    .data("is_left", is_left)
+    .data("value", is_left ? "left" : "right");
 };
 
 interface KeyToReferenceStore {
@@ -89,6 +116,7 @@ export class PianoRollRow {
   expand_clones = false;
   previous?: PianoRollRow | null;
   reference: JQuery<HTMLElement> | null;
+  associated_spacer?: JQuery<HTMLElement>;
   current_frame: number;
   active_keys: KeysList; // all keys pressed on this frame
   on_keys: KeysList; // keys newly pressed on this frame
@@ -205,10 +233,16 @@ export class PianoRollRow {
       row.append(key_el);
       this.key_references[key_to_string(key)] = key_el;
     }
-    const lstick = create_stick_element(true);
-    const rstick = create_stick_element(false);
-    this.key_references["KEY_LSTICK"] = lstick;
-    this.key_references["KEY_RSTICK"] = rstick;
+    const lstick_btn = create_stick_element(true);
+    const rstick_btn = create_stick_element(false);
+    this.key_references["KEY_LSTICK"] = lstick_btn;
+    this.key_references["KEY_RSTICK"] = rstick_btn;
+    row.append(lstick_btn).append(rstick_btn);
+    // Joysticks
+    const lstick = create_joystick_element(true);
+    const rstick = create_joystick_element(false);
+    this.key_references["STICK_LSTICK"] = lstick;
+    this.key_references["STICK_RSTICK"] = rstick;
     row.append(lstick).append(rstick);
     // Add and remove row buttons
     row
@@ -447,6 +481,9 @@ export class PianoRoll {
     $(this).parent().data("object").toggle_key($(this).data("value")); // get the clicked element's parent,
     // get the PianoRollRow object corresponding to that, then toggle the corresponding key
   };
+  static create_spacer_row = function (): JQuery<HTMLElement> {
+    return $("<tr/>").addClass("row_spacer");
+  };
   constructor(options: {
     contents: PianoRollRow[];
     reference: JQuery<HTMLElement>;
@@ -557,10 +594,15 @@ export class PianoRoll {
     if (!element) {
       element = input_line.create_element();
       input_line.reference = element;
+      const spacer_row = PianoRoll.create_spacer_row();
+      input_line.associated_spacer = spacer_row;
       if (this.contents.length === 0) {
-        this.reference.append(element);
+        this.reference.append(element).append(spacer_row);
       } else {
-        this.get(position > 0 ? position - 1 : 0).reference.after(element);
+        this.get(position > 0 ? position - 1 : 0).associated_spacer.after(
+          element
+        );
+        element.after(spacer_row);
       }
     }
     if (!position) {
@@ -571,7 +613,11 @@ export class PianoRoll {
     this.refresh();
   }
   remove(position: number): void {
-    this.get(position).reference.remove();
+    const in_position = this.get(position);
+    in_position.reference.remove();
+    if (in_position.associated_spacer) {
+      this.get(position).associated_spacer.remove();
+    }
     this.contents.splice(position, 1);
     this.refresh();
   }

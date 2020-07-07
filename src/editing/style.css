@@ -77,12 +77,12 @@ td * {
 .spacer {
   width: 10px !important;
 }
-.frame_number.bg_fade_in {
+.bg_fade_in {
   animation-name: btn_bg_fade_in;
   animation-duration: 300ms;
   background-color: var(--btn-hover-bg);
 }
-.frame_number.bg_fade_out {
+.bg_fade_out {
   animation-name: btn_bg_fade_out;
   animation-duration: 300ms;
   background-color: transparent;
@@ -93,14 +93,24 @@ td * {
   filter: var(--key-filter);
   vertical-align: bottom;
 }
+.joystick_icon {
+  height: 20px;
+  width: 24px;
+  filter: var(--key-filter);
+  vertical-align: bottom;
+  padding: 3px;
+  margin: -3px;
+  border-radius: 4px;
+}
 .key.active > .key_icon {
   filter: var(--key-filter-pressed);
 }
 .stick_icon {
-  height: 25px;
-  width: 20px;
+  height: 20px;
+  width: 21px;
 }
-.key {
+.key,
+.joystick {
   text-align: center;
   vertical-align: bottom;
 }
@@ -109,12 +119,16 @@ td * {
   height: 17px;
   border-radius: 4px;
   filter: var(--ui-btn-filter);
+  padding: 2px;
+  margin: -2px;
 }
 .remove_btn_img {
   width: 17px;
   height: 17px;
   border-radius: 4px;
   filter: var(--ui-btn-filter);
+  padding: 2px;
+  margin: -2px;
 }
 @keyframes btn_bg_fade_in {
   from {
@@ -162,6 +176,9 @@ td * {
 .row_btn_container {
   vertical-align: bottom;
   opacity: 0;
+}
+.row_spacer {
+  height: 5px;
 }
 #navbar {
   position: fixed;
