@@ -7,6 +7,17 @@
 button:active {
   box-shadow: none;
 }
+input,
+textarea {
+  background-color: var(--input-bg);
+  color: var(--input-text);
+  border: none;
+  border-radius: 3px;
+  padding: 3px;
+  height: 100%;
+  outline: none;
+  padding-left: 5px;
+}
 .light {
   --bg: var(--light-bg);
   --text: var(--light-text);
@@ -188,6 +199,7 @@ td * {
   margin: 0px 0px;
   background-color: var(--navbar-bg);
   text-align: left;
+  z-index: 1000;
 }
 .navbar_element {
   background-color: transparent;
@@ -208,4 +220,11 @@ td * {
   border-left: var(--navbar-btn-hover-border);
   border-right: var(--navbar-btn-hover-border);
   background-color: var(--navbar-btn-hover-bg);
+}
+.stick_change_dialogue {
+  border: 1px solid var(--border);
+  background-color: var(--bg);
+  border-radius: 4px;
+  width: min-content;
+  padding: 3px;
 }

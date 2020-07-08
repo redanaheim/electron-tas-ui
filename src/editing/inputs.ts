@@ -55,7 +55,8 @@ const create_stick_element = function (is_left: boolean): JQuery<HTMLElement> {
 };
 
 const create_joystick_element = function (
-  is_left: boolean
+  is_left: boolean,
+  row_owner: PianoRollRow
 ): JQuery<HTMLElement> {
   return $("<td/>")
     .addClass("joystick")
@@ -79,7 +80,18 @@ const create_joystick_element = function (
         )
     )
     .data("is_left", is_left)
-    .data("value", is_left ? "left" : "right");
+    .data("value", is_left ? "left" : "right")
+    .data("row_owner", row_owner)
+    .click(function () {
+      const row: PianoRollRow = $(this).data("row_owner");
+      if (!row.owner) {
+        row.reeval(row.previous);
+      } else {
+        row.owner.refresh();
+      }
+      if (!row.owner.stick_change_dialogue) return;
+      row.owner.stick_change_dialogue.point_to(row, is_left);
+    });
 };
 
 interface KeyToReferenceStore {
@@ -125,8 +137,8 @@ export class PianoRollRow {
   lstick_pos: StickPos;
   rstick_pos: StickPos;
   // is the stick position inherited from previous frame?
-  is_lstick_clone: boolean;
-  is_rstick_clone: boolean;
+  is_lstick_clone = true;
+  is_rstick_clone = true;
   is_clone: boolean; // is everthing about the frame the same as the previous?
   frozen = false; // should we stop evaluating keys?
   key_references: KeyToReferenceStore = {};
@@ -239,8 +251,8 @@ export class PianoRollRow {
     this.key_references["KEY_RSTICK"] = rstick_btn;
     row.append(lstick_btn).append(rstick_btn);
     // Joysticks
-    const lstick = create_joystick_element(true);
-    const rstick = create_joystick_element(false);
+    const lstick = create_joystick_element(true, this);
+    const rstick = create_joystick_element(false, this);
     this.key_references["STICK_LSTICK"] = lstick;
     this.key_references["STICK_RSTICK"] = rstick;
     row.append(lstick).append(rstick);
@@ -347,7 +359,22 @@ export class PianoRollRow {
     }
   }
   set_stick(is_lstick: boolean, pos: StickPos): void {
-    this[is_lstick ? "lstick_pos" : "rstick_pos"] = pos;
+    if (
+      pos.equals(
+        is_lstick ? this.previous.lstick_pos : this.previous.rstick_pos
+      )
+    ) {
+      if (is_lstick) this.is_lstick_clone = true;
+      else this.is_lstick_clone = true;
+    } else {
+      if (is_lstick) {
+        this.is_lstick_clone = false;
+        this.lstick_pos = pos.clone();
+      } else {
+        this.is_rstick_clone = false;
+        this.rstick_pos = pos.clone();
+      }
+    }
   }
   set_bg(color?: string): void {
     if (!this.reference) return;
@@ -386,20 +413,16 @@ export class PianoRollRow {
     }
     return;
   }
-  reeval_sticks(previous: PianoRollRow, set_previous?: boolean): void {
-    if (this.frozen) return;
-    if (!previous) previous = this.previous || null;
-    if (set_previous) {
-      this.previous = previous;
-    }
-    this.is_lstick_clone = this.lstick_pos.equals(previous.lstick_pos);
-    this.is_rstick_clone = this.lstick_pos.equals(previous.rstick_pos);
+  reeval_sticks(previous: PianoRollRow): void {
+    if (this.frozen || !this.previous) return;
+    if (this.is_lstick_clone) this.lstick_pos = previous.lstick_pos.clone();
+    if (this.is_rstick_clone) this.rstick_pos = previous.rstick_pos.clone();
   }
   reeval(previous: PianoRollRow, hide_clones?: boolean): void {
     if (!previous) previous = this.previous || null;
     this.previous = previous;
     this.reeval_keys(previous, false);
-    this.reeval_sticks(previous, false);
+    this.reeval_sticks(previous);
     // Update whether this row is a clone
     if (this.on_keys.length() === 0 && this.off_keys.length() === 0) {
       this.is_clone = this.is_lstick_clone && this.is_rstick_clone;
@@ -486,8 +509,8 @@ class StickChangeDialogue {
   constructor(owner: PianoRoll) {
     this.owner = owner;
     const element: JQuery<HTMLElement> = $("<div/>")
+      .data("object", this)
       .addClass("stick_change_dialogue")
-      .css("display", "none")
       .css("z-index", 100)
       .append(
         $("<table/>")
@@ -507,73 +530,65 @@ class StickChangeDialogue {
                 $("<td/>").append(
                   $("<input/>")
                     .addClass("stick_change_input angle")
-                    .text("0")
-                    .data("object", this)
-                    .change(function () {
-                      const self = $(this);
-                      const object: StickChangeDialogue = self.data("object");
-                      let old_stick_pos: StickPos;
-                      if (object.pointing_to_lstick) {
-                        // get old stick position
-                        old_stick_pos = object.in_row.lstick_pos.clone();
-                      } else {
-                        old_stick_pos = object.in_row.rstick_pos.clone();
-                      }
-                      // Set the position to a new position with the angle typed and the old magnitude
-                      object.in_row.set_stick(
-                        object.pointing_to_lstick,
-                        new StickPos(
-                          Number(self.val()),
-                          old_stick_pos.magnitude
-                        )
-                      );
-                    })
+                    .val(0)
+                    .attr("type", "number")
                 )
               )
               .append(
                 $("<td/>").append(
                   $("<input/>")
                     .addClass("stick_change_input magnitude")
-                    .text("0")
-                    .data("object", this)
-                    .change(function () {
-                      const self = $(this);
-                      const object: StickChangeDialogue = self.data("object");
-                      let old_stick_pos: StickPos;
-                      if (object.pointing_to_lstick) {
-                        old_stick_pos = object.in_row.lstick_pos.clone();
-                      } else {
-                        old_stick_pos = object.in_row.rstick_pos.clone();
-                      }
-                      // Set the position to a new position with the angle typed and the old magnitude
-                      object.in_row.set_stick(
-                        object.pointing_to_lstick,
-                        new StickPos(old_stick_pos.angle, Number(self.val()))
-                      );
-                    })
+                    .val(0)
+                    .attr("type", "number")
                 )
               )
           )
       )
-      .focusout(function () {
-        $(this).fadeOut();
+      .mouseleave(function () {
+        const self = $(this);
+        const object: StickChangeDialogue = self.data("object");
+        // Set the position to a new position with the angle typed and the old magnitude
+        object.in_row.set_stick(
+          object.pointing_to_lstick,
+          new StickPos(
+            Number(self.find(".angle").val()),
+            Number(self.find(".magnitude").val())
+          )
+        );
+        self.fadeOut(100, function () {
+          $(this).find(".angle").val(0);
+          $(this).find(".magnitude").val(0);
+        });
+        object.in_row = null;
+        object.pointing_to = null;
+        object.pointing_to_lstick = null;
       });
     this.reference = element;
-    this.owner.reference.append(element);
+    $("body").append(element); // add element to the body
+    element.fadeOut(0);
   }
   point_to(row: PianoRollRow, point_to_lstick: boolean): void {
     this.in_row = row;
     this.pointing_to = row.reference.find(
       point_to_lstick ? ".lstick_el" : ".rstick_el"
     );
-    this.reference.find("angle").text(row.lstick_pos.angle);
-    this.reference.find("magnitude").text(row.lstick_pos.magnitude);
-    const coordinates = this.pointing_to.offset();
-    coordinates.top += this.pointing_to.height() + 5;
+    this.pointing_to_lstick = point_to_lstick;
     this.reference
-      .offset(coordinates)
-      .css("transform", "translate(-50%, 0%)")
-      .fadeIn(400);
+      .find(".angle")
+      .val(
+        (point_to_lstick ? row.lstick_pos.angle : row.rstick_pos.angle) || 0
+      );
+    this.reference
+      .find(".magnitude")
+      .val(
+        point_to_lstick ? row.lstick_pos.magnitude : row.rstick_pos.magnitude
+      );
+    const coordinates = this.pointing_to.offset();
+    coordinates.top += this.pointing_to.height() + 5; // move the dialogue to below the stick clicked
+    coordinates.left -= this.reference.width() / 2; // move the dialogue to align the middle with the stick clicked
+    this.reference.css({ top: "0px", left: "0px" });
+    this.reference.offset(coordinates);
+    this.reference.fadeIn(100);
   }
 }
 
@@ -581,7 +596,7 @@ export class PianoRoll {
   readonly contents: PianoRollRow[];
   readonly reference: JQuery<HTMLElement>;
   readonly key_state: PianoRollKeyState = {}; // for keeping track of pressed keys
-  private stick_change_dialogue: StickChangeDialogue;
+  stick_change_dialogue: StickChangeDialogue;
   navbar?: JQuery<HTMLElement>;
   show_clones = true;
   static click_handler_func = function (): void {
@@ -650,7 +665,7 @@ export class PianoRoll {
                 .addClass("export_better_scripts navbar_element")
                 .click(function () {
                   const owner_piano: PianoRoll = $(this).data("owner");
-                  console.log(owner_piano.make_better_scripts(true));
+                  console.log(owner_piano.make_better_scripts(true).contents);
                 })
                 .data("owner", this)
                 .text("Export as Better Scripts Script")
@@ -664,7 +679,7 @@ export class PianoRoll {
                 .addClass("export_better_scripts navbar_element")
                 .click(function () {
                   const owner_piano: PianoRoll = $(this).data("owner");
-                  console.log(owner_piano.make_nx_tas(false));
+                  console.log(owner_piano.make_nx_tas(false).contents);
                 })
                 .data("owner", this)
                 .text("Export as nx-TAS Script")
