@@ -555,7 +555,7 @@ class StickChangeDialogue {
             Number(self.find(".magnitude").val())
           )
         );
-        self.fadeOut(100, function () {
+        self.fadeOut(200, function () {
           $(this).find(".angle").val(0);
           $(this).find(".magnitude").val(0);
         });
@@ -568,6 +568,15 @@ class StickChangeDialogue {
     element.fadeOut(0);
   }
   point_to(row: PianoRollRow, point_to_lstick: boolean): void {
+    if (this.pointing_to !== null && this.pointing_to !== undefined) {
+      this.in_row.set_stick(
+        this.pointing_to_lstick,
+        new StickPos(
+          Number(this.reference.find(".angle").val()),
+          Number(this.reference.find(".magnitude").val())
+        )
+      );
+    }
     this.in_row = row;
     this.pointing_to = row.reference.find(
       point_to_lstick ? ".lstick_el" : ".rstick_el"
@@ -584,11 +593,13 @@ class StickChangeDialogue {
         point_to_lstick ? row.lstick_pos.magnitude : row.rstick_pos.magnitude
       );
     const coordinates = this.pointing_to.offset();
-    coordinates.top += this.pointing_to.height() + 5; // move the dialogue to below the stick clicked
-    coordinates.left -= this.reference.width() / 2; // move the dialogue to align the middle with the stick clicked
-    this.reference.css({ top: "0px", left: "0px" });
-    this.reference.offset(coordinates);
-    this.reference.fadeIn(100);
+    this.reference.css({
+      top: coordinates.top + this.pointing_to.height() + 10,
+      left: coordinates.left,
+      position: "absolute",
+    }); // move the dialogue to below the stick clicked
+    console.log("coordinates", coordinates);
+    this.reference.fadeIn(200);
   }
 }
 
