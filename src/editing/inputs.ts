@@ -12,6 +12,8 @@ import { script_from_parsed_lines } from "../assets/compiling/decompile";
 
 import { compile } from "../assets/compiling/compile";
 
+import { export_file } from "../storing";
+
 interface PianoRollRowConstructorOptions {
   previous: PianoRollRow;
   active_keys: KeysList;
@@ -676,7 +678,11 @@ export class PianoRoll {
                 .addClass("export_better_scripts navbar_element")
                 .click(function () {
                   const owner_piano: PianoRoll = $(this).data("owner");
-                  console.log(owner_piano.make_better_scripts(true).contents);
+                  export_file({
+                    file: owner_piano.make_better_scripts(false),
+                    title: "Exporting Better Scripts Script",
+                    message: "Choose a location",
+                  });
                 })
                 .data("owner", this)
                 .text("Export as Better Scripts Script")
@@ -690,7 +696,11 @@ export class PianoRoll {
                 .addClass("export_better_scripts navbar_element")
                 .click(function () {
                   const owner_piano: PianoRoll = $(this).data("owner");
-                  console.log(owner_piano.make_nx_tas(false).contents);
+                  export_file({
+                    file: owner_piano.make_nx_tas(false),
+                    title: "Exporting nx-TAS Script",
+                    message: "Choose a location",
+                  });
                 })
                 .data("owner", this)
                 .text("Export as nx-TAS Script")

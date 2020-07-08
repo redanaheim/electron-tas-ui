@@ -1,6 +1,7 @@
-import { app, remote } from "electron";
+import { app, remote, BrowserWindow, dialog } from "electron";
 import { readFile, writeFile } from "fs";
 import { join } from "path";
+import { FileLike } from "./assets/compiling/classes";
 
 interface InternalData {
   [key: string]: any;
@@ -197,4 +198,48 @@ export const store_defaults = {
     decompiling_perfect_decimal_match: true,
     is_default: true,
   },
+};
+
+interface ExportFileOptions {
+  file: FileLike;
+  title?: string;
+  message?: string;
+  field_label?: string;
+  no_replace_prompt?: boolean;
+  browser_window?: BrowserWindow;
+  create_directory?: boolean;
+  show_hidden?: boolean;
+  button_label?: string;
+}
+
+export const export_file = async function (
+  options: ExportFileOptions
+): Promise<string> {
+  const properties_list: any = [];
+  if (options.create_directory !== false) {
+    properties_list.push("createDirectory");
+  }
+  if (options.no_replace_prompt !== false) {
+    properties_list.push("showOverwriteConfirmation");
+  }
+  if (options.show_hidden !== false) {
+    properties_list.push("showHiddenFiles");
+  }
+  const save_dialog = await (dialog ? dialog : remote.dialog).showSaveDialog(
+    options.browser_window || null,
+    {
+      title: options.title || "",
+      message: options.message || "",
+      buttonLabel: options.button_label || undefined,
+      nameFieldLabel: options.field_label || undefined,
+      properties: properties_list,
+    }
+  );
+  if (save_dialog.canceled) return;
+  try {
+    await write_file_async(save_dialog.filePath, options.file.as_string());
+  } catch (err) {
+    console.error(err);
+  }
+  return save_dialog.filePath;
 };
