@@ -220,7 +220,7 @@ export const string_to_key = function (key: string | Key): Key {
 };
 
 export class KeysList {
-  private internal_array: Key[] = [];
+  private internal_set: Set<Key> = new Set();
   static all_keys: Key[] = [
     Key.A,
     Key.B,
@@ -240,71 +240,51 @@ export class KeysList {
     Key.RSTICK,
   ];
   constructor(internal_array?: Key[]) {
-    if (internal_array) {
-      for (const key of internal_array) {
-        this.internal_array.push(key);
-      }
-    }
+    this.internal_set = new Set(internal_array);
   }
   append(key: Key): void {
-    if (this.internal_array.includes(key)) return;
-    this.internal_array.push(key);
+    this.internal_set.add(key);
   }
   append_list(key_list: Key[]): void {
     for (const key of key_list) {
-      this.append(key);
+      this.internal_set.add(key);
     }
   }
   remove(key: Key): void {
-    const new_internal_array = [];
-    for (const existing_key of this.internal_array) {
-      if (key !== existing_key) {
-        new_internal_array.push(existing_key);
-      }
-    }
-    this.internal_array = new_internal_array;
+    this.internal_set.delete(key);
   }
   remove_list(key_list: Key[]): void {
-    const new_internal_array = [];
-    for (const existing_key of this.internal_array) {
+    const new_internal_array: Set<Key> = new Set();
+    for (const existing_key of this.internal_set) {
       if (key_list.includes(existing_key) === false) {
-        new_internal_array.push(existing_key);
+        new_internal_array.add(existing_key);
       }
     }
-    this.internal_array = new_internal_array;
+    this.internal_set = new_internal_array;
   }
   length(): number {
-    return this.internal_array.length;
+    return this.internal_set.size;
   }
   clear(): void {
-    this.internal_array = [];
-  }
-  sort(): void {
-    this.internal_array = this.internal_array.sort((a: Key, b: Key) => a - b);
+    this.internal_set.clear();
   }
   empty(): boolean {
-    return this.internal_array.length === 0;
+    return this.internal_set.size === 0;
   }
   get_array(): string[] {
-    return this.internal_array.map((x) => key_to_string(x));
-  }
-  raw_array(): Key[] {
-    return this.internal_array.slice(); // create a copy :)
+    return [...this.internal_set].map((x) => key_to_string(x));
   }
   equals(other: KeysList): boolean {
-    this.sort();
-    other.sort();
-    const other_array = other.raw_array();
-    for (let i = 0; i < this.internal_array.length; i++) {
-      if (other_array[i] !== this.internal_array[i]) return false;
+    for (const key of this.internal_set) {
+      if (!other.internal_set.has(key)) return false;
     }
     return true;
   }
   has(key: Key): boolean {
-    return this.internal_array.includes(key);
+    return this.internal_set.has(key);
   }
   clone(): KeysList {
-    return new KeysList(this.internal_array);
+    return new KeysList([...this.internal_set]);
   }
 }
 export class StickPos {
