@@ -6,6 +6,7 @@ import {
   string_to_key,
   last_index_of,
   ParsedLine,
+  key_to_string,
 } from "./classes";
 
 const calc_angle = function (x: number, y: number): number {
@@ -127,8 +128,12 @@ class PureInputLine {
     this.off_keys = new KeysList();
     this.previous = previous;
     for (const key of all_keys) {
-      const this_has = this.pressed_keys.get_array().includes(key);
-      const prev_has = previous.pressed_keys.get_array().includes(key);
+      const this_has = this.pressed_keys
+        .get_array()
+        .includes(key_to_string(key));
+      const prev_has = previous.pressed_keys
+        .get_array()
+        .includes(key_to_string(key));
       if (this_has === prev_has && this_has === true) {
         this.clone_keys.append(key);
       } else if (this_has === prev_has && this_has === false) {

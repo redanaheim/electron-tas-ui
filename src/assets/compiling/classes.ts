@@ -87,22 +87,22 @@ export const last_index_of = function (array: any[]): number {
 };
 
 export enum Key {
-  A = "KEY_A",
-  B = "KEY_B",
-  X = "KEY_X",
-  Y = "KEY_Y",
-  DLEFT = "KEY_DLEFT",
-  DUP = "KEY_DUP",
-  DDOWN = "KEY_DDOWN",
-  DRIGHT = "KEY_DRIGHT",
-  L = "KEY_L",
-  R = "KEY_R",
-  ZL = "KEY_ZL",
-  ZR = "KEY_ZR",
-  PLUS = "KEY_PLUS",
-  MINUS = "KEY_MINUS",
-  LSTICK = "KEY_LSTICK",
-  RSTICK = "KEY_RSTICK",
+  A = 0,
+  B = 1,
+  X = 2,
+  Y = 3,
+  DLEFT = 4,
+  DUP = 5,
+  DDOWN = 6,
+  DRIGHT = 7,
+  L = 8,
+  R = 9,
+  ZL = 10,
+  ZR = 11,
+  PLUS = 12,
+  MINUS = 13,
+  LSTICK = 14,
+  RSTICK = 15,
 }
 export const key_to_string = function (key: Key): string {
   switch (key) {
@@ -160,7 +160,7 @@ export const key_to_string = function (key: Key): string {
   }
 };
 
-export const string_to_key = function (key: string): Key {
+export const string_to_key = function (key: string | Key): Key {
   if (typeof key !== "string") {
     return key;
   }
@@ -276,17 +276,29 @@ export class KeysList {
   length(): number {
     return this.internal_array.length;
   }
+  clear(): void {
+    this.internal_array = [];
+  }
+  sort(): void {
+    this.internal_array = this.internal_array.sort((a: Key, b: Key) => a - b);
+  }
   empty(): boolean {
     return this.internal_array.length === 0;
   }
   get_array(): string[] {
     return this.internal_array.map((x) => key_to_string(x));
   }
+  raw_array(): Key[] {
+    return this.internal_array.slice(); // create a copy :)
+  }
   equals(other: KeysList): boolean {
-    for (const key of this.internal_array) {
-      if (other.get_array().includes(key) === false) return false;
+    this.sort();
+    other.sort();
+    const other_array = other.raw_array();
+    for (let i = 0; i < this.internal_array.length; i++) {
+      if (other_array[i] !== this.internal_array[i]) return false;
     }
-    return other.get_array().length === this.internal_array.length;
+    return true;
   }
   has(key: Key): boolean {
     return this.internal_array.includes(key);

@@ -136,6 +136,8 @@ export class PianoRollRow {
   on_keys: KeysList; // keys newly pressed on this frame
   off_keys: KeysList; // keys released on this frame
   cloned_on_keys: KeysList; // keys that are on and inherited from the frame before
+  // are all keys cloned?
+  all_keys_cloned = false;
   lstick_pos: StickPos;
   rstick_pos: StickPos;
   // is the stick position inherited from previous frame?
@@ -413,6 +415,9 @@ export class PianoRollRow {
         this.off_keys.remove(key);
       }
     }
+    if (this.on_keys.length() === 0 && this.off_keys.length() === 0)
+      this.all_keys_cloned = true;
+    else this.all_keys_cloned = false;
     return;
   }
   reeval_sticks(previous: PianoRollRow): void {
@@ -426,7 +431,7 @@ export class PianoRollRow {
     this.reeval_keys(previous, false);
     this.reeval_sticks(previous);
     // Update whether this row is a clone
-    if (this.on_keys.length() === 0 && this.off_keys.length() === 0) {
+    if (this.all_keys_cloned) {
       this.is_clone = this.is_lstick_clone && this.is_rstick_clone;
       if (this.is_clone) {
         let potential_owner = this.previous;
