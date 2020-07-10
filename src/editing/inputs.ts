@@ -120,7 +120,7 @@ export class PianoRollRow {
     Key.RSTICK,
   ];
   // is this the first line?
-  has_previous: boolean;
+  has_previous = false;
   // root PianoRoll element
   owner?: PianoRoll;
   // if this element is a clone row, this is a reference to the source
@@ -131,59 +131,46 @@ export class PianoRollRow {
   previous?: PianoRollRow | null;
   reference: JQuery<HTMLElement> | null;
   associated_spacer?: JQuery<HTMLElement>;
-  current_frame: number;
-  active_keys: KeysList; // all keys pressed on this frame
-  on_keys: KeysList; // keys newly pressed on this frame
-  off_keys: KeysList; // keys released on this frame
-  cloned_on_keys: KeysList; // keys that are on and inherited from the frame before
+  current_frame = 0;
+  active_keys = new KeysList(); // all keys pressed on this frame
+  on_keys = new KeysList(); // keys newly pressed on this frame
+  off_keys = new KeysList(); // keys released on this frame
+  cloned_on_keys = new KeysList(); // keys that are on and inherited from the frame before
   // are all keys cloned?
   all_keys_cloned = false;
-  lstick_pos: StickPos;
-  rstick_pos: StickPos;
+  lstick_pos = new StickPos(0, 0);
+  rstick_pos = new StickPos(0, 0);
   // is the stick position inherited from previous frame?
   is_lstick_clone = true;
   is_rstick_clone = true;
-  is_clone: boolean; // is everthing about the frame the same as the previous?
+  is_clone = false; // is everthing about the frame the same as the previous?
   frozen = false; // should we stop evaluating keys?
   key_references: KeyToReferenceStore = {};
   constructor(options?: PianoRollRowConstructorOptions) {
     if (!options) {
       // Create empty object for the purpose of serving as previous for a later line
-      this.current_frame = 0;
-      this.active_keys = new KeysList();
-      this.has_previous = false;
-      this.is_clone = false;
       this.is_lstick_clone = false;
       this.is_rstick_clone = false;
-      this.lstick_pos = new StickPos(0, 0);
-      this.rstick_pos = new StickPos(0, 0);
-      this.on_keys = new KeysList();
-      this.off_keys = new KeysList();
     } else {
       // destructuring options for less unreadable code
-      const {
-        previous,
-        active_keys,
-        lstick_pos,
-        rstick_pos,
-        frame,
-        reference,
-      } = options;
-      this.has_previous = Boolean(previous);
-      this.reference = reference;
-      this.current_frame = frame || previous.current_frame + 1;
-      this.active_keys = active_keys;
-      this.on_keys = new KeysList();
-      this.off_keys = new KeysList();
+      this.has_previous = Boolean(options.previous);
+      this.reference = options.reference;
+      this.current_frame = options.frame || options.previous.current_frame + 1;
+      this.active_keys = options.active_keys;
       // re-call constructor to fix range issues, i.e. magnitude over 32767
-      this.lstick_pos = new StickPos(lstick_pos.angle, lstick_pos.magnitude);
-      this.rstick_pos = new StickPos(rstick_pos.angle, rstick_pos.magnitude);
+      this.lstick_pos = new StickPos(
+        options.lstick_pos.angle,
+        options.lstick_pos.magnitude
+      );
+      this.rstick_pos = new StickPos(
+        options.rstick_pos.angle,
+        options.rstick_pos.magnitude
+      );
       // clone calculation
-      this.cloned_on_keys = new KeysList();
       // iterating over every key pressed in the previous frame, if it is pressed here too, it's a clone key
       for (const key of PianoRollRow.all_keys) {
         const this_has = this.active_keys.has(key);
-        const prev_has = previous.active_keys.has(key);
+        const prev_has = options.previous.active_keys.has(key);
         if (this_has === prev_has) {
           this.cloned_on_keys.append(key);
         } else if (this_has) {
@@ -193,8 +180,12 @@ export class PianoRollRow {
         }
       }
       // check the same way for sticks
-      this.is_lstick_clone = this.lstick_pos.equals(previous.lstick_pos);
-      this.is_rstick_clone = this.lstick_pos.equals(previous.rstick_pos);
+      this.is_lstick_clone = this.lstick_pos.equals(
+        options.previous.lstick_pos
+      );
+      this.is_rstick_clone = this.lstick_pos.equals(
+        options.previous.rstick_pos
+      );
       // if both sticks are cloned, and this.clone_keys has the same length as this.active_keys, this object is a clone
       this.is_clone =
         this.is_lstick_clone &&
@@ -605,7 +596,6 @@ class StickChangeDialogue {
       left: coordinates.left,
       position: "absolute",
     }); // move the dialogue to below the stick clicked
-    console.log("coordinates", coordinates);
     this.reference.fadeIn(200);
   }
 }
