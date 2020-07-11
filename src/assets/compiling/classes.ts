@@ -291,7 +291,7 @@ export class StickPos {
   readonly angle: number;
   readonly magnitude: number;
   constructor(angle: number, magnitude: number) {
-    this.angle = angle;
+    this.angle = angle % 360;
     this.magnitude = FifteenBitInt(magnitude);
   }
   stringify(is_lstick: boolean): string {

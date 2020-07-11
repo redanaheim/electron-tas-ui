@@ -166,7 +166,7 @@ const separate_brackets_stick = function (parameter: any): [number, number] {
     .map((x: string) => Number(x));
 };
 
-const parse_line = function (
+export const parse_line = function (
   line: string,
   last_frame: number,
   throw_errors?: boolean

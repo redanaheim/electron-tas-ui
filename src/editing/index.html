@@ -12,10 +12,11 @@
       href="https://fonts.googleapis.com/css?family=Roboto"
     />
     <script>
-      let { on_init } = require("./index.js");
+      let { on_init, x } = require("./index.js");
       let { set_theme } = require("../theme.js");
       $(document).ready(() => {
         window.piano = on_init();
+        Object.assign(window, x);
       });
     </script>
   </head>

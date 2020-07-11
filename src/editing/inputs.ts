@@ -8,6 +8,7 @@ import {
   key_to_string,
   ParsedLine,
   FileLike,
+  string_to_key,
 } from "../assets/compiling/classes";
 
 import { script_from_parsed_lines } from "../assets/compiling/decompile";
@@ -101,7 +102,6 @@ const create_joystick_element = function (
 interface KeyToReferenceStore {
   [key: string]: JQuery<HTMLElement>;
 }
-
 export class PianoRollRow {
   static all_keys = [
     Key.A,
@@ -148,6 +148,43 @@ export class PianoRollRow {
   is_clone = false; // is everthing about the frame the same as the previous?
   frozen = false; // should we stop evaluating keys?
   key_references: KeyToReferenceStore = {};
+  static from(
+    line: ParsedLine,
+    previous_active_keys = new KeysList(),
+    previous_lstick_pos = new StickPos(0, 0),
+    previous_rstick_pos = new StickPos(0, 0)
+  ): PianoRollRow {
+    const row = new PianoRollRow();
+    row.freeze();
+    row.active_keys = previous_active_keys;
+    row.set_key(
+      line.keys_on.map((x) => string_to_key(x)),
+      true
+    );
+    row.set_key(
+      line.keys_off.map((x) => string_to_key(x)),
+      false
+    );
+    if (line.lstick_changes) {
+      row.set_stick(
+        true,
+        new StickPos(...line.lstick_pos_polar),
+        previous_lstick_pos
+      );
+    } else {
+      row.set_stick(true, previous_lstick_pos, previous_lstick_pos);
+    }
+    if (line.rstick_changes) {
+      row.set_stick(
+        false,
+        new StickPos(...line.rstick_pos_polar),
+        previous_rstick_pos
+      );
+    } else {
+      row.set_stick(false, previous_rstick_pos, previous_rstick_pos);
+    }
+    return row;
+  }
   constructor(options?: PianoRollRowConstructorOptions) {
     if (!options) {
       // Create empty object for the purpose of serving as previous for a later line
@@ -377,22 +414,27 @@ export class PianoRollRow {
       }
     }
   }
-  set_stick(is_lstick: boolean, pos: StickPos): void {
+  set_stick(
+    is_lstick: boolean,
+    pos: StickPos,
+    use_for_comparison?: StickPos
+  ): void {
     if (
       pos.equals(
-        is_lstick ? this.previous.lstick_pos : this.previous.rstick_pos
+        use_for_comparison ||
+          (is_lstick ? this.previous.lstick_pos : this.previous.rstick_pos)
       )
     ) {
       if (is_lstick) this.is_lstick_clone = true;
-      else this.is_lstick_clone = true;
+      else this.is_rstick_clone = true;
     } else {
-      if (is_lstick) {
-        this.is_lstick_clone = false;
-        this.lstick_pos = pos.clone();
-      } else {
-        this.is_rstick_clone = false;
-        this.rstick_pos = pos.clone();
-      }
+      if (is_lstick) this.is_lstick_clone = false;
+      else this.is_rstick_clone = false;
+    }
+    if (is_lstick) {
+      this.lstick_pos = pos.clone();
+    } else {
+      this.rstick_pos = pos.clone();
     }
   }
   set_bg(color?: string): void {
