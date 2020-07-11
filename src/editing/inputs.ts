@@ -1,3 +1,5 @@
+// TODO: right click functions in the editor
+
 import {
   KeysList,
   StickPos,
@@ -15,11 +17,11 @@ import { compile } from "../assets/compiling/compile";
 import { export_file } from "../storing";
 
 interface PianoRollRowConstructorOptions {
-  previous: PianoRollRow;
-  active_keys: KeysList;
-  lstick_pos: StickPos;
-  rstick_pos: StickPos;
-  reference: JQuery<HTMLElement>;
+  previous?: PianoRollRow;
+  active_keys?: KeysList;
+  lstick_pos?: StickPos;
+  rstick_pos?: StickPos;
+  reference?: JQuery<HTMLElement>;
   frame?: number;
 }
 
@@ -154,43 +156,49 @@ export class PianoRollRow {
     } else {
       // destructuring options for less unreadable code
       this.has_previous = Boolean(options.previous);
-      this.reference = options.reference;
+      this.reference = options.reference || null;
       this.current_frame = options.frame || options.previous.current_frame + 1;
-      this.active_keys = options.active_keys;
+      this.active_keys = options.active_keys || new KeysList();
       // re-call constructor to fix range issues, i.e. magnitude over 32767
-      this.lstick_pos = new StickPos(
-        options.lstick_pos.angle,
-        options.lstick_pos.magnitude
-      );
-      this.rstick_pos = new StickPos(
-        options.rstick_pos.angle,
-        options.rstick_pos.magnitude
-      );
-      // clone calculation
-      // iterating over every key pressed in the previous frame, if it is pressed here too, it's a clone key
-      for (const key of PianoRollRow.all_keys) {
-        const this_has = this.active_keys.has(key);
-        const prev_has = options.previous.active_keys.has(key);
-        if (this_has === prev_has) {
-          this.cloned_on_keys.append(key);
-        } else if (this_has) {
-          this.on_keys.append(key);
-        } else {
-          this.off_keys.append(key);
-        }
+      if ("lstick_pos" in options) {
+        this.lstick_pos = new StickPos(
+          options.lstick_pos.angle,
+          options.lstick_pos.magnitude
+        );
       }
-      // check the same way for sticks
-      this.is_lstick_clone = this.lstick_pos.equals(
-        options.previous.lstick_pos
-      );
-      this.is_rstick_clone = this.lstick_pos.equals(
-        options.previous.rstick_pos
-      );
-      // if both sticks are cloned, and this.clone_keys has the same length as this.active_keys, this object is a clone
-      this.is_clone =
-        this.is_lstick_clone &&
-        this.is_rstick_clone &&
-        this.cloned_on_keys.length() === Object.keys(Key).length;
+      if ("rstick_pos" in options) {
+        this.rstick_pos = new StickPos(
+          options.rstick_pos.angle,
+          options.rstick_pos.magnitude
+        );
+      }
+      if ("previous" in options) {
+        // clone calculation
+        // iterating over every key pressed in the previous frame, if it is pressed here too, it's a clone key
+        for (const key of PianoRollRow.all_keys) {
+          const this_has = this.active_keys.has(key);
+          const prev_has = options.previous.active_keys.has(key);
+          if (this_has === prev_has) {
+            this.cloned_on_keys.append(key);
+          } else if (this_has) {
+            this.on_keys.append(key);
+          } else {
+            this.off_keys.append(key);
+          }
+        }
+        // check the same way for sticks
+        this.is_lstick_clone = this.lstick_pos.equals(
+          options.previous.lstick_pos
+        );
+        this.is_rstick_clone = this.lstick_pos.equals(
+          options.previous.rstick_pos
+        );
+        // if both sticks are cloned, and this.clone_keys has the same length as this.active_keys, this object is a clone
+        this.is_clone =
+          this.is_lstick_clone &&
+          this.is_rstick_clone &&
+          this.cloned_on_keys.length() === Object.keys(Key).length;
+      }
     }
   }
   create_element(): JQuery<HTMLElement> {
@@ -341,6 +349,22 @@ export class PianoRollRow {
       this.owner.refresh();
     } else {
       this.reeval_keys(this.previous, false);
+    }
+  }
+  set_key(keys: Key[] | Key, pressed?: boolean): void {
+    if (!(keys instanceof Array)) {
+      keys = [keys];
+    }
+    if (pressed) {
+      for (const key of keys) {
+        if (this.active_keys.has(key)) continue;
+        this.toggle_key(key);
+      }
+    } else {
+      for (const key of keys) {
+        if (!this.active_keys.has(key)) continue;
+        this.toggle_key(key);
+      }
     }
   }
   show_key(key: Key, pressed?: boolean): void {
@@ -619,6 +643,7 @@ export class PianoRoll {
     reference: JQuery<HTMLElement>;
     jquery_document?: JQuery<Document>;
     navbar?: JQuery<HTMLElement>;
+    no_add_row?: boolean;
   }) {
     this.contents = options.contents;
     this.reference = options.reference;
@@ -638,6 +663,9 @@ export class PianoRoll {
     if (options.navbar) {
       this.navbar = options.navbar;
       this.bind_navbar(this.navbar);
+    }
+    if (!options.no_add_row) {
+      this.add(null, 0);
     }
     $(".key").click(PianoRoll.click_handler_func);
     this.stick_change_dialogue = new StickChangeDialogue(this);

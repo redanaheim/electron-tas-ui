@@ -8,6 +8,5 @@ export const on_init = (): PianoRoll => {
     jquery_document: $(document),
     navbar: $("#navbar"),
   });
-  piano.add(null, 0);
   return piano;
 };
