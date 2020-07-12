@@ -9,7 +9,12 @@ if (require("electron-squirrel-startup")) {
 }
 
 const menu_ids = {
-  editing_dependent: ["editing_save", "editing_save_as", "editing_export_as"],
+  editing_dependent: [
+    "editing_save",
+    "editing_save_as",
+    "editing_export_as_nx_tas",
+    "editing_export_as_tig",
+  ],
 };
 
 // https://github.com/electron/electron/issues/18397#
@@ -285,11 +290,21 @@ const create_js_compile_export_window = async (): Promise<void> => {
   );
 };
 
-const export_active = (save?: boolean, save_as?: boolean): (() => void) => {
+const export_active = (
+  save?: boolean,
+  save_as?: boolean,
+  nx_tas?: boolean
+): (() => void) => {
   return function (): void {
     BrowserWindow.getFocusedWindow().webContents.send(
       "requests",
-      save ? (save_as ? "request_save_as" : "request_save") : "request_export"
+      nx_tas
+        ? "request_export_nx_tas"
+        : save
+        ? save_as
+          ? "request_save_as"
+          : "request_save"
+        : "request_export"
     );
   };
 };

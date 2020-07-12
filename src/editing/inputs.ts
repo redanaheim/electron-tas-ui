@@ -749,6 +749,10 @@ export class PianoRoll {
               this.export();
               break;
             }
+            case "request_export_nx_tas": {
+              this.export(false, false, true);
+              break;
+            }
           }
         }
       }
@@ -799,12 +803,7 @@ export class PianoRoll {
                 .addClass("export_better_scripts navbar_element")
                 .click(function () {
                   const owner_piano: PianoRoll = $(this).data("owner");
-                  export_file({
-                    file: owner_piano.make_nx_tas(false),
-                    title: "Exporting nx-TAS Script",
-                    message: "Choose a location",
-                    default_name: "script1.txt",
-                  });
+                  owner_piano.export(false, false, true);
                 })
                 .data("owner", this)
                 .text("Export as nx-TAS Script")
@@ -826,14 +825,21 @@ export class PianoRoll {
   get_position(row: PianoRollRow): number {
     return this.contents.indexOf(row);
   }
-  async export(saved?: boolean, save_as?: boolean): Promise<string> {
+  async export(
+    saved?: boolean,
+    save_as?: boolean,
+    nx_tas?: boolean
+  ): Promise<string> {
     console.log("save_as: ", save_as);
     console.log("saved: ", saved);
     const path = await export_file({
-      file: this.make_better_scripts(true, this.saved),
-      title: `${saved ? "Save" : "Export"} Better Scripts Script`,
-      message: "Choose a location",
-      default_name: "script1.tig",
+      file: nx_tas
+        ? this.make_nx_tas()
+        : this.make_better_scripts(true, this.saved),
+      title: `${saved ? "Save" : "Export"} ${
+        nx_tas ? "nx-TAS" : "Better Scripts"
+      } Script`,
+      default_name: `script1.${nx_tas ? "txt" : "tig"}`,
       browser_window: remote.getCurrentWindow(),
       path:
         (save_as ? undefined : saved ? this.representing : undefined) ||

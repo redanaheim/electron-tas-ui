@@ -34,10 +34,25 @@ export async function create_menu(): Promise<Menu> {
         },
         {
           click: menu_click_handlers.export_active(),
-          accelerator: "CmdOrCtrl+Shift+X",
           label: "Export As...",
           id: "editing_export_as",
-          enabled: false,
+          enabled: true,
+          submenu: [
+            {
+              click: menu_click_handlers.export_active(),
+              accelerator: "CmdOrCtrl+Shift+X",
+              label: "Export As Better Scripts Script...",
+              enabled: false,
+              id: "editing_export_as_tig",
+            },
+            {
+              click: menu_click_handlers.export_active(false, false, true),
+              accelerator: "CmdOrCtrl+Alt+X",
+              label: "Export As nx-TAS Script...",
+              enabled: false,
+              id: "editing_export_as_nx_tas",
+            },
+          ],
         },
         { type: "separator" },
         {
