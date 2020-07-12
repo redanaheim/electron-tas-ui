@@ -13,7 +13,9 @@ import {
 import { script_from_parsed_lines } from "../assets/compiling/decompile";
 import { compile } from "../assets/compiling/compile";
 import { export_file } from "../storing";
-import { ipcRenderer } from "electron";
+import { ipcRenderer /*, remote*/ } from "electron";
+
+// const { Menu, MenuItem } = remote;
 
 interface PianoRollRowConstructorOptions {
   previous?: PianoRollRow;
@@ -681,6 +683,8 @@ export class PianoRoll {
   stick_change_dialogue: StickChangeDialogue;
   navbar?: JQuery<HTMLElement>;
   show_clones = true;
+  saved = false;
+  representing?: string;
   static click_handler_func = function (): void {
     $(this).parent().data("object").toggle_key($(this).data("value")); // get the clicked element's parent,
     // get the PianoRollRow object corresponding to that, then toggle the corresponding key
@@ -694,6 +698,7 @@ export class PianoRoll {
     jquery_document?: JQuery<Document>;
     navbar?: JQuery<HTMLElement>;
     no_add_row?: boolean;
+    no_await_ipc?: boolean;
   }) {
     this.contents = options.contents;
     this.reference = options.reference;
@@ -717,8 +722,30 @@ export class PianoRoll {
     if (!options.no_add_row) {
       this.add(null, 0);
     }
+    if (!options.no_await_ipc) {
+      this.await_ipc();
+    }
     $(".key").click(PianoRoll.click_handler_func);
     this.stick_change_dialogue = new StickChangeDialogue(this);
+  }
+  /*change_menu(): void {
+
+  }*/
+  await_ipc(): void {
+    // Handles all ipc messages sent to this page's webContents
+    // Requests channel
+    ipcRenderer.on(
+      "requests",
+      (event: Electron.IpcRendererEvent, data: any) => {
+        if (typeof data === "string") {
+          switch (data) {
+            case "request_save": {
+              this.export(true);
+            }
+          }
+        }
+      }
+    );
   }
   toggle_clones(): void {
     this.show_clones = !this.show_clones;
@@ -751,15 +778,7 @@ export class PianoRoll {
                 .addClass("export_better_scripts navbar_element")
                 .click(async function () {
                   const owner_piano: PianoRoll = $(this).data("owner");
-                  owner_piano.set_represented(
-                    await export_file({
-                      file: owner_piano.make_better_scripts(false),
-                      title: "Exporting Better Scripts Script",
-                      message: "Choose a location",
-                      default_name: "script1.tig",
-                    })
-                  );
-                  owner_piano.set_saved(true);
+                  owner_piano.export(false, true);
                 })
                 .data("owner", this)
                 .text("Export as Better Scripts Script")
@@ -799,6 +818,24 @@ export class PianoRoll {
   }
   get_position(row: PianoRollRow): number {
     return this.contents.indexOf(row);
+  }
+  async export(saved?: boolean, save_as?: boolean): Promise<string> {
+    const path = await export_file({
+      file: this.make_better_scripts(false),
+      title: "Save Better Scripts Script",
+      message: "Choose a location",
+      default_name: "script1.tig",
+      path:
+        (save_as ? undefined : saved ? this.representing : undefined) ||
+        undefined, // if path is undefined, export_file will have a
+      // dialog show up to pick the filepath
+    });
+    if (path === "") return;
+    if (saved) {
+      this.set_represented(path);
+      this.set_saved(true);
+    }
+    return path;
   }
   add(element: JQuery<HTMLElement> | null, position?: number): void {
     position = position !== undefined ? position : last_index_of(this.contents);
@@ -843,13 +880,15 @@ export class PianoRoll {
     this.contents.splice(position, 1);
     this.refresh();
   }
-  set_represented(path?: string): void {
+  set_represented(path: string): void {
     ipcRenderer.send("save_events", {
       is_represented_update: true,
       path: path,
     });
+    this.representing = path;
   }
   set_saved(saved?: boolean): void {
+    this.saved = saved;
     ipcRenderer.send("save_events", saved ? "saved" : "unsaved");
   }
   refresh(): void {

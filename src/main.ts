@@ -77,6 +77,20 @@ const create_editing_window = async (): Promise<void> => {
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
   });
   main_window.loadFile(path.join(__dirname, "../src/editing/index.html"));
+  main_window.on("close", async (e: Electron.Event) => {
+    if (main_window.isDocumentEdited()) {
+      e.preventDefault();
+      const response = await dialog.showMessageBox(main_window, {
+        buttons: ["Cancel", "Close", "Save"],
+        message:
+          "Are you sure you want to close this window? All unsaved data will be lost.",
+      });
+      if (response.response === 1) main_window.destroy();
+      else if (response.response === 2) {
+        main_window.webContents.send("requests", "request_save");
+      }
+    }
+  });
   main_window.webContents.on(
     "ipc-message",
     (_event: Electron.Event, channel: string, data: any) => {

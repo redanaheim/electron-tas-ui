@@ -203,6 +203,7 @@ export const store_defaults = {
 interface ExportFileOptions {
   file: FileLike;
   title?: string;
+  path?: string;
   message?: string;
   field_label?: string;
   no_replace_prompt?: boolean;
@@ -216,30 +217,36 @@ interface ExportFileOptions {
 export const export_file = async function (
   options: ExportFileOptions
 ): Promise<string> {
-  const properties_list: any = [];
-  if (options.create_directory !== false) {
-    properties_list.push("createDirectory");
-  }
-  if (options.no_replace_prompt !== false) {
-    properties_list.push("showOverwriteConfirmation");
-  }
-  if (options.show_hidden !== false) {
-    properties_list.push("showHiddenFiles");
-  }
-  const save_dialog = await (dialog ? dialog : remote.dialog).showSaveDialog(
-    options.browser_window || null,
-    {
-      title: options.title || "",
-      message: options.message || "",
-      buttonLabel: options.button_label || undefined,
-      nameFieldLabel: options.field_label || undefined,
-      properties: properties_list,
-      defaultPath: options.default_name || undefined,
+  let save_dialog: Electron.SaveDialogReturnValue;
+  if (!options.path) {
+    const properties_list: any = [];
+    if (options.create_directory !== false) {
+      properties_list.push("createDirectory");
     }
-  );
-  if (save_dialog.canceled) return;
+    if (options.no_replace_prompt !== false) {
+      properties_list.push("showOverwriteConfirmation");
+    }
+    if (options.show_hidden !== false) {
+      properties_list.push("showHiddenFiles");
+    }
+    save_dialog = await (dialog ? dialog : remote.dialog).showSaveDialog(
+      options.browser_window || null,
+      {
+        title: options.title || "",
+        message: options.message || "",
+        buttonLabel: options.button_label || undefined,
+        nameFieldLabel: options.field_label || undefined,
+        properties: properties_list,
+        defaultPath: options.default_name || undefined,
+      }
+    );
+    if (save_dialog.canceled) return "";
+  }
   try {
-    await write_file_async(save_dialog.filePath, options.file.as_string());
+    await write_file_async(
+      options.path ? options.path : save_dialog.filePath,
+      options.file.as_string()
+    );
   } catch (err) {
     console.error(err);
   }
