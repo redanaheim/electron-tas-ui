@@ -209,8 +209,8 @@ export const script_from_parsed_lines = function (
       current_line += update_frame.frame - current_frame;
     }
     current_frame = update_frame.frame;
-    if (update_frame.keys_on.length > 0) {
-      current_line += ` ON{${update_frame.keys_on.join(",")}}`;
+    if (update_frame.keys_on.length > 0 || update_frame.frame === 1) {
+      current_line += ` ON{${update_frame.keys_on.join(",") || "NONE"}}`;
     }
     if (update_frame.keys_off.length > 0) {
       current_line += ` OFF{${update_frame.keys_off.join(",")}}`;

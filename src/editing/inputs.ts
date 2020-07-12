@@ -428,13 +428,13 @@ export class PianoRollRow {
       if (is_lstick) this.is_lstick_clone = true;
       else this.is_rstick_clone = true;
     } else {
-      if (is_lstick) this.is_lstick_clone = false;
-      else this.is_rstick_clone = false;
-    }
-    if (is_lstick) {
-      this.lstick_pos = pos.clone();
-    } else {
-      this.rstick_pos = pos.clone();
+      if (is_lstick) {
+        this.lstick_pos = pos.clone();
+        this.is_lstick_clone = false;
+      } else {
+        this.is_rstick_clone = false;
+        this.rstick_pos = pos.clone();
+      }
     }
   }
   set_bg(color?: string): void {
@@ -843,7 +843,7 @@ export class PianoRoll {
   make_update_frames(): ParsedLine[] {
     const to_return: ParsedLine[] = [];
     for (const line of this.contents) {
-      if (!line.is_clone) {
+      if (!line.is_clone || line.current_frame <= 1) {
         to_return.push({
           frame: line.current_frame,
           keys_on: line.on_keys.get_array(),
@@ -857,14 +857,35 @@ export class PianoRoll {
     }
     return to_return;
   }
+  make_project_data(): string {
+    let data_buffer = "// Project Data\r\n";
+    const flags = [];
+    if (this.show_clones === false) {
+      flags.push("no_clones");
+      if (this.contents.length > 1) {
+        data_buffer += "// row_show_clones:";
+        const showing: string[] = [];
+        for (let i = 0; i < this.contents.length; i++) {
+          if (this.contents[i].expand_clones) showing.push(i.toString(16));
+        }
+        data_buffer += `${showing.join(",")}\r\n`;
+      }
+    }
+    return data_buffer + `// flags:${flags.join(",")}`;
+  }
   make_better_scripts(array?: boolean): FileLike {
+    const project_data = new FileLike(this.make_project_data());
+    let input_data: FileLike;
     if (array) {
-      return new FileLike(script_from_parsed_lines(this.make_update_frames()));
+      input_data = new FileLike(
+        script_from_parsed_lines(this.make_update_frames())
+      );
     } else {
-      return new FileLike(
+      input_data = new FileLike(
         script_from_parsed_lines(this.make_update_frames()).join("\n")
       );
     }
+    return project_data.join(input_data);
   }
   make_nx_tas(throw_errors?: boolean): FileLike {
     return new FileLike(

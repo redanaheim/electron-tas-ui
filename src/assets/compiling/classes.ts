@@ -21,8 +21,16 @@ export class FileLike {
       this.contents = data;
     }
   }
+  join(other: FileLike): FileLike {
+    return new FileLike(this.as_array().concat(other.as_array()));
+  }
   as_string(): string {
     return this.is_string ? this.contents : this.contents.join("\n");
+  }
+  as_array(): string[] {
+    return this.is_string
+      ? this.contents.split(/(?:\r\n|\r|\n)/)
+      : this.contents;
   }
 }
 
