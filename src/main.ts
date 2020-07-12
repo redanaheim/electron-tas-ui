@@ -77,6 +77,30 @@ const create_editing_window = async (): Promise<void> => {
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
   });
   main_window.loadFile(path.join(__dirname, "../src/editing/index.html"));
+  main_window.webContents.on(
+    "ipc-message",
+    (_event: Electron.Event, channel: string, data: any) => {
+      switch (channel) {
+        case "save_events": {
+          if (data.is_represented_update) {
+            main_window.setRepresentedFilename(data.path);
+          } else if (typeof data === "string") {
+            switch (data) {
+              case "saved": {
+                main_window.setDocumentEdited(false);
+                break;
+              }
+              case "unsaved": {
+                main_window.setDocumentEdited(true);
+                break;
+              }
+            }
+          }
+          break;
+        }
+      }
+    }
+  );
 };
 
 const create_export_window = async (): Promise<void> => {

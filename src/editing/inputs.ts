@@ -10,12 +10,10 @@ import {
   FileLike,
   string_to_key,
 } from "../assets/compiling/classes";
-
 import { script_from_parsed_lines } from "../assets/compiling/decompile";
-
 import { compile } from "../assets/compiling/compile";
-
 import { export_file } from "../storing";
+import { ipcRenderer } from "electron";
 
 interface PianoRollRowConstructorOptions {
   previous?: PianoRollRow;
@@ -751,14 +749,17 @@ export class PianoRoll {
             .append(
               $("<button/>")
                 .addClass("export_better_scripts navbar_element")
-                .click(function () {
+                .click(async function () {
                   const owner_piano: PianoRoll = $(this).data("owner");
-                  export_file({
-                    file: owner_piano.make_better_scripts(false),
-                    title: "Exporting Better Scripts Script",
-                    message: "Choose a location",
-                    default_name: "script1.tig",
-                  });
+                  owner_piano.set_represented(
+                    await export_file({
+                      file: owner_piano.make_better_scripts(false),
+                      title: "Exporting Better Scripts Script",
+                      message: "Choose a location",
+                      default_name: "script1.tig",
+                    })
+                  );
+                  owner_piano.set_saved(true);
                 })
                 .data("owner", this)
                 .text("Export as Better Scripts Script")
@@ -842,6 +843,15 @@ export class PianoRoll {
     this.contents.splice(position, 1);
     this.refresh();
   }
+  set_represented(path?: string): void {
+    ipcRenderer.send("save_events", {
+      is_represented_update: true,
+      path: path,
+    });
+  }
+  set_saved(saved?: boolean): void {
+    ipcRenderer.send("save_events", saved ? "saved" : "unsaved");
+  }
   refresh(): void {
     // EXTREMELY INTENSIVE
     this.get(0).reeval(new PianoRollRow());
@@ -851,6 +861,8 @@ export class PianoRoll {
     // re-bind click events for new elements
     $(".key").off("click");
     $(".key").click(PianoRoll.click_handler_func);
+    // tell main process this document is unsaved
+    this.set_saved(false);
   }
   make_update_frames(): ParsedLine[] {
     const to_return: ParsedLine[] = [];
