@@ -13,9 +13,7 @@ import {
 import { script_from_parsed_lines } from "../assets/compiling/decompile";
 import { compile } from "../assets/compiling/compile";
 import { export_file } from "../storing";
-import { ipcRenderer /*, remote*/ } from "electron";
-
-// const { Menu, MenuItem } = remote;
+import { ipcRenderer, remote } from "electron";
 
 interface PianoRollRowConstructorOptions {
   previous?: PianoRollRow;
@@ -741,6 +739,15 @@ export class PianoRoll {
           switch (data) {
             case "request_save": {
               this.export(true);
+              break;
+            }
+            case "request_save_as": {
+              this.export(true, true);
+              break;
+            }
+            case "request_export": {
+              this.export();
+              break;
             }
           }
         }
@@ -820,11 +827,14 @@ export class PianoRoll {
     return this.contents.indexOf(row);
   }
   async export(saved?: boolean, save_as?: boolean): Promise<string> {
+    console.log("save_as: ", save_as);
+    console.log("saved: ", saved);
     const path = await export_file({
-      file: this.make_better_scripts(false),
-      title: "Save Better Scripts Script",
+      file: this.make_better_scripts(true, this.saved),
+      title: `${saved ? "Save" : "Export"} Better Scripts Script`,
       message: "Choose a location",
       default_name: "script1.tig",
+      browser_window: remote.getCurrentWindow(),
       path:
         (save_as ? undefined : saved ? this.representing : undefined) ||
         undefined, // if path is undefined, export_file will have a
@@ -936,8 +946,12 @@ export class PianoRoll {
     }
     return data_buffer + `// flags:${flags.join(",")}`;
   }
-  make_better_scripts(array?: boolean): FileLike {
-    const project_data = new FileLike(this.make_project_data());
+  make_better_scripts(
+    array?: boolean,
+    include_project_data?: boolean
+  ): FileLike {
+    // eslint-disable-next-line prefer-rest-params
+    console.log(arguments);
     let input_data: FileLike;
     if (array) {
       input_data = new FileLike(
@@ -948,7 +962,12 @@ export class PianoRoll {
         script_from_parsed_lines(this.make_update_frames()).join("\n")
       );
     }
-    return project_data.join(input_data);
+    if (include_project_data) {
+      const project_data = new FileLike(this.make_project_data());
+      return project_data.join(input_data);
+    } else {
+      return input_data;
+    }
   }
   make_nx_tas(throw_errors?: boolean): FileLike {
     return new FileLike(

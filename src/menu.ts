@@ -1,6 +1,7 @@
 import { app, BrowserWindow, Menu, MenuItem } from "electron";
 import { menu_click_handlers } from "./main";
 import { Store, store_defaults } from "./storing";
+
 export async function create_menu(): Promise<Menu> {
   let template: any = [
     {
@@ -15,6 +16,28 @@ export async function create_menu(): Promise<Menu> {
           click: menu_click_handlers.create_export_window,
           accelerator: "CmdOrCtrl+Shift+E",
           label: "Export Existing Script",
+        },
+        { type: "separator" },
+        {
+          click: menu_click_handlers.export_active(true),
+          accelerator: "CmdOrCtrl+S",
+          label: "Save",
+          id: "editing_save",
+          enabled: false,
+        },
+        {
+          click: menu_click_handlers.export_active(true, true),
+          accelerator: "CmdOrCtrl+Shift+S",
+          label: "Save As...",
+          id: "editing_save_as",
+          enabled: false,
+        },
+        {
+          click: menu_click_handlers.export_active(),
+          accelerator: "CmdOrCtrl+Shift+X",
+          label: "Export As...",
+          id: "editing_export_as",
+          enabled: false,
         },
         { type: "separator" },
         {

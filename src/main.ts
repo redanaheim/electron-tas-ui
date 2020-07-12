@@ -8,6 +8,10 @@ if (require("electron-squirrel-startup")) {
   app.quit();
 }
 
+const menu_ids = {
+  editing_dependent: ["editing_save", "editing_save_as", "editing_export_as"],
+};
+
 // https://github.com/electron/electron/issues/18397#
 app.allowRendererProcessReuse = true;
 
@@ -90,6 +94,16 @@ const create_editing_window = async (): Promise<void> => {
         main_window.webContents.send("requests", "request_save");
       }
     }
+  });
+  main_window.on("focus", () => {
+    menu_ids.editing_dependent.forEach((x: string) => {
+      Menu.getApplicationMenu().getMenuItemById(x).enabled = true;
+    });
+  });
+  main_window.on("blur", () => {
+    menu_ids.editing_dependent.forEach((x: string) => {
+      Menu.getApplicationMenu().getMenuItemById(x).enabled = false;
+    });
   });
   main_window.webContents.on(
     "ipc-message",
@@ -271,6 +285,15 @@ const create_js_compile_export_window = async (): Promise<void> => {
   );
 };
 
+const export_active = (save?: boolean, save_as?: boolean): (() => void) => {
+  return function (): void {
+    BrowserWindow.getFocusedWindow().webContents.send(
+      "requests",
+      save ? (save_as ? "request_save_as" : "request_save") : "request_export"
+    );
+  };
+};
+
 const toggle_theme = async (): Promise<void> => {
   const db = new Store("config", store_defaults.config);
   const current = await db.get("theme");
@@ -387,6 +410,7 @@ export const menu_click_handlers = {
   show_decompiler_errors: show_decompiler_errors,
   create_compile_export_window: create_compile_export_window,
   create_js_compile_export_window: create_js_compile_export_window,
+  export_active: export_active,
   open_backups: open_backups,
   clear_backups: clear_backups,
   toggle_theme: toggle_theme,
