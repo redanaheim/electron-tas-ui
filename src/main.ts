@@ -27,6 +27,7 @@ const exporting_window_size = {
   height: is_mac ? 150 : 120,
   width: is_mac ? 330 : 430,
 };
+
 const create_window = async (): Promise<void> => {
   const current = await Store.value_of(
     "config",
