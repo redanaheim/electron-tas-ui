@@ -210,6 +210,7 @@ interface ExportFileOptions {
   create_directory?: boolean;
   show_hidden?: boolean;
   button_label?: string;
+  default_name?: string;
 }
 
 export const export_file = async function (
@@ -233,6 +234,7 @@ export const export_file = async function (
       buttonLabel: options.button_label || undefined,
       nameFieldLabel: options.field_label || undefined,
       properties: properties_list,
+      defaultPath: options.default_name || undefined,
     }
   );
   if (save_dialog.canceled) return;

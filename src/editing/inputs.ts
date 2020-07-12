@@ -305,7 +305,17 @@ export class PianoRollRow {
               .addClass("add_button")
               .click(function () {
                 const row = $(this).parents("tr").data("object");
-                row.owner.add(null, row.owner.get_position(row) + 1);
+                let add_count: number;
+                // eslint-disable-next-line no-constant-condition
+                if (false && row.owner.key_state.shift) {
+                  add_count = Number(prompt("How many rows?", "1")) || 1;
+                  const position = row.owner.get_position(row) + 1;
+                  for (let i = 0; i < add_count; i++) {
+                    row.owner.add(null, position);
+                  }
+                } else {
+                  row.owner.add(null, row.owner.get_position(row) + 1);
+                }
               })
               .append(
                 $("<img/>")
@@ -747,6 +757,7 @@ export class PianoRoll {
                     file: owner_piano.make_better_scripts(false),
                     title: "Exporting Better Scripts Script",
                     message: "Choose a location",
+                    default_name: "script1.tig",
                   });
                 })
                 .data("owner", this)
@@ -765,6 +776,7 @@ export class PianoRoll {
                     file: owner_piano.make_nx_tas(false),
                     title: "Exporting nx-TAS Script",
                     message: "Choose a location",
+                    default_name: "script1.txt",
                   });
                 })
                 .data("owner", this)
