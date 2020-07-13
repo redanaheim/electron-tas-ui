@@ -371,10 +371,10 @@ export class PianoRollRow {
       // AND we are showing them currently on this element
       this.show_children(false);
       this.expand_clones = !this.expand_clones;
-    } else if (this.owner && this.owner.show_clones) {
+    } else if (this.owner?.show_clones) {
       // if we are currently showing clones as a whole
       this.show_children();
-    } else if (!this.expand_clones && this.owner && !this.owner.show_clones) {
+    } else if (!this.expand_clones && this.owner?.show_clones === false) {
       // if we are currently not showing clones as a whole and we are also not showing them here
       this.show_children();
       this.expand_clones = !this.expand_clones;
@@ -563,7 +563,7 @@ export class PianoRollRow {
   }
   show_children(should_show = true): void {
     if (this.is_row_owner) {
-      this.get_row_children().forEach((child: PianoRollRow): void => {
+      this.get_row_children().forEach((child): void => {
         child.show(should_show);
       });
     }

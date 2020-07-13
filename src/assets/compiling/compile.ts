@@ -136,7 +136,7 @@ const as_key = function (x: string): string {
       return x;
     }
     default: {
-      if (/^KEY_/.test(x)) {
+      if (x.startsWith("KEY_")) {
         return x;
       } else {
         return `KEY_${x}`;

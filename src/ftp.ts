@@ -57,8 +57,12 @@ export class IpAddress {
     });
   };
   constructor(text: string) {
-    if (IpAddress.regex.test(text)) {
-      this.parts = text.split(".").map((x) => +x);
+    const parts = text.split(".").map((x) => +x);
+    if (
+      !parts.some((x) => x > 255 || x < 0 || isNaN(x)) &&
+      parts.length === 4
+    ) {
+      this.parts = parts;
       this.did_succeed = true;
     } else {
       this.error =
