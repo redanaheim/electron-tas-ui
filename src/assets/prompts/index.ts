@@ -10,9 +10,11 @@ export const on_init = function (): void {
     ipcRenderer.send("prompts", "cancel");
   };
   document.getElementById("confirm").onclick = function (): void {
-    ipcRenderer.send(
-      "prompts",
-      (document.getElementById("input") as HTMLInputElement).value
-    );
+    setTimeout(() => {
+      ipcRenderer.send(
+        "prompts",
+        (document.getElementById("input") as HTMLInputElement).value
+      );
+    }, 200);
   };
 };

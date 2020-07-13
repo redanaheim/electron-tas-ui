@@ -15,6 +15,7 @@ export const prompt = function (
       webPreferences: {
         nodeIntegration: true,
       },
+      resizable: false,
     });
     prompt_window.loadFile(join(__dirname, "./index.html"));
     prompt_window.webContents.on(
@@ -22,6 +23,7 @@ export const prompt = function (
       (_e: Electron.Event): void => {
         setTimeout(() => {
           prompt_window.webContents.send("prompts", {
+            // send message text to prompt window to update the question
             message: message,
             is_message: true,
           });
@@ -29,6 +31,7 @@ export const prompt = function (
       }
     );
     prompt_window.webContents.on(
+      // wait for prompt resolution and resolve the promise with the entered string
       "ipc-message",
       (event: Electron.Event, channel: string, data: any): void => {
         if (channel !== "prompts") return;
@@ -46,25 +49,26 @@ export const prompt = function (
 export const listen_for_prompt_requests = function (
   window: BrowserWindow
 ): void {
-  window.webContents.on("ipc-message", async function listener(
-    _e: Electron.Event,
-    channel: string,
-    data: any
-  ): Promise<void> {
-    if (channel !== "prompts") return;
-    if (data.is_prompt_request) {
-      if (data.id) {
-        const result = await prompt(
-          window,
-          data.message || "Enter a string.",
-          data.default || undefined
-        );
-        window.webContents.send("prompts", {
-          is_prompt_resolution: true,
-          result: result,
-          id: data.id,
-        });
+  window.webContents.on(
+    "ipc-message",
+    async (_e: Electron.Event, channel: string, data: any): Promise<void> => {
+      if (channel !== "prompts") return;
+      if (data.is_prompt_request) {
+        if (data.id) {
+          const result = await prompt(
+            // create the prompt window and wait for the response
+            window,
+            data.message || "Enter a string.",
+            data.default || undefined
+          );
+          window.webContents.send("prompts", {
+            // send prompt response to original window
+            is_prompt_resolution: true,
+            result: result,
+            id: data.id,
+          });
+        }
       }
     }
-  });
+  );
 };
