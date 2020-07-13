@@ -2,6 +2,7 @@ import { app, BrowserWindow, Menu, shell, dialog, nativeTheme } from "electron";
 import * as path from "path";
 import { readdir, unlink, existsSync, mkdirSync } from "fs";
 import { Store, store_defaults } from "./storing";
+import { listen_for_prompt_requests } from "./assets/prompts/prompt_main";
 const is_mac = process.platform === "darwin";
 
 if (require("electron-squirrel-startup")) {
@@ -71,8 +72,6 @@ const create_help_window = async (html_path: string): Promise<void> => {
   main_window.loadFile(path.join(__dirname, html_path));
 };
 
-import { prompt } from "./assets/prompts/prompt";
-
 const create_editing_window = async (): Promise<void> => {
   const current = await Store.value_of(
     "config",
@@ -133,15 +132,10 @@ const create_editing_window = async (): Promise<void> => {
           }
           break;
         }
-        case "prompts": {
-          prompt(
-            main_window,
-            typeof data === "string" ? data : "Enter a string."
-          );
-        }
       }
     }
   );
+  listen_for_prompt_requests(main_window);
 };
 
 const create_export_window = async (): Promise<void> => {

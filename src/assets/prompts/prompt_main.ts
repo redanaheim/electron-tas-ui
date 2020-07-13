@@ -42,3 +42,29 @@ export const prompt = function (
     );
   });
 };
+
+export const listen_for_prompt_requests = function (
+  window: BrowserWindow
+): void {
+  window.webContents.on("ipc-message", async function listener(
+    _e: Electron.Event,
+    channel: string,
+    data: any
+  ): Promise<void> {
+    if (channel !== "prompts") return;
+    if (data.is_prompt_request) {
+      if (data.id) {
+        const result = await prompt(
+          window,
+          data.message || "Enter a string.",
+          data.default || undefined
+        );
+        window.webContents.send("prompts", {
+          is_prompt_resolution: true,
+          result: result,
+          id: data.id,
+        });
+      }
+    }
+  });
+};
