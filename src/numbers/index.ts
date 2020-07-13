@@ -3,10 +3,7 @@ export const find_average = function (x: number, y: number): number {
 };
 export const on_change = function (): void {
   $("#out").html(
-    find_average(
-      Number($("#lower").val()),
-      Number($("#upper").val())
-    ).toString()
+    find_average(+$("#lower").val(), +$("#upper").val()).toString()
   );
 };
 export const change_range = (is_up: boolean): void => {

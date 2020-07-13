@@ -58,7 +58,7 @@ export class IpAddress {
   };
   constructor(text: string) {
     if (IpAddress.regex.test(text)) {
-      this.parts = text.split(".").map((x) => Number(x));
+      this.parts = text.split(".").map((x) => +x);
       this.did_succeed = true;
     } else {
       this.error =

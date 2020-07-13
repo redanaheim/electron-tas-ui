@@ -16,15 +16,15 @@ const macro_modify = function (
   }
   for (let i = 2; i < matches.length; i += 2) {
     // start at 3rd element; first two are irrelevant
-    modifiers[Number(matches[i])] = matches[i + 1]; // the contents to add to the line are in odd indexes
+    modifiers[+matches[i]] = matches[i + 1]; // the contents to add to the line are in odd indexes
   }
   const to_return = [];
   for (let i = 0; i < macro.internal_actions.length; i++) {
     let current_line = macro.internal_actions[i];
     for (const key of Object.keys(modifiers)) {
       // iterate through modifiers
-      if (i + 1 === Number(key)) {
-        current_line += " " + modifiers[Number(key)];
+      if (i + 1 === +key) {
+        current_line += " " + modifiers[+key];
       }
     }
     to_return.push(current_line);
@@ -170,7 +170,7 @@ export class Preprocessor {
       } else if (Preprocessor.loop_regex.test(line)) {
         const contents = Preprocessor.loop_regex.exec(line);
         const macro_name = contents[1]; // first index is entire matching object, we only care about the captured groups
-        const reps = Number(contents[2]);
+        const reps = +contents[2];
         let matching_function: ScriptFunction | null = null;
         for (const script_function of this.macros.functions) {
           if (script_function.name.toLowerCase() === macro_name.toLowerCase()) {

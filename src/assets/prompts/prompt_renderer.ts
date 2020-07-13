@@ -9,7 +9,7 @@ export const request_prompt = async function (
     is_prompt_request: true,
     id: id,
     message: message || "Enter a string.",
-    default: default_ || undefined,
+    default: default_ || void 0,
   });
   return new Promise((res, rej) => {
     ipcRenderer.on("prompts", function listener(

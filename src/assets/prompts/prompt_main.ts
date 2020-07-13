@@ -59,7 +59,7 @@ export const listen_for_prompt_requests = function (
             // create the prompt window and wait for the response
             window,
             data.message || "Enter a string.",
-            data.default || undefined
+            data.default || void 0
           );
           window.webContents.send("prompts", {
             // send prompt response to original window

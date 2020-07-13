@@ -163,7 +163,7 @@ export const key_to_string = function (key: Key): string {
       return "KEY_RSTICK";
     }
     default: {
-      return undefined;
+      return void 0;
     }
   }
 };
@@ -222,7 +222,7 @@ export const string_to_key = function (key: string | Key): Key {
       return Key.RSTICK;
     }
     default: {
-      return undefined;
+      return void 0;
     }
   }
 };

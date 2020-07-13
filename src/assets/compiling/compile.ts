@@ -163,7 +163,7 @@ const separate_brackets_stick = function (parameter: any): [number, number] {
     .split("}")[0]
     .split(",")
     .slice(0, 2)
-    .map((x: string) => Number(x));
+    .map((x: string) => +x);
 };
 
 export const parse_line = function (
@@ -186,7 +186,7 @@ export const parse_line = function (
     to_return.frame = 1;
   } else if (/^[0-9]+$/.test(parameters[0])) {
     // frame number is a valid number
-    to_return.frame = Number(parameters[0]) + last_frame;
+    to_return.frame = +parameters[0] + last_frame;
   } else {
     if (throw_errors)
       throw new Error(`Invalid frame number - '${parameters[0]}'`);

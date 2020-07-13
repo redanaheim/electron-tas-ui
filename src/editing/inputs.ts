@@ -308,7 +308,7 @@ export class PianoRollRow {
                 let add_count: number;
                 // eslint-disable-next-line no-constant-condition
                 if (false && row.owner.key_state.shift) {
-                  add_count = Number(prompt("How many rows?", "1")) || 1;
+                  add_count = +prompt("How many rows?", "1") || 1;
                   const position = row.owner.get_position(row) + 1;
                   for (let i = 0; i < add_count; i++) {
                     row.owner.add(null, position);
@@ -625,8 +625,8 @@ class StickChangeDialogue {
         object.in_row.set_stick(
           object.pointing_to_lstick,
           new StickPos(
-            Number(self.find(".angle").val()),
-            Number(self.find(".magnitude").val())
+            +self.find(".angle").val(),
+            +self.find(".magnitude").val()
           )
         );
         self.fadeOut(200, function () {
@@ -642,12 +642,12 @@ class StickChangeDialogue {
     element.fadeOut(0);
   }
   point_to(row: PianoRollRow, point_to_lstick: boolean): void {
-    if (this.pointing_to !== null && this.pointing_to !== undefined) {
+    if (this.pointing_to !== null && this.pointing_to !== void 0) {
       this.in_row.set_stick(
         this.pointing_to_lstick,
         new StickPos(
-          Number(this.reference.find(".angle").val()),
-          Number(this.reference.find(".magnitude").val())
+          +this.reference.find(".angle").val(),
+          +this.reference.find(".magnitude").val()
         )
       );
     }
@@ -862,9 +862,7 @@ export class PianoRoll {
       } Script`,
       default_name: `script1.${nx_tas ? "txt" : "tig"}`,
       browser_window: remote.getCurrentWindow(),
-      path:
-        (save_as ? undefined : saved ? this.representing : undefined) ||
-        undefined, // if path is undefined, export_file will have a
+      path: (save_as ? void 0 : saved ? this.representing : void 0) || void 0, // if path is undefined, export_file will have a
       // dialog show up to pick the filepath
     });
     if (path === "") return;
@@ -875,7 +873,7 @@ export class PianoRoll {
     return path;
   }
   add(element: JQuery<HTMLElement> | null, position?: number): void {
-    position = position !== undefined ? position : last_index_of(this.contents);
+    position = position !== void 0 ? position : last_index_of(this.contents);
     const previous_in_position = this.get(position) || new PianoRollRow();
     const input_line = new PianoRollRow({
       previous: previous_in_position,

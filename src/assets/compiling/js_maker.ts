@@ -64,10 +64,10 @@ class InternalQueueElement {
   constructor(options: InternalQueueElementOptions) {
     if (options.use_blank_queue_element) {
       this.is_input_frame = false;
-      this.rest_info = options.blank_queue_element || undefined;
+      this.rest_info = options.blank_queue_element || void 0;
     } else {
       this.is_input_frame = true;
-      this.inputs = options.input_frame || undefined;
+      this.inputs = options.input_frame || void 0;
     }
   }
   is_empty(): boolean {

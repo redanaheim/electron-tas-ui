@@ -91,7 +91,7 @@ class PureInputLine {
     }
     // Frame number
     const parts = line.split(" ");
-    this.frame = Number(parts[0]);
+    this.frame = +parts[0];
     // Pressed keys
     if (parts[1] === "NONE") {
       this.pressed_keys = new KeysList();
@@ -103,8 +103,8 @@ class PureInputLine {
     }
     // Stick positions
     this.lstick_pos_cartesian = [
-      Number(parts[2].split(";")[0]),
-      Number(parts[2].split(";")[1]),
+      +parts[2].split(";")[0],
+      +parts[2].split(";")[1],
     ];
     this.lstick_pos = cartesian_to_polar(
       this.lstick_pos_cartesian[0],
@@ -112,8 +112,8 @@ class PureInputLine {
       allow_decimals
     );
     this.rstick_pos_cartesian = [
-      Number(parts[3].split(";")[0]),
-      Number(parts[3].split(";")[1]),
+      +parts[3].split(";")[0],
+      +parts[3].split(";")[1],
     ];
     this.rstick_pos = cartesian_to_polar(
       this.rstick_pos_cartesian[0],

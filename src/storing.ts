@@ -107,7 +107,7 @@ export class Store {
   ): Promise<InternalData[keyof InternalData]> {
     const data = await this.data;
     if (!defaults) return data[property];
-    return data[property] === undefined ? defaults[property] : data[property];
+    return data[property] === void 0 ? defaults[property] : data[property];
   }
   /**
    * Changes the value of a property as stored in the instance
@@ -234,10 +234,10 @@ export const export_file = async function (
       {
         title: options.title || "",
         message: options.message || "",
-        buttonLabel: options.button_label || undefined,
-        nameFieldLabel: options.field_label || undefined,
+        buttonLabel: options.button_label || void 0,
+        nameFieldLabel: options.field_label || void 0,
         properties: properties_list,
-        defaultPath: options.default_name || undefined,
+        defaultPath: options.default_name || void 0,
       }
     );
     if (save_dialog.canceled) return "";
