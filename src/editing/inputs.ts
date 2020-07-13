@@ -12,7 +12,9 @@ import {
 } from "../assets/compiling/classes";
 import { script_from_parsed_lines } from "../assets/compiling/decompile";
 import { compile } from "../assets/compiling/compile";
+import { IpAddress } from "../ftp";
 import { export_file } from "../storing";
+import { request_prompt } from "../assets/prompts/prompt_renderer";
 import { ipcRenderer, remote } from "electron";
 
 interface PianoRollRowConstructorOptions {
@@ -683,6 +685,7 @@ export class PianoRoll {
   show_clones = true;
   saved = false;
   representing?: string;
+  switch?: IpAddress;
   static click_handler_func = function (): void {
     $(this).parent().data("object").toggle_key($(this).data("value")); // get the clicked element's parent,
     // get the PianoRollRow object corresponding to that, then toggle the corresponding key
@@ -812,6 +815,24 @@ export class PianoRoll {
         )
         .append($("<td/>").addClass("navbar_spacer"))
     );
+  }
+  async ask_for_ip(): Promise<void> {
+    const response = await request_prompt(
+      "Enter the local IP address of your Switch."
+    );
+    if (response === "cancel") return;
+    let switch_ip: IpAddress;
+    try {
+      switch_ip = new IpAddress(response);
+    } catch (err) {
+      console.error(err);
+      return;
+    }
+    if (switch_ip.did_succeed) {
+      this.switch = switch_ip;
+    } else {
+      IpAddress.error_from(switch_ip, remote.getCurrentWindow());
+    }
   }
   create_navbar(): void {
     this.navbar.html("");

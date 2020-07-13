@@ -4,9 +4,10 @@
 // TODO: Find out why connection sometimes never closes
 import * as Client from "ftp";
 import { existsSync, mkdirSync, createWriteStream, writeFile } from "fs";
-import { app, remote } from "electron";
+import { app, remote, BrowserWindow } from "electron";
 import { sys } from "ping";
 import { join } from "path";
+
 const format_time = function (): string {
   const date = new Date();
   const weekday = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][
@@ -43,6 +44,18 @@ export class IpAddress {
   parts: number[];
   did_succeed: boolean;
   error: string;
+  static error_from = async function (
+    instance: IpAddress,
+    window: BrowserWindow
+  ): Promise<void> {
+    if (instance.did_succeed) return;
+    await remote.dialog.showMessageBox(window, {
+      message: "Invalid IP Address",
+      detail: instance.error,
+      type: "error",
+      buttons: ["OK"],
+    });
+  };
   constructor(text: string) {
     if (IpAddress.regex.test(text)) {
       this.parts = text.split(".").map((x) => Number(x));

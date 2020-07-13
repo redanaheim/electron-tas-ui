@@ -58,7 +58,7 @@ export const compile_on_click = async function (): Promise<void> {
   if (existsSync(source_path) === false) {
     await dialog.showMessageBox(this_window, {
       message: "Invalid Source Path",
-      details: "The given path does not point to a file.",
+      detail: "The given path does not point to a file.",
       type: "error",
       buttons: ["OK"],
     });
@@ -78,7 +78,6 @@ export const compile_on_click = async function (): Promise<void> {
       )
     );
   } catch (err) {
-    console.error(err);
     await dialog.showMessageBox(this_window, {
       title: "Error",
       message: err.toString(),

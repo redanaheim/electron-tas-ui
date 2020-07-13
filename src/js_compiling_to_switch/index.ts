@@ -5,7 +5,8 @@ import { compile } from "../assets/compiling/compile";
 import { existsSync } from "fs";
 import { join } from "path";
 let path: any = null;
-const { app, dialog, BrowserWindow } = require("electron").remote;
+import { remote } from "electron";
+const { app, dialog, BrowserWindow } = remote;
 export const on_init = async function (): Promise<void> {
   // Set input values to ones from last time
   const last_values = new Store(
@@ -41,7 +42,7 @@ export const send = async function (
   if (/^[0-9a-zA-Z.]+$/.test(export_name) === false) {
     await dialog.showMessageBox(this_window, {
       message: "Invalid Export Name",
-      details: "You can only use '.' and alphanumeric characters.",
+      detail: "You can only use '.' and alphanumeric characters.",
       type: "error",
       buttons: ["OK"],
     });
@@ -49,13 +50,7 @@ export const send = async function (
   }
   const switch_ip = new IpAddress(ip_text);
   if (switch_ip.did_succeed === false) {
-    await dialog.showMessageBox(this_window, {
-      message: "Invalid IP Address",
-      details:
-        "Switch's IP address can only be 4 numbers between 0 and 255 separated by '.'",
-      type: "error",
-      buttons: ["OK"],
-    });
+    IpAddress.error_from(switch_ip, remote.getCurrentWindow());
     return;
   }
   let is_replacing: boolean;
@@ -170,7 +165,7 @@ export const send_on_click = async function (): Promise<void> {
   if (existsSync(source_path) === false) {
     await dialog.showMessageBox(this_window, {
       message: "Invalid Source Path",
-      details: "The given path does not point to a file.",
+      detail: "The given path does not point to a file.",
       type: "error",
       buttons: ["OK"],
     });
