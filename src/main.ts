@@ -71,6 +71,8 @@ const create_help_window = async (html_path: string): Promise<void> => {
   main_window.loadFile(path.join(__dirname, html_path));
 };
 
+import { prompt } from "./assets/prompts/prompt";
+
 const create_editing_window = async (): Promise<void> => {
   const current = await Store.value_of(
     "config",
@@ -130,6 +132,12 @@ const create_editing_window = async (): Promise<void> => {
             }
           }
           break;
+        }
+        case "prompts": {
+          prompt(
+            main_window,
+            typeof data === "string" ? data : "Enter a string."
+          );
         }
       }
     }
@@ -447,6 +455,7 @@ app.on("activate", () => {
 
 // Menu items
 import { create_menu } from "./menu";
+
 create_menu().then((value: Menu) => {
   Menu.setApplicationMenu(value);
 });
