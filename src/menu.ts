@@ -98,6 +98,24 @@ export async function create_menu(): Promise<Menu> {
       ],
     },
     {
+      label: "Project",
+      submenu: [
+        {
+          click: menu_click_handlers.request_export_to_switch,
+          label: "Export to Switch",
+          enabled: false,
+          id: "editing_export_to_switch",
+        },
+        { type: "separator" },
+        {
+          click: menu_click_handlers.request_enter_switch_ip,
+          label: "Enter Switch's Local IP Address",
+          enabled: false,
+          id: "editing_enter_switch_ip",
+        },
+      ],
+    },
+    {
       label: "Utilities",
       submenu: [
         {

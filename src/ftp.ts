@@ -59,6 +59,7 @@ export class IpAddress {
   constructor(text: string) {
     if (IpAddress.regex.test(text)) {
       this.parts = text.split(".").map((x) => Number(x));
+      this.did_succeed = true;
     } else {
       this.error =
         "Invalid IP address format. Try 4 numbers between 0 and 255 separated by dots.";

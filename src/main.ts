@@ -15,6 +15,8 @@ const menu_ids = {
     "editing_save_as",
     "editing_export_as_nx_tas",
     "editing_export_as_tig",
+    "editing_export_to_switch",
+    "editing_enter_switch_ip",
   ],
 };
 
@@ -38,7 +40,9 @@ const exporting_window_size = {
   width: is_mac ? 330 : 430,
 };
 
-const create_window = async (): Promise<void> => {
+export const menu_click_handlers: { [key: string]: any } = {};
+
+menu_click_handlers.create_window = async (): Promise<void> => {
   const current = await Store.value_of(
     "config",
     "theme",
@@ -55,7 +59,9 @@ const create_window = async (): Promise<void> => {
   main_window.loadFile(path.join(__dirname, "../src/index.html"));
 };
 
-const create_help_window = async (html_path: string): Promise<void> => {
+menu_click_handlers.create_help_window = async (
+  html_path: string
+): Promise<void> => {
   const current = await Store.value_of(
     "config",
     "theme",
@@ -72,7 +78,7 @@ const create_help_window = async (html_path: string): Promise<void> => {
   main_window.loadFile(path.join(__dirname, html_path));
 };
 
-const create_editing_window = async (): Promise<void> => {
+menu_click_handlers.create_editing_window = async (): Promise<void> => {
   const current = await Store.value_of(
     "config",
     "theme",
@@ -138,7 +144,7 @@ const create_editing_window = async (): Promise<void> => {
   listen_for_prompt_requests(main_window);
 };
 
-const create_export_window = async (): Promise<void> => {
+menu_click_handlers.create_export_window = async (): Promise<void> => {
   const current = await Store.value_of(
     "config",
     "theme",
@@ -157,7 +163,7 @@ const create_export_window = async (): Promise<void> => {
   popup.loadFile(path.join(__dirname, "../src/exporting/index.html"));
 };
 
-const create_compile_window = async (): Promise<void> => {
+menu_click_handlers.create_compile_window = async (): Promise<void> => {
   const current = await Store.value_of(
     "config",
     "theme",
@@ -176,7 +182,7 @@ const create_compile_window = async (): Promise<void> => {
   popup.loadFile(path.join(__dirname, "../src/compiling/index.html"));
 };
 
-const create_numeric_value_window = async (): Promise<void> => {
+menu_click_handlers.create_numeric_value_window = async (): Promise<void> => {
   const current = await Store.value_of(
     "config",
     "theme",
@@ -195,7 +201,7 @@ const create_numeric_value_window = async (): Promise<void> => {
   popup.loadFile(path.join(__dirname, "../src/numbers/index.html"));
 };
 
-const create_decompile_window = async (): Promise<void> => {
+menu_click_handlers.create_decompile_window = async (): Promise<void> => {
   const current = await Store.value_of(
     "config",
     "theme",
@@ -214,7 +220,7 @@ const create_decompile_window = async (): Promise<void> => {
   popup.loadFile(path.join(__dirname, "../src/decompiling/index.html"));
 };
 
-const create_preprocessor_window = async (): Promise<void> => {
+menu_click_handlers.create_preprocessor_window = async (): Promise<void> => {
   const current = await Store.value_of(
     "config",
     "theme",
@@ -233,7 +239,7 @@ const create_preprocessor_window = async (): Promise<void> => {
   popup.loadFile(path.join(__dirname, "../src/preprocessing/index.html"));
 };
 
-const create_js_compile_window = async (): Promise<void> => {
+menu_click_handlers.create_js_compile_window = async (): Promise<void> => {
   const current = await Store.value_of(
     "config",
     "theme",
@@ -252,7 +258,7 @@ const create_js_compile_window = async (): Promise<void> => {
   popup.loadFile(path.join(__dirname, "../src/js_compiling/index.html"));
 };
 
-const create_compile_export_window = async (): Promise<void> => {
+menu_click_handlers.create_compile_export_window = async (): Promise<void> => {
   const current = await Store.value_of(
     "config",
     "theme",
@@ -271,7 +277,9 @@ const create_compile_export_window = async (): Promise<void> => {
   popup.loadFile(path.join(__dirname, "../src/compiling_to_switch/index.html"));
 };
 
-const create_js_compile_export_window = async (): Promise<void> => {
+menu_click_handlers.create_js_compile_export_window = async (): Promise<
+  void
+> => {
   const current = await Store.value_of(
     "config",
     "theme",
@@ -292,7 +300,7 @@ const create_js_compile_export_window = async (): Promise<void> => {
   );
 };
 
-const export_active = (
+menu_click_handlers.export_active = (
   save?: boolean,
   save_as?: boolean,
   nx_tas?: boolean
@@ -311,7 +319,21 @@ const export_active = (
   };
 };
 
-const toggle_theme = async (): Promise<void> => {
+menu_click_handlers.request_export_to_switch = (): void => {
+  BrowserWindow.getFocusedWindow().webContents.send(
+    "requests",
+    "request_export_to_switch"
+  );
+};
+
+menu_click_handlers.request_enter_switch_ip = (): void => {
+  BrowserWindow.getFocusedWindow().webContents.send(
+    "requests",
+    "request_enter_ip"
+  );
+};
+
+menu_click_handlers.toggle_theme = async (): Promise<void> => {
   const db = new Store("config", store_defaults.config);
   const current = await db.get("theme");
   if (current === "light") {
@@ -325,7 +347,9 @@ const toggle_theme = async (): Promise<void> => {
   });
 };
 
-const on_os_theme_update = async (is_dark: boolean): Promise<void> => {
+menu_click_handlers.on_os_theme_update = async (
+  is_dark: boolean
+): Promise<void> => {
   const db = new Store("config", store_defaults.config);
   if (is_dark === true) {
     db.set("theme", "dark");
@@ -338,7 +362,7 @@ const on_os_theme_update = async (is_dark: boolean): Promise<void> => {
   });
 };
 
-const open_backups = async (): Promise<void> => {
+menu_click_handlers.open_backups = async (): Promise<void> => {
   const folder = path.join(app.getPath("userData"), "backups");
   if (existsSync(folder) === false) {
     mkdirSync(folder);
@@ -346,7 +370,7 @@ const open_backups = async (): Promise<void> => {
   shell.openItem(folder);
 };
 
-const clear_backups = async (): Promise<void> => {
+menu_click_handlers.clear_backups = async (): Promise<void> => {
   const folder = path.join(app.getPath("userData"), "backups");
   const response = await dialog.showMessageBox(null, {
     title: "Confirm",
@@ -375,7 +399,9 @@ const clear_backups = async (): Promise<void> => {
   }
 };
 
-const show_compiler_errors = async function (do_show: boolean): Promise<void> {
+menu_click_handlers.show_compiler_errors = async function (
+  do_show: boolean
+): Promise<void> {
   const show_dialog_selections = await new Store(
     "dialogs",
     store_defaults.dialogs
@@ -393,7 +419,7 @@ const show_compiler_errors = async function (do_show: boolean): Promise<void> {
   }
 };
 
-const show_decompiler_errors = async function (
+menu_click_handlers.show_decompiler_errors = async function (
   do_show: boolean
 ): Promise<void> {
   const show_dialog_selections = await new Store(
@@ -414,7 +440,7 @@ const show_decompiler_errors = async function (
 };
 
 // Export menu click events
-export const menu_click_handlers = {
+/*export const menu_click_handlers = {
   create_help_window: create_help_window,
   create_editing_window: create_editing_window,
   create_export_window: create_export_window,
@@ -431,11 +457,11 @@ export const menu_click_handlers = {
   open_backups: open_backups,
   clear_backups: clear_backups,
   toggle_theme: toggle_theme,
-};
+};*/
 
 // App events
 
-app.on("ready", create_window);
+app.on("ready", menu_click_handlers.create_window);
 
 app.on("window-all-closed", () => {
   app.quit();
@@ -443,7 +469,7 @@ app.on("window-all-closed", () => {
 
 app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) {
-    create_window();
+    menu_click_handlers.create_window();
   }
 });
 
@@ -457,5 +483,5 @@ create_menu().then((value: Menu) => {
 // Theme change handling
 
 nativeTheme.on("updated", () => {
-  on_os_theme_update(nativeTheme.shouldUseDarkColors);
+  menu_click_handlers.on_os_theme_update(nativeTheme.shouldUseDarkColors);
 });

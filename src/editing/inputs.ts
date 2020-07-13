@@ -756,6 +756,10 @@ export class PianoRoll {
               this.export(false, false, true);
               break;
             }
+            case "request_enter_ip": {
+              this.ask_for_ip();
+              break;
+            }
           }
         }
       }
@@ -828,9 +832,10 @@ export class PianoRoll {
       console.error(err);
       return;
     }
-    if (switch_ip.did_succeed) {
+    if (switch_ip.did_succeed === true) {
       this.switch = switch_ip;
     } else {
+      console.log(switch_ip);
       IpAddress.error_from(switch_ip, remote.getCurrentWindow());
     }
   }
