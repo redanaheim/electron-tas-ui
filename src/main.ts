@@ -439,26 +439,6 @@ menu_click_handlers.show_decompiler_errors = async function (
   }
 };
 
-// Export menu click events
-/*export const menu_click_handlers = {
-  create_help_window: create_help_window,
-  create_editing_window: create_editing_window,
-  create_export_window: create_export_window,
-  create_compile_window: create_compile_window,
-  create_numeric_value_window: create_numeric_value_window,
-  create_decompile_window: create_decompile_window,
-  create_preprocessor_window: create_preprocessor_window,
-  create_js_compile_window: create_js_compile_window,
-  show_compiler_errors: show_compiler_errors,
-  show_decompiler_errors: show_decompiler_errors,
-  create_compile_export_window: create_compile_export_window,
-  create_js_compile_export_window: create_js_compile_export_window,
-  export_active: export_active,
-  open_backups: open_backups,
-  clear_backups: clear_backups,
-  toggle_theme: toggle_theme,
-};*/
-
 // App events
 
 app.on("ready", menu_click_handlers.create_window);

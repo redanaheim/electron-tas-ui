@@ -835,7 +835,6 @@ export class PianoRoll {
     if (switch_ip.did_succeed === true) {
       this.switch = switch_ip;
     } else {
-      console.log(switch_ip);
       IpAddress.error_from(switch_ip, remote.getCurrentWindow());
     }
   }
@@ -856,12 +855,8 @@ export class PianoRoll {
     save_as?: boolean,
     nx_tas?: boolean
   ): Promise<string> {
-    console.log("save_as: ", save_as);
-    console.log("saved: ", saved);
     const path = await export_file({
-      file: nx_tas
-        ? this.make_nx_tas()
-        : this.make_better_scripts(true, this.saved),
+      file: nx_tas ? this.make_nx_tas() : this.make_better_scripts(true, saved),
       title: `${saved ? "Save" : "Export"} ${
         nx_tas ? "nx-TAS" : "Better Scripts"
       } Script`,
@@ -874,8 +869,8 @@ export class PianoRoll {
     });
     if (path === "") return;
     if (saved) {
-      this.set_represented(path);
       this.set_saved(true);
+      this.set_represented(path);
     }
     return path;
   }
@@ -976,14 +971,15 @@ export class PianoRoll {
         data_buffer += `${showing.join(",")}\r\n`;
       }
     }
+    if (this.switch) {
+      data_buffer += `// switch_ip:${this.switch.parts.join(".")}\r\n`;
+    }
     return data_buffer + `// flags:${flags.join(",")}`;
   }
   make_better_scripts(
     array?: boolean,
     include_project_data?: boolean
   ): FileLike {
-    // eslint-disable-next-line prefer-rest-params
-    console.log(arguments);
     let input_data: FileLike;
     if (array) {
       input_data = new FileLike(

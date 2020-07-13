@@ -250,5 +250,6 @@ export const export_file = async function (
   } catch (err) {
     console.error(err);
   }
+  if (!save_dialog) return options.path;
   return save_dialog.filePath;
 };
