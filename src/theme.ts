@@ -11,4 +11,7 @@ export async function set_theme(doc: Document): Promise<void> {
     doc.body.classList.replace(theme === "dark" ? "light" : "dark", theme);
   }
 }
-set_theme(document);
+set_theme(document).then(
+  () => void 0,
+  (reason) => console.error(reason)
+);

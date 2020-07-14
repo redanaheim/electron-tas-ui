@@ -58,7 +58,7 @@ export const decompile_on_click = async function (): Promise<void> {
     is_default: false,
   });
 
-  if (existsSync(source_path) === false) {
+  if (!existsSync(source_path)) {
     await dialog.showMessageBox(this_window, {
       message: "Invalid Source Path",
       detail: "The given path does not point to a file.",

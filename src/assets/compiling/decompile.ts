@@ -84,7 +84,7 @@ class PureInputLine {
     if (used_to_clear) this.used_to_clear = true;
     line = line.trim();
     if (
-      (PureInputLine.line_regex.test(line) === false || line === "") &&
+      (!PureInputLine.line_regex.test(line) || line === "") &&
       throw_errors
     ) {
       throw new Error(`Invalid line "${line}", cannot parse`);
@@ -134,9 +134,9 @@ class PureInputLine {
       const prev_has = previous.pressed_keys
         .get_array()
         .includes(key_to_string(key));
-      if (this_has === prev_has && this_has === true) {
+      if (this_has === prev_has && this_has) {
         this.clone_keys.append(key);
-      } else if (this_has === prev_has && this_has === false) {
+      } else if (this_has === prev_has && !this_has) {
         continue;
       } else if (this_has) {
         this.on_keys.append(key);
@@ -148,14 +148,14 @@ class PureInputLine {
     this.are_keys_same =
       this.on_keys.equals(this.previous.on_keys) &&
       this.off_keys.equals(this.previous.off_keys);
-    this.lstick_changes = this.lstick_pos.equals(previous.lstick_pos) === false;
-    this.rstick_changes = this.rstick_pos.equals(previous.rstick_pos) === false;
+    this.lstick_changes = !this.lstick_pos.equals(previous.lstick_pos);
+    this.rstick_changes = !this.rstick_pos.equals(previous.rstick_pos);
   }
   equals_last(): boolean {
     // Does this object have the exact same inputs as the one before it?
     return (
-      this.lstick_changes === false &&
-      this.rstick_changes === false &&
+      !this.lstick_changes &&
+      !this.rstick_changes &&
       this.are_keys_same
     );
   }
@@ -163,7 +163,7 @@ class PureInputLine {
     let buffer = `${this.frame === 1 ? "+" : this.frame - this.previous.frame}`;
     // Should we add anything to the line regarding the keys?
     let added_keys = false;
-    if (this.are_keys_same === false) {
+    if (!this.are_keys_same) {
       const on_keys = this.on_keys.get_array();
       const off_keys = this.off_keys.get_array();
       if (this.pressed_keys.get_array().length === 0) {
@@ -258,13 +258,13 @@ export const decompile = function (
         allow_decimals
       );
       new_empty_obj.compare_to(obj.previous);
-      if (new_empty_obj.equals_last() === false) {
+      if (!new_empty_obj.equals_last()) {
         queue.push(new_empty_obj);
       }
     }
     // If it's equal to the last one in the queue anyway, why bother?
     if (
-      obj.equals_last() === false ||
+      !obj.equals_last() ||
       added_clear ||
       line === lines[last_index_of(lines)]
     ) {

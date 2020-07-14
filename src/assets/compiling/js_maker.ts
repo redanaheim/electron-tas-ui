@@ -71,7 +71,7 @@ class InternalQueueElement {
     }
   }
   is_empty(): boolean {
-    if (this.is_input_frame === false) return false;
+    if (!this.is_input_frame) return false;
     return (
       this.inputs.lstick_pos.magnitude === 0 &&
       this.inputs.rstick_pos.magnitude === 0 &&
@@ -104,8 +104,8 @@ export class VirtualController {
     // If the previous entry is an empty controller input and the entry before that is a wait
     if (
       this.queue_reference.data.length >= 2 &&
-      this.queue_reference.data[this.queue_reference.data.length - 2]
-        .is_input_frame === false &&
+      !this.queue_reference.data[this.queue_reference.data.length - 2]
+        .is_input_frame &&
       this.queue_reference.data[
         last_index_of(this.queue_reference.data)
       ].is_empty()

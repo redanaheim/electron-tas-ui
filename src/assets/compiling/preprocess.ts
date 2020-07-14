@@ -115,9 +115,9 @@ export class Preprocessor {
         }
         this.current_content.splice(i, 1);
         i--;
-      } else if (in_definition === true && current_function.active) {
+      } else if (in_definition && current_function.active) {
         line = line.trim();
-        if (Preprocessor.action_line_regex.test(line) === false) continue; // ignore invalid lines
+        if (!Preprocessor.action_line_regex.test(line)) continue; // ignore invalid lines
         current_function.internal_actions.push(line);
         this.current_content.splice(i, 1);
         i--;

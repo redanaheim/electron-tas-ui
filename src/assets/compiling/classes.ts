@@ -264,7 +264,7 @@ export class KeysList {
   remove_list(key_list: Key[]): void {
     const new_internal_array: Set<Key> = new Set();
     for (const existing_key of this.internal_set) {
-      if (key_list.includes(existing_key) === false) {
+      if (!key_list.includes(existing_key)) {
         new_internal_array.add(existing_key);
       }
     }

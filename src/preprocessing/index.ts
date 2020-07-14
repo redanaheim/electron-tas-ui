@@ -52,13 +52,18 @@ export const preprocess_on_click = async function (): Promise<void> {
     "last_input_values",
     store_defaults.last_input_values
   );
-  last_values.make({
-    preprocessing_file_path: source_path,
-    preprocessing_save_path: save_path,
-    is_default: false,
-  });
+  last_values
+    .make({
+      preprocessing_file_path: source_path,
+      preprocessing_save_path: save_path,
+      is_default: false,
+    })
+    .then(
+      () => void 0,
+      (reason) => console.error(reason)
+    );
 
-  if (existsSync(source_path) === false) {
+  if (!existsSync(source_path)) {
     await dialog.showMessageBox(this_window, {
       message: "Invalid Source Path",
       detail: "The given path does not point to a file.",

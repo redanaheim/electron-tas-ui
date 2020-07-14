@@ -287,14 +287,14 @@ export class PianoRollRow {
     }
     const lstick_btn = create_stick_element(true);
     const rstick_btn = create_stick_element(false);
-    this.key_references["KEY_LSTICK"] = lstick_btn;
-    this.key_references["KEY_RSTICK"] = rstick_btn;
+    this.key_references.KEY_LSTICK = lstick_btn;
+    this.key_references.KEY_RSTICK = rstick_btn;
     row.append(lstick_btn).append(rstick_btn);
     // Joysticks
     const lstick = create_joystick_element(true, this);
     const rstick = create_joystick_element(false, this);
-    this.key_references["STICK_LSTICK"] = lstick;
-    this.key_references["STICK_RSTICK"] = rstick;
+    this.key_references.STICK_LSTICK = lstick;
+    this.key_references.STICK_RSTICK = rstick;
     row.append(lstick).append(rstick);
     // Add and remove row buttons
     row
@@ -374,7 +374,7 @@ export class PianoRollRow {
     } else if (this.owner?.show_clones) {
       // if we are currently showing clones as a whole
       this.show_children();
-    } else if (!this.expand_clones && this.owner?.show_clones === false) {
+    } else if (!this.expand_clones && !this.owner?.show_clones) {
       // if we are currently not showing clones as a whole and we are also not showing them here
       this.show_children();
       this.expand_clones = !this.expand_clones;
@@ -726,6 +726,7 @@ export class PianoRoll {
     if (!options.no_await_ipc) {
       this.await_ipc();
     }
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     $(".key").click(PianoRoll.click_handler_func);
     this.stick_change_dialogue = new StickChangeDialogue(this);
   }
@@ -741,23 +742,38 @@ export class PianoRoll {
         if (typeof data === "string") {
           switch (data) {
             case "request_save": {
-              this.export(true);
+              this.export(true).then(
+                () => void 0,
+                (reason) => console.error(reason)
+              );
               break;
             }
             case "request_save_as": {
-              this.export(true, true);
+              this.export(true, true).then(
+                () => void 0,
+                (reason) => console.error(reason)
+              );
               break;
             }
             case "request_export": {
-              this.export();
+              this.export().then(
+                () => void 0,
+                (reason) => console.error(reason)
+              );
               break;
             }
             case "request_export_nx_tas": {
-              this.export(false, false, true);
+              this.export(false, false, true).then(
+                () => void 0,
+                (reason) => console.error(reason)
+              );
               break;
             }
             case "request_enter_ip": {
-              this.ask_for_ip();
+              this.ask_for_ip().then(
+                () => void 0,
+                (reason) => console.error(reason)
+              );
               break;
             }
           }
@@ -794,9 +810,12 @@ export class PianoRoll {
             .append(
               $("<button/>")
                 .addClass("export_better_scripts navbar_element")
-                .click(async function () {
+                .click(function () {
                   const owner_piano: PianoRoll = $(this).data("owner");
-                  owner_piano.export(false, true);
+                  owner_piano.export(false, true).then(
+                    () => void 0,
+                    (reason) => console.error(reason)
+                  );
                 })
                 .data("owner", this)
                 .text("Export as Better Scripts Script")
@@ -810,7 +829,10 @@ export class PianoRoll {
                 .addClass("export_better_scripts navbar_element")
                 .click(function () {
                   const owner_piano: PianoRoll = $(this).data("owner");
-                  owner_piano.export(false, false, true);
+                  owner_piano.export(false, false, true).then(
+                    () => void 0,
+                    (reason) => console.error(reason)
+                  );
                 })
                 .data("owner", this)
                 .text("Export as nx-TAS Script")
@@ -832,10 +854,13 @@ export class PianoRoll {
       console.error(err);
       return;
     }
-    if (switch_ip.did_succeed === true) {
+    if (switch_ip.did_succeed) {
       this.switch = switch_ip;
     } else {
-      IpAddress.error_from(switch_ip, remote.getCurrentWindow());
+      IpAddress.error_from(switch_ip, remote.getCurrentWindow()).then(
+        () => void 0,
+        (reason) => console.error(reason)
+      );
     }
   }
   create_navbar(): void {
@@ -934,6 +959,7 @@ export class PianoRoll {
     }
     // re-bind click events for new elements
     $(".key").off("click");
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     $(".key").click(PianoRoll.click_handler_func);
     // tell main process this document is unsaved
     this.set_saved(false);
@@ -958,7 +984,7 @@ export class PianoRoll {
   make_project_data(): string {
     let data_buffer = "// Project Data\r\n";
     const flags = [];
-    if (this.show_clones === false) {
+    if (!this.show_clones) {
       flags.push("no_clones");
       if (this.contents.length > 1) {
         data_buffer += "// row_show_clones:";

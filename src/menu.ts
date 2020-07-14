@@ -154,7 +154,10 @@ export async function create_menu(): Promise<Menu> {
                 _event: Event
               ): Promise<void> => {
                 const dialogs = new Store("dialogs", store_defaults.dialogs);
-                dialogs.set("show_compile_success", menu_item.checked);
+                dialogs.set("show_compile_success", menu_item.checked).then(
+                  () => void 0,
+                  (reason) => console.error(reason)
+                );
                 return;
               },
               label: "Show Compile Success",
@@ -197,10 +200,12 @@ export async function create_menu(): Promise<Menu> {
                   "preferences",
                   store_defaults.preferences
                 );
-                dialogs.set(
-                  "decompiling_perfect_decimal_match",
-                  menu_item.checked
-                );
+                dialogs
+                  .set("decompiling_perfect_decimal_match", menu_item.checked)
+                  .then(
+                    () => void 0,
+                    (reason) => console.error(reason)
+                  );
                 return;
               },
               label: "Allow Decimals on Stick Angles",
@@ -223,7 +228,10 @@ export async function create_menu(): Promise<Menu> {
                 _event: Event
               ): Promise<void> => {
                 const dialogs = new Store("dialogs", store_defaults.dialogs);
-                dialogs.set("show_export_success", menu_item.checked);
+                dialogs.set("show_export_success", menu_item.checked).then(
+                  () => void 0,
+                  (reason) => console.error(reason)
+                );
                 return;
               },
               label: "Show Export Success",
@@ -241,7 +249,12 @@ export async function create_menu(): Promise<Menu> {
                 _event: Event
               ): Promise<void> => {
                 const dialogs = new Store("dialogs", store_defaults.dialogs);
-                dialogs.set("all_exporting_show_replace", menu_item.checked);
+                dialogs
+                  .set("all_exporting_show_replace", menu_item.checked)
+                  .then(
+                    () => void 0,
+                    (reason) => console.error(reason)
+                  );
                 return;
               },
               label: "Show Warning When Replacing Scripts",

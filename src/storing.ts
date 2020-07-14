@@ -147,8 +147,8 @@ export class Store {
       return err;
     }
     // Set each property from the object given
-    for (let i = 0; i < Object.keys(obj).length; i++) {
-      data[Object.keys(obj)[i]] = obj[Object.keys(obj)[i]];
+    for (const key of Object.keys(obj)) {
+      data[key] = obj[key];
     }
     let res: any;
     try {
@@ -220,13 +220,13 @@ export const export_file = async function (
   let save_dialog: Electron.SaveDialogReturnValue;
   if (!options.path) {
     const properties_list: any = [];
-    if (options.create_directory !== false) {
+    if (options.create_directory) {
       properties_list.push("createDirectory");
     }
-    if (options.no_replace_prompt !== false) {
+    if (options.no_replace_prompt) {
       properties_list.push("showOverwriteConfirmation");
     }
-    if (options.show_hidden !== false) {
+    if (options.show_hidden) {
       properties_list.push("showHiddenFiles");
     }
     save_dialog = await (dialog ? dialog : remote.dialog).showSaveDialog(

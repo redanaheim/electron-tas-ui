@@ -56,7 +56,10 @@ menu_click_handlers.create_window = async (): Promise<void> => {
     },
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
   });
-  main_window.loadFile(path.join(__dirname, "../src/index.html"));
+  main_window.loadFile(path.join(__dirname, "../src/index.html")).then(
+    () => void 0,
+    (reason) => console.error(reason)
+  );
 };
 
 menu_click_handlers.create_help_window = async (
@@ -75,7 +78,10 @@ menu_click_handlers.create_help_window = async (
     },
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
   });
-  main_window.loadFile(path.join(__dirname, html_path));
+  main_window.loadFile(path.join(__dirname, html_path)).then(
+    () => void 0,
+    (reason) => console.error(reason)
+  );
 };
 
 menu_click_handlers.create_editing_window = async (): Promise<void> => {
@@ -92,19 +98,28 @@ menu_click_handlers.create_editing_window = async (): Promise<void> => {
     },
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
   });
-  main_window.loadFile(path.join(__dirname, "../src/editing/index.html"));
-  main_window.on("close", async (e: Electron.Event) => {
+  main_window.loadFile(path.join(__dirname, "../src/editing/index.html")).then(
+    () => void 0,
+    (reason) => console.error(reason)
+  );
+  main_window.on("close", (e: Electron.Event) => {
     if (main_window.isDocumentEdited()) {
       e.preventDefault();
-      const response = await dialog.showMessageBox(main_window, {
-        buttons: ["Cancel", "Close", "Save"],
-        message:
-          "Are you sure you want to close this window? All unsaved data will be lost.",
-      });
-      if (response.response === 1) main_window.destroy();
-      else if (response.response === 2) {
-        main_window.webContents.send("requests", "request_save");
-      }
+      dialog
+        .showMessageBox(main_window, {
+          buttons: ["Cancel", "Close", "Save"],
+          message:
+            "Are you sure you want to close this window? All unsaved data will be lost.",
+        })
+        .then(
+          (response) => {
+            if (response.response === 1) main_window.destroy();
+            else if (response.response === 2) {
+              main_window.webContents.send("requests", "request_save");
+            }
+          },
+          (reason) => console.error(reason)
+        );
     }
   });
   main_window.on("focus", () => {
@@ -160,7 +175,10 @@ menu_click_handlers.create_export_window = async (): Promise<void> => {
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
   });
   popup.setMenuBarVisibility(false);
-  popup.loadFile(path.join(__dirname, "../src/exporting/index.html"));
+  popup.loadFile(path.join(__dirname, "../src/exporting/index.html")).then(
+    () => void 0,
+    (reason) => console.error(reason)
+  );
 };
 
 menu_click_handlers.create_compile_window = async (): Promise<void> => {
@@ -179,7 +197,10 @@ menu_click_handlers.create_compile_window = async (): Promise<void> => {
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
   });
   popup.setMenuBarVisibility(false);
-  popup.loadFile(path.join(__dirname, "../src/compiling/index.html"));
+  popup.loadFile(path.join(__dirname, "../src/compiling/index.html")).then(
+    () => void 0,
+    (reason) => console.error(reason)
+  );
 };
 
 menu_click_handlers.create_numeric_value_window = async (): Promise<void> => {
@@ -198,7 +219,10 @@ menu_click_handlers.create_numeric_value_window = async (): Promise<void> => {
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
   });
   popup.setMenuBarVisibility(false);
-  popup.loadFile(path.join(__dirname, "../src/numbers/index.html"));
+  popup.loadFile(path.join(__dirname, "../src/numbers/index.html")).then(
+    () => void 0,
+    (reason) => console.error(reason)
+  );
 };
 
 menu_click_handlers.create_decompile_window = async (): Promise<void> => {
@@ -217,7 +241,10 @@ menu_click_handlers.create_decompile_window = async (): Promise<void> => {
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
   });
   popup.setMenuBarVisibility(false);
-  popup.loadFile(path.join(__dirname, "../src/decompiling/index.html"));
+  popup.loadFile(path.join(__dirname, "../src/decompiling/index.html")).then(
+    () => void 0,
+    (reason) => console.error(reason)
+  );
 };
 
 menu_click_handlers.create_preprocessor_window = async (): Promise<void> => {
@@ -236,7 +263,10 @@ menu_click_handlers.create_preprocessor_window = async (): Promise<void> => {
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
   });
   popup.setMenuBarVisibility(false);
-  popup.loadFile(path.join(__dirname, "../src/preprocessing/index.html"));
+  popup.loadFile(path.join(__dirname, "../src/preprocessing/index.html")).then(
+    () => void 0,
+    (reason) => console.error(reason)
+  );
 };
 
 menu_click_handlers.create_js_compile_window = async (): Promise<void> => {
@@ -255,7 +285,10 @@ menu_click_handlers.create_js_compile_window = async (): Promise<void> => {
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
   });
   popup.setMenuBarVisibility(false);
-  popup.loadFile(path.join(__dirname, "../src/js_compiling/index.html"));
+  popup.loadFile(path.join(__dirname, "../src/js_compiling/index.html")).then(
+    () => void 0,
+    (reason) => console.error(reason)
+  );
 };
 
 menu_click_handlers.create_compile_export_window = async (): Promise<void> => {
@@ -274,7 +307,12 @@ menu_click_handlers.create_compile_export_window = async (): Promise<void> => {
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
   });
   popup.setMenuBarVisibility(false);
-  popup.loadFile(path.join(__dirname, "../src/compiling_to_switch/index.html"));
+  popup
+    .loadFile(path.join(__dirname, "../src/compiling_to_switch/index.html"))
+    .then(
+      () => void 0,
+      (reason) => console.error(reason)
+    );
 };
 
 menu_click_handlers.create_js_compile_export_window = async (): Promise<
@@ -295,9 +333,12 @@ menu_click_handlers.create_js_compile_export_window = async (): Promise<
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
   });
   popup.setMenuBarVisibility(false);
-  popup.loadFile(
-    path.join(__dirname, "../src/js_compiling_to_switch/index.html")
-  );
+  popup
+    .loadFile(path.join(__dirname, "../src/js_compiling_to_switch/index.html"))
+    .then(
+      () => void 0,
+      (reason) => console.error(reason)
+    );
 };
 
 menu_click_handlers.export_active = (
@@ -337,34 +378,50 @@ menu_click_handlers.toggle_theme = async (): Promise<void> => {
   const db = new Store("config", store_defaults.config);
   const current = await db.get("theme");
   if (current === "light") {
-    db.set("theme", "dark");
+    db.set("theme", "dark").then(
+      () => void 0,
+      (reason) => console.error(reason)
+    );
   } else {
-    db.set("theme", "light");
+    db.set("theme", "light").then(
+      () => void 0,
+      (reason) => console.error(reason)
+    );
   }
   // Change theme for all open windows
   BrowserWindow.getAllWindows().forEach((win) => {
-    win.webContents.executeJavaScript("set_theme(document);");
+    win.webContents.executeJavaScript("set_theme(document);").then(
+      () => void 0,
+      (reason) => console.error(reason)
+    );
   });
 };
 
-menu_click_handlers.on_os_theme_update = async (
-  is_dark: boolean
-): Promise<void> => {
+menu_click_handlers.on_os_theme_update = (is_dark: boolean): void => {
   const db = new Store("config", store_defaults.config);
-  if (is_dark === true) {
-    db.set("theme", "dark");
+  if (is_dark) {
+    db.set("theme", "dark").then(
+      () => void 0,
+      (reason) => console.error(reason)
+    );
   } else {
-    db.set("theme", "light");
+    db.set("theme", "light").then(
+      () => void 0,
+      (reason) => console.error(reason)
+    );
   }
   // Change theme for all open windows
   BrowserWindow.getAllWindows().forEach((win) => {
-    win.webContents.executeJavaScript("set_theme(document);");
+    win.webContents.executeJavaScript("set_theme(document);").then(
+      () => void 0,
+      (reason) => console.error(reason)
+    );
   });
 };
 
-menu_click_handlers.open_backups = async (): Promise<void> => {
+menu_click_handlers.open_backups = (): void => {
   const folder = path.join(app.getPath("userData"), "backups");
-  if (existsSync(folder) === false) {
+  if (!existsSync(folder)) {
     mkdirSync(folder);
   }
   shell.openItem(folder);
@@ -390,22 +447,24 @@ menu_click_handlers.clear_backups = async (): Promise<void> => {
         });
       }
     });
-    dialog.showMessageBox({
-      title: "Success",
-      message: "All backups have been deleted.",
-      type: "info",
-      buttons: ["OK"],
-    });
+    dialog
+      .showMessageBox({
+        title: "Success",
+        message: "All backups have been deleted.",
+        type: "info",
+        buttons: ["OK"],
+      })
+      .then(
+        () => void 0,
+        (reason) => console.error(reason)
+      );
   }
 };
 
 menu_click_handlers.show_compiler_errors = async function (
   do_show: boolean
 ): Promise<void> {
-  const show_dialog_selections = await new Store(
-    "dialogs",
-    store_defaults.dialogs
-  );
+  const show_dialog_selections = new Store("dialogs", store_defaults.dialogs);
   try {
     await show_dialog_selections.set("show_compiler_errors", do_show);
   } catch (err) {
@@ -422,10 +481,7 @@ menu_click_handlers.show_compiler_errors = async function (
 menu_click_handlers.show_decompiler_errors = async function (
   do_show: boolean
 ): Promise<void> {
-  const show_dialog_selections = await new Store(
-    "dialogs",
-    store_defaults.dialogs
-  );
+  const show_dialog_selections = new Store("dialogs", store_defaults.dialogs);
   try {
     await show_dialog_selections.set("show_decompiler_errors", do_show);
   } catch (err) {
@@ -456,9 +512,12 @@ app.on("activate", () => {
 // Menu items
 import { create_menu } from "./menu";
 
-create_menu().then((value: Menu) => {
-  Menu.setApplicationMenu(value);
-});
+create_menu().then(
+  (value: Menu) => {
+    Menu.setApplicationMenu(value);
+  },
+  (reason) => console.error(reason)
+);
 
 // Theme change handling
 

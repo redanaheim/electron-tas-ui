@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-this-alias */
 /* eslint-disable no-async-promise-executor */
 // TODO: Don't use async promise executors
@@ -110,7 +111,7 @@ export class IpAddress {
   ): Promise<PathTo<string>> {
     const that = this;
     return new Promise(async (res, rej) => {
-      if ((await that.is_valid()) === false) {
+      if (!(await that.is_valid())) {
         rej(
           `Ping IP address ${that.parts.join(
             "."
@@ -137,7 +138,7 @@ export class IpAddress {
             app_path = remote.app.getPath("userData");
           }
           // Make sure backups directory exists
-          if (existsSync(join(app_path, "backups")) === false) {
+          if (!existsSync(join(app_path, "backups"))) {
             mkdirSync(join(app_path, "backups"));
           }
           // Make file for backup
@@ -158,13 +159,13 @@ export class IpAddress {
             res({
               path: join(app_path, "backups", backup_name),
             });
-            if (connection_ready === false) {
+            if (!connection_ready) {
               client.end();
             }
           });
         });
       };
-      if (connection_ready === false) {
+      if (!connection_ready) {
         client.on("ready", on_ready);
       } else {
         on_ready();
@@ -195,7 +196,7 @@ export class IpAddress {
   ): Promise<boolean> {
     const that = this;
     return new Promise(async (res, rej) => {
-      if ((await that.is_valid()) === false) {
+      if (!(await that.is_valid())) {
         rej(
           "Ping IP address " +
             that.parts.join(".") +
@@ -220,12 +221,12 @@ export class IpAddress {
             if (item.name === target && item.type === "-") exists = true;
           });
           res(exists);
-          if (connection_ready === false) {
+          if (!connection_ready) {
             client.end();
           }
         });
       };
-      if (connection_ready === false) {
+      if (!connection_ready) {
         client.on("ready", on_ready);
       } else {
         on_ready();
@@ -248,7 +249,7 @@ export class IpAddress {
   async send(source: string, target: string, port: number): Promise<Result> {
     const that = this;
     return new Promise(async (res, rej) => {
-      if ((await that.is_valid()) === false) {
+      if (!(await that.is_valid())) {
         rej(
           `Ping IP address ${that.parts.join(
             "."

@@ -26,7 +26,7 @@ export const send = async function (
 ): Promise<void> {
   const this_window = BrowserWindow.getFocusedWindow();
 
-  if (/^[0-9a-zA-Z.-]+$/.test(export_name) === false) {
+  if (!/^[0-9a-zA-Z.-]+$/.test(export_name)) {
     await dialog.showMessageBox(this_window, {
       message: "Invalid Export Name",
       detail: "You can only use '.', '-', and alphanumeric characters.",
@@ -36,7 +36,7 @@ export const send = async function (
     return;
   }
   const switch_ip = new IpAddress(ip_text);
-  if (switch_ip.did_succeed === false) {
+  if (!switch_ip.did_succeed) {
     IpAddress.error_from(switch_ip, remote.getCurrentWindow());
     return;
   }
@@ -116,7 +116,7 @@ export const pick_file = async function (): Promise<string> {
 export const send_on_click = async function (): Promise<void> {
   const this_window = BrowserWindow.getFocusedWindow();
   const source_path = $("#file_path").val().toString();
-  if (existsSync(source_path) === false) {
+  if (!existsSync(source_path)) {
     await dialog.showMessageBox(this_window, {
       message: "Invalid Source Path",
       detail: "The given path does not point to a file.",

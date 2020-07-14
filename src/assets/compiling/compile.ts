@@ -24,7 +24,7 @@ const opposite_keys = function (raw: string[], valid_keys: string[]): string[] {
   // invert keys: get every key except the ones passed to the "raw" argument
   const to_return: string[] = [];
   for (let i = 0; i < 16; i++) {
-    if (raw.includes(valid_keys[i]) === false) {
+    if (!raw.includes(valid_keys[i])) {
       to_return.push(valid_keys[i]);
     }
   }
@@ -78,9 +78,9 @@ class ControllerState {
     if (throw_errors) {
       for (const key of script_line.keys_on.concat(script_line.keys_off)) {
         if (
-          ControllerState.valid_keys
+          !ControllerState.valid_keys
             .concat(["ALL", "NONE"])
-            .includes(key.toUpperCase()) === false
+            .includes(key.toUpperCase())
         ) {
           throw new Error("Invalid key name: " + key);
         }
@@ -92,7 +92,7 @@ class ControllerState {
     // Handle keys that should be on for this frame
     for (let i = 0; i < pressed_keys.length; i++) {
       if (
-        script_line.keys_off.includes(pressed_keys[i]) === false &&
+        !script_line.keys_off.includes(pressed_keys[i]) &&
         ControllerState.valid_keys.includes(pressed_keys[i])
       ) {
         new_pressed_keys.push(pressed_keys[i]);
@@ -122,8 +122,8 @@ class ControllerState {
     // Handle control sticks
     const lstick_pos = make_stick_cartesian(script_line.lstick_pos_polar);
     const rstick_pos = make_stick_cartesian(script_line.rstick_pos_polar);
-    if (script_line.lstick_changes === true) this.lstick_pos = lstick_pos;
-    if (script_line.rstick_changes === true) this.rstick_pos = rstick_pos;
+    if (script_line.lstick_changes) this.lstick_pos = lstick_pos;
+    if (script_line.rstick_changes) this.rstick_pos = rstick_pos;
   }
 }
 const as_key = function (x: string): string {
@@ -288,7 +288,7 @@ export const compile = function (
     }
     for (const line of file_lines) {
       // create list of frames where we need to update the controller, and what to do
-      if (/^([0-9]+|\+) .+$/.test(line) === false) continue; // no valid frame number found, ignore
+      if (!/^([0-9]+|\+) .+$/.test(line)) continue; // no valid frame number found, ignore
       const parsed_line = parse_line(
         line,
         current_frame,
