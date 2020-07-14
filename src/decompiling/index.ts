@@ -30,7 +30,7 @@ export const pick_file = async function (): Promise<string> {
   if (path) $("#file_path").val(path);
   return path;
 };
-export const pick_save_path = async function (): Promise<void> {
+export const pick_save_path = async function (): Promise<Electron.SaveDialogReturnValue> {
   const save_path = await dialog.showSaveDialog(
     BrowserWindow.getFocusedWindow(),
     {
