@@ -63,8 +63,8 @@ class ControllerState {
     // For checking if we should print the frame or not
     return (
       this.pressed_keys.length === 0 &&
-      !this.lstick_pos.some((x) => x !== 0) &&
-      !this.rstick_pos.some((x) => x !== 0)
+      !this.lstick_pos.some(x => x !== 0) &&
+      !this.rstick_pos.some(x => x !== 0)
     );
   }
   print(frame: number): string {
@@ -90,27 +90,25 @@ class ControllerState {
     const pressed_keys = this.pressed_keys;
     let new_pressed_keys: string[] = [];
     // Handle keys that should be on for this frame
-    for (let i = 0; i < pressed_keys.length; i++) {
+    for (const key of pressed_keys) {
       if (
-        !script_line.keys_off.includes(pressed_keys[i]) &&
-        ControllerState.valid_keys.includes(pressed_keys[i])
+        !script_line.keys_off.includes(key) &&
+        ControllerState.valid_keys.includes(key)
       ) {
-        new_pressed_keys.push(pressed_keys[i]);
+        new_pressed_keys.push(key);
       }
     }
-    for (let i = 0; i < script_line.keys_on.length; i++) {
-      if (pressed_keys.includes(script_line.keys_on[i])) {
+    for (const key of script_line.keys_on) {
+      if (pressed_keys.includes(key)) {
         if (throw_errors) {
           throw new Error(
-            `Frame ${script_line.frame.toString()}: cannot press ${
-              script_line.keys_on[i]
-            } as it is already pressed.`
+            `Frame ${script_line.frame.toString()}: cannot press ${key} as it is already pressed.`
           );
         } else {
           continue;
         }
-      } else if (ControllerState.valid_keys.includes(script_line.keys_on[i])) {
-        new_pressed_keys.push(script_line.keys_on[i]);
+      } else if (ControllerState.valid_keys.includes(key)) {
+        new_pressed_keys.push(key);
       }
     }
     if (script_line.keys_on.includes("ALL")) {
@@ -193,8 +191,7 @@ export const parse_line = function (
     to_return.frame = last_frame + 1;
   }
   parameters.shift();
-  for (let i = 0; i < parameters.length; i++) {
-    const parameter = parameters[i];
+  for (const parameter of parameters) {
     const keyword = parameter.split("{")[0];
     switch (keyword.toLowerCase()) {
       case "on": {
@@ -208,13 +205,13 @@ export const parse_line = function (
       case "raw": {
         // turn off all others besides the ones included in brackets
         const included_keys = separate_brackets(parameter);
-        if (included_keys.map((x) => x.toLowerCase()).join("_") === "none") {
+        if (included_keys.map(x => x.toLowerCase()).join("_") === "none") {
           // turn no keys on
           to_return.keys_on = [];
           // opposite of [] is all keys; since raw{none} should leave no keys on, turn them all off
           to_return.keys_off = opposite_keys([], ControllerState.valid_keys);
         } else if (
-          included_keys.map((x) => x.toLowerCase()).join("_") === "all"
+          included_keys.map(x => x.toLowerCase()).join("_") === "all"
         ) {
           to_return.keys_on = opposite_keys([], ControllerState.valid_keys);
           to_return.keys_off = [];
@@ -276,7 +273,7 @@ export const compile = function (
   let update_frames: ParsedLine[] = [];
   let current_frame = 1;
   if (!no_script) {
-    const lines = script.split("\n").map((x) => x.replace(/[\r\n]/g, ""));
+    const lines = script.split("\n").map(x => x.replace(/[\r\n]/g, ""));
     const contents = new Preprocessor(lines); // just initializing object
     contents.do_all(); // actually preprocess
     const file_lines = contents.current_content;

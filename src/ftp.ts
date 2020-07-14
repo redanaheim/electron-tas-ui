@@ -58,9 +58,9 @@ export class IpAddress {
     });
   };
   constructor(text: string) {
-    const parts = text.split(".").map((x) => +x);
+    const parts = text.split(".").map(x => +x);
     if (
-      !parts.some((x) => x > 255 || x < 0 || isNaN(x)) &&
+      !parts.some(x => x > 255 || x < 0 || isNaN(x)) &&
       parts.length === 4
     ) {
       this.parts = parts;

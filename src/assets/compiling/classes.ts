@@ -280,7 +280,7 @@ export class KeysList {
     return this.internal_set.size === 0;
   }
   get_array(): string[] {
-    return [...this.internal_set].map((x) => key_to_string(x));
+    return [...this.internal_set].map(x => key_to_string(x));
   }
   equals(other: KeysList): boolean {
     for (const key of this.internal_set) {

@@ -98,7 +98,7 @@ class PureInputLine {
     } else {
       this.pressed_keys = new KeysList();
       this.pressed_keys.append_list(
-        parts[1].split(";").map((x) => string_to_key(x))
+        parts[1].split(";").map(x => string_to_key(x))
       );
     }
     // Stick positions
@@ -236,7 +236,7 @@ export const decompile = function (
 ): string {
   let buffer = "";
   script = typeof script === "string" ? script : "";
-  const lines = script.split("\n").map((x) => x.replace(/[\r\n]/g, ""));
+  const lines = script.split("\n").map(x => x.replace(/[\r\n]/g, ""));
   const queue = [PureInputLine.empty];
   let last_updated_frame = 0;
   for (const line of lines) {

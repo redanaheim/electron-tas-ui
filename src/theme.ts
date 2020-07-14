@@ -13,5 +13,5 @@ export async function set_theme(doc: Document): Promise<void> {
 }
 set_theme(document).then(
   () => void 0,
-  (reason) => console.error(reason)
+  reason => console.error(reason)
 );

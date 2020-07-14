@@ -52,11 +52,16 @@ export const decompile_on_click = async function (): Promise<void> {
     "last_input_values",
     store_defaults.last_input_values
   );
-  last_values.make({
-    decompiling_file_path: source_path,
-    decompiling_save_path: save_path,
-    is_default: false,
-  });
+  last_values
+    .make({
+      decompiling_file_path: source_path,
+      decompiling_save_path: save_path,
+      is_default: false,
+    })
+    .then(
+      () => void 0,
+      reason => console.error(reason)
+    );
 
   if (!existsSync(source_path)) {
     await dialog.showMessageBox(this_window, {
@@ -96,10 +101,7 @@ export const decompile_on_click = async function (): Promise<void> {
     });
     return;
   }
-  const show_dialog_selections = await new Store(
-    "dialogs",
-    store_defaults.dialogs
-  );
+  const show_dialog_selections = new Store("dialogs", store_defaults.dialogs);
   if (await show_dialog_selections.get("show_decompile_success")) {
     const button = await dialog.showMessageBox(this_window, {
       message: "Sucessfully saved decompiled script.",
@@ -107,7 +109,10 @@ export const decompile_on_click = async function (): Promise<void> {
       buttons: ["OK", "Do not show this again"],
     });
     if (button.response === 1) {
-      show_dialog_selections.set("show_decompile_success", false);
+      show_dialog_selections.set("show_decompile_success", false).then(
+        () => void 0,
+        reason => console.error(reason)
+      );
     }
   }
 };

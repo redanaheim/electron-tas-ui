@@ -58,7 +58,7 @@ menu_click_handlers.create_window = async (): Promise<void> => {
   });
   main_window.loadFile(path.join(__dirname, "../src/index.html")).then(
     () => void 0,
-    (reason) => console.error(reason)
+    reason => console.error(reason)
   );
 };
 
@@ -80,7 +80,7 @@ menu_click_handlers.create_help_window = async (
   });
   main_window.loadFile(path.join(__dirname, html_path)).then(
     () => void 0,
-    (reason) => console.error(reason)
+    reason => console.error(reason)
   );
 };
 
@@ -100,7 +100,7 @@ menu_click_handlers.create_editing_window = async (): Promise<void> => {
   });
   main_window.loadFile(path.join(__dirname, "../src/editing/index.html")).then(
     () => void 0,
-    (reason) => console.error(reason)
+    reason => console.error(reason)
   );
   main_window.on("close", (e: Electron.Event) => {
     if (main_window.isDocumentEdited()) {
@@ -112,13 +112,13 @@ menu_click_handlers.create_editing_window = async (): Promise<void> => {
             "Are you sure you want to close this window? All unsaved data will be lost.",
         })
         .then(
-          (response) => {
+          response => {
             if (response.response === 1) main_window.destroy();
             else if (response.response === 2) {
               main_window.webContents.send("requests", "request_save");
             }
           },
-          (reason) => console.error(reason)
+          reason => console.error(reason)
         );
     }
   });
@@ -177,7 +177,7 @@ menu_click_handlers.create_export_window = async (): Promise<void> => {
   popup.setMenuBarVisibility(false);
   popup.loadFile(path.join(__dirname, "../src/exporting/index.html")).then(
     () => void 0,
-    (reason) => console.error(reason)
+    reason => console.error(reason)
   );
 };
 
@@ -199,7 +199,7 @@ menu_click_handlers.create_compile_window = async (): Promise<void> => {
   popup.setMenuBarVisibility(false);
   popup.loadFile(path.join(__dirname, "../src/compiling/index.html")).then(
     () => void 0,
-    (reason) => console.error(reason)
+    reason => console.error(reason)
   );
 };
 
@@ -221,7 +221,7 @@ menu_click_handlers.create_numeric_value_window = async (): Promise<void> => {
   popup.setMenuBarVisibility(false);
   popup.loadFile(path.join(__dirname, "../src/numbers/index.html")).then(
     () => void 0,
-    (reason) => console.error(reason)
+    reason => console.error(reason)
   );
 };
 
@@ -243,7 +243,7 @@ menu_click_handlers.create_decompile_window = async (): Promise<void> => {
   popup.setMenuBarVisibility(false);
   popup.loadFile(path.join(__dirname, "../src/decompiling/index.html")).then(
     () => void 0,
-    (reason) => console.error(reason)
+    reason => console.error(reason)
   );
 };
 
@@ -265,7 +265,7 @@ menu_click_handlers.create_preprocessor_window = async (): Promise<void> => {
   popup.setMenuBarVisibility(false);
   popup.loadFile(path.join(__dirname, "../src/preprocessing/index.html")).then(
     () => void 0,
-    (reason) => console.error(reason)
+    reason => console.error(reason)
   );
 };
 
@@ -287,7 +287,7 @@ menu_click_handlers.create_js_compile_window = async (): Promise<void> => {
   popup.setMenuBarVisibility(false);
   popup.loadFile(path.join(__dirname, "../src/js_compiling/index.html")).then(
     () => void 0,
-    (reason) => console.error(reason)
+    reason => console.error(reason)
   );
 };
 
@@ -311,7 +311,7 @@ menu_click_handlers.create_compile_export_window = async (): Promise<void> => {
     .loadFile(path.join(__dirname, "../src/compiling_to_switch/index.html"))
     .then(
       () => void 0,
-      (reason) => console.error(reason)
+      reason => console.error(reason)
     );
 };
 
@@ -337,7 +337,7 @@ menu_click_handlers.create_js_compile_export_window = async (): Promise<
     .loadFile(path.join(__dirname, "../src/js_compiling_to_switch/index.html"))
     .then(
       () => void 0,
-      (reason) => console.error(reason)
+      reason => console.error(reason)
     );
 };
 
@@ -380,19 +380,19 @@ menu_click_handlers.toggle_theme = async (): Promise<void> => {
   if (current === "light") {
     db.set("theme", "dark").then(
       () => void 0,
-      (reason) => console.error(reason)
+      reason => console.error(reason)
     );
   } else {
     db.set("theme", "light").then(
       () => void 0,
-      (reason) => console.error(reason)
+      reason => console.error(reason)
     );
   }
   // Change theme for all open windows
-  BrowserWindow.getAllWindows().forEach((win) => {
+  BrowserWindow.getAllWindows().forEach(win => {
     win.webContents.executeJavaScript("set_theme(document);").then(
       () => void 0,
-      (reason) => console.error(reason)
+      reason => console.error(reason)
     );
   });
 };
@@ -402,19 +402,19 @@ menu_click_handlers.on_os_theme_update = (is_dark: boolean): void => {
   if (is_dark) {
     db.set("theme", "dark").then(
       () => void 0,
-      (reason) => console.error(reason)
+      reason => console.error(reason)
     );
   } else {
     db.set("theme", "light").then(
       () => void 0,
-      (reason) => console.error(reason)
+      reason => console.error(reason)
     );
   }
   // Change theme for all open windows
-  BrowserWindow.getAllWindows().forEach((win) => {
+  BrowserWindow.getAllWindows().forEach(win => {
     win.webContents.executeJavaScript("set_theme(document);").then(
       () => void 0,
-      (reason) => console.error(reason)
+      reason => console.error(reason)
     );
   });
 };
@@ -442,7 +442,7 @@ menu_click_handlers.clear_backups = async (): Promise<void> => {
       if (err) throw err;
 
       for (const backup of list) {
-        unlink(path.join(folder, backup), (err) => {
+        unlink(path.join(folder, backup), err => {
           if (err) throw err;
         });
       }
@@ -456,7 +456,7 @@ menu_click_handlers.clear_backups = async (): Promise<void> => {
       })
       .then(
         () => void 0,
-        (reason) => console.error(reason)
+        reason => console.error(reason)
       );
   }
 };
@@ -516,7 +516,7 @@ create_menu().then(
   (value: Menu) => {
     Menu.setApplicationMenu(value);
   },
-  (reason) => console.error(reason)
+  reason => console.error(reason)
 );
 
 // Theme change handling

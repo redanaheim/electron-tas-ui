@@ -138,7 +138,7 @@ export class VirtualController {
   }
   press(list: Key[]): void {
     if (list instanceof Array) {
-      list = list.map((x) => string_to_key(x));
+      list = list.map(x => string_to_key(x));
       this.queue_reference.data[
         last_index_of(this.queue_reference.data)
       ].inputs.on_keys.append_list(list);
@@ -160,7 +160,7 @@ export class VirtualController {
   }
   release(list: Key[]): void {
     if (list instanceof Array) {
-      list = list.map((x) => string_to_key(x));
+      list = list.map(x => string_to_key(x));
       this.queue_reference.data[
         last_index_of(this.queue_reference.data)
       ].inputs.on_keys.remove_list(list);

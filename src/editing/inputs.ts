@@ -158,11 +158,11 @@ export class PianoRollRow {
     row.freeze();
     row.active_keys = previous_active_keys;
     row.set_key(
-      line.keys_on.map((x) => string_to_key(x)),
+      line.keys_on.map(x => string_to_key(x)),
       true
     );
     row.set_key(
-      line.keys_off.map((x) => string_to_key(x)),
+      line.keys_off.map(x => string_to_key(x)),
       false
     );
     if (line.lstick_changes) {
@@ -744,35 +744,35 @@ export class PianoRoll {
             case "request_save": {
               this.export(true).then(
                 () => void 0,
-                (reason) => console.error(reason)
+                reason => console.error(reason)
               );
               break;
             }
             case "request_save_as": {
               this.export(true, true).then(
                 () => void 0,
-                (reason) => console.error(reason)
+                reason => console.error(reason)
               );
               break;
             }
             case "request_export": {
               this.export().then(
                 () => void 0,
-                (reason) => console.error(reason)
+                reason => console.error(reason)
               );
               break;
             }
             case "request_export_nx_tas": {
               this.export(false, false, true).then(
                 () => void 0,
-                (reason) => console.error(reason)
+                reason => console.error(reason)
               );
               break;
             }
             case "request_enter_ip": {
               this.ask_for_ip().then(
                 () => void 0,
-                (reason) => console.error(reason)
+                reason => console.error(reason)
               );
               break;
             }
@@ -814,7 +814,7 @@ export class PianoRoll {
                   const owner_piano: PianoRoll = $(this).data("owner");
                   owner_piano.export(false, true).then(
                     () => void 0,
-                    (reason) => console.error(reason)
+                    reason => console.error(reason)
                   );
                 })
                 .data("owner", this)
@@ -831,7 +831,7 @@ export class PianoRoll {
                   const owner_piano: PianoRoll = $(this).data("owner");
                   owner_piano.export(false, false, true).then(
                     () => void 0,
-                    (reason) => console.error(reason)
+                    reason => console.error(reason)
                   );
                 })
                 .data("owner", this)
@@ -859,7 +859,7 @@ export class PianoRoll {
     } else {
       IpAddress.error_from(switch_ip, remote.getCurrentWindow()).then(
         () => void 0,
-        (reason) => console.error(reason)
+        reason => console.error(reason)
       );
     }
   }

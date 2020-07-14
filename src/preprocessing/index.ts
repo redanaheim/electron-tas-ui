@@ -60,7 +60,7 @@ export const preprocess_on_click = async function (): Promise<void> {
     })
     .then(
       () => void 0,
-      (reason) => console.error(reason)
+      reason => console.error(reason)
     );
 
   if (!existsSync(source_path)) {

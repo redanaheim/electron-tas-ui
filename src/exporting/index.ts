@@ -37,7 +37,10 @@ export const send = async function (
   }
   const switch_ip = new IpAddress(ip_text);
   if (!switch_ip.did_succeed) {
-    IpAddress.error_from(switch_ip, remote.getCurrentWindow());
+    IpAddress.error_from(switch_ip, remote.getCurrentWindow()).then(
+      () => void 0,
+      reason => console.error(reason)
+    );
     return;
   }
   let is_replacing: boolean;
@@ -84,10 +87,7 @@ export const send = async function (
     });
     return;
   }
-  const show_dialog_selections = await new Store(
-    "dialogs",
-    store_defaults.dialogs
-  );
+  const show_dialog_selections = new Store("dialogs", store_defaults.dialogs);
   if (await show_dialog_selections.get("show_export_success")) {
     const button = await dialog.showMessageBox(this_window, {
       message: result.did_succeed
@@ -97,7 +97,10 @@ export const send = async function (
       buttons: ["OK", "Do not show this again"],
     });
     if (button.response === 1) {
-      show_dialog_selections.set("show_export_success", false);
+      show_dialog_selections.set("show_export_success", false).then(
+        () => void 0,
+        reason => console.error(reason)
+      );
     }
   }
 };
@@ -132,11 +135,19 @@ export const send_on_click = async function (): Promise<void> {
     "last_input_values",
     store_defaults.last_input_values
   );
-  last_values.make({
-    exporting_source_path: source_path,
-    exporting_export_name: export_name,
-    exporting_switch_ip: switch_ip,
-    is_default: false,
-  });
-  send(source_path, export_name, switch_ip);
+  last_values
+    .make({
+      exporting_source_path: source_path,
+      exporting_export_name: export_name,
+      exporting_switch_ip: switch_ip,
+      is_default: false,
+    })
+    .then(
+      () => void 0,
+      reason => console.error(reason)
+    );
+  send(source_path, export_name, switch_ip).then(
+    () => void 0,
+    reason => console.error(reason)
+  );
 };

@@ -17,7 +17,10 @@ export const prompt = function (
       },
       resizable: false,
     });
-    prompt_window.loadFile(join(__dirname, "./index.html"));
+    prompt_window.loadFile(join(__dirname, "./index.html")).then(
+      () => void 0,
+      reason => console.error(reason)
+    );
     prompt_window.webContents.on(
       "did-finish-load",
       (_e: Electron.Event): void => {
@@ -51,22 +54,26 @@ export const listen_for_prompt_requests = function (
 ): void {
   window.webContents.on(
     "ipc-message",
-    async (_e: Electron.Event, channel: string, data: any): Promise<void> => {
+    (_e: Electron.Event, channel: string, data: any): void => {
       if (channel !== "prompts") return;
       if (data.is_prompt_request) {
         if (data.id) {
-          const result = await prompt(
+          prompt(
             // create the prompt window and wait for the response
             window,
             data.message || "Enter a string.",
             data.default || void 0
+          ).then(
+            result => {
+              window.webContents.send("prompts", {
+                // send prompt response to original window
+                is_prompt_resolution: true,
+                result: result,
+                id: data.id,
+              });
+            },
+            reason => console.error(reason)
           );
-          window.webContents.send("prompts", {
-            // send prompt response to original window
-            is_prompt_resolution: true,
-            result: result,
-            id: data.id,
-          });
         }
       }
     }
