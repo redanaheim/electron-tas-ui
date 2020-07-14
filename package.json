@@ -46,6 +46,9 @@
       "plugin:import/warnings"
     ],
     "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "project": "tsconfig.json"
+    },
     "rules": {
       "@typescript-eslint/camelcase": "off",
       "@typescript-eslint/no-explicit-any": "off",
@@ -54,7 +57,21 @@
         {
           "argsIgnorePattern": "^_"
         }
-      ]
+      ],
+      "@typescript-eslint/prefer-for-of": "error",
+      "yoda": "error",
+      "@typescript-eslint/dot-notation": [
+        "error"
+      ],
+      "@typescript-eslint/prefer-readonly": "error",
+      "@typescript-eslint/prefer-includes": "error",
+      "@typescript-eslint/prefer-as-const": "error",
+      "@typescript-eslint/no-unsafe-return": "error",
+      "@typescript-eslint/no-unnecessary-type-assertion": "error",
+      "@typescript-eslint/no-unnecessary-boolean-literal-compare": "error",
+      "@typescript-eslint/no-unnecessary-condition": "error",
+      "@typescript-eslint/no-for-in-array": "error",
+      "@typescript-eslint/no-floating-promises": "error"
     }
   },
   "devDependencies": {
@@ -62,7 +79,7 @@
     "@typescript-eslint/parser": "^2.31.0",
     "electron": "8.2.5",
     "electron-builder": "^22.6.0",
-    "eslint": "^6.8.0",
+    "eslint": "^7.4.0",
     "eslint-plugin-import": "^2.20.2",
     "typescript": "^3.8.3"
   },
