@@ -83,10 +83,7 @@ class PureInputLine {
     this.off_keys = new KeysList();
     if (used_to_clear) this.used_to_clear = true;
     line = line.trim();
-    if (
-      (!PureInputLine.line_regex.test(line) || line === "") &&
-      throw_errors
-    ) {
+    if ((!PureInputLine.line_regex.test(line) || line === "") && throw_errors) {
       throw new Error(`Invalid line "${line}", cannot parse`);
     }
     // Frame number
@@ -153,11 +150,7 @@ class PureInputLine {
   }
   equals_last(): boolean {
     // Does this object have the exact same inputs as the one before it?
-    return (
-      !this.lstick_changes &&
-      !this.rstick_changes &&
-      this.are_keys_same
-    );
+    return !this.lstick_changes && !this.rstick_changes && this.are_keys_same;
   }
   print(is_last?: boolean): string {
     let buffer = `${this.frame === 1 ? "+" : this.frame - this.previous.frame}`;
@@ -230,13 +223,12 @@ export const script_from_parsed_lines = function (
 };
 
 export const decompile = function (
-  script: string | Buffer,
+  script: string[],
   throw_errors?: boolean,
   allow_decimals?: boolean
 ): string {
   let buffer = "";
-  script = typeof script === "string" ? script : "";
-  const lines = script.split("\n").map(x => x.replace(/[\r\n]/g, ""));
+  const lines = script.map(x => x.replace(/[\r\n]/g, ""));
   const queue = [PureInputLine.empty];
   let last_updated_frame = 0;
   for (const line of lines) {

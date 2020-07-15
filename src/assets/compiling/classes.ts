@@ -11,7 +11,7 @@ export const FifteenBitInt = function (float: number): number {
 
 export class FileLike {
   is_string = false;
-  contents: any = [];
+  contents: string | string[] = [];
   constructor(data: string | string[]) {
     if (typeof data === "string") {
       this.is_string = true;
@@ -25,12 +25,18 @@ export class FileLike {
     return new FileLike(this.as_array().concat(other.as_array()));
   }
   as_string(): string {
-    return this.is_string ? this.contents : this.contents.join("\n");
+    if (this.is_string && typeof this.contents === "string") {
+      return this.contents;
+    } else if (this.contents instanceof Array) {
+      return this.contents.join("\n");
+    }
   }
   as_array(): string[] {
-    return this.is_string
-      ? this.contents.split(/(?:\r\n|\r|\n)/)
-      : this.contents;
+    if (this.is_string && typeof this.contents === "string") {
+      this.contents.split(/(?:\r\n|\r|\n)/);
+    } else if (this.contents instanceof Array) {
+      return this.contents;
+    }
   }
 }
 

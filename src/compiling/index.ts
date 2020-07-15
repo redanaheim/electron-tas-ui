@@ -1,8 +1,8 @@
 import {
-  read_file_async,
   write_file_async,
   Store,
   store_defaults,
+  read_FileLike,
 } from "../storing";
 import { existsSync } from "fs";
 import { compile } from "../assets/compiling/compile";
@@ -69,12 +69,12 @@ export const compile_on_click = async function (): Promise<void> {
     });
     return;
   }
-  const file_content = (await read_file_async(source_path, "utf8")).toString();
+  const file_content = await read_FileLike(source_path);
   try {
     await write_file_async(
       save_path,
       compile(
-        file_content,
+        file_content.as_array(),
         await Store.value_of(
           "dialogs",
           "show_compiler_errors",

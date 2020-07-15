@@ -112,7 +112,7 @@ export const send = async function (
     await write_file_async(
       source_path,
       compile(
-        "",
+        [],
         await Store.value_of(
           "dialogs",
           "show_compiler_errors",

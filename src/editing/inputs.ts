@@ -12,7 +12,7 @@ import { script_from_parsed_lines } from "../assets/compiling/decompile";
 import { compile, parse_line } from "../assets/compiling/compile";
 import { Preprocessor } from "../assets/compiling/preprocess";
 import { IpAddress } from "../ftp";
-import { export_file } from "../storing";
+import { export_file, read_FileLike } from "../storing";
 import { request_prompt } from "../assets/prompts/prompt_renderer";
 import { ipcRenderer, remote } from "electron";
 
@@ -688,7 +688,17 @@ export class PianoRoll {
   frozen = false;
   representing?: string;
   switch?: IpAddress;
-  static from(file: string[], options: PianoRollConstructorOptions): PianoRoll {
+  static from = async function (
+    filepath: string,
+    options: PianoRollConstructorOptions
+  ): Promise<PianoRoll | null> {
+    let file: string[];
+    try {
+      file = (await read_FileLike(filepath)).as_array();
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
     const piano = new PianoRoll(options);
     let last_frame = 0;
     // Preprocess the script so we don't have to deal with crazy loops and stuff
@@ -731,9 +741,10 @@ export class PianoRoll {
       );
     }
     PianoRoll.apply(project_data, piano);
-    piano.refresh();
+    piano.set_represented(filepath);
+    piano.set_saved(true);
     return piano;
-  }
+  };
   static apply(project_data: string[], piano: PianoRoll): void {
     for (const line of project_data) {
       if (line === "// Project Data") continue;
@@ -1107,7 +1118,7 @@ export class PianoRoll {
   }
   make_nx_tas(throw_errors?: boolean): FileLike {
     return new FileLike(
-      compile("", throw_errors, true, this.make_update_frames())
+      compile([], throw_errors, true, this.make_update_frames())
     );
   }
 }

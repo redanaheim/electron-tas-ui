@@ -1,5 +1,6 @@
 import { app, remote, BrowserWindow, dialog } from "electron";
-import { readFile, writeFile } from "fs";
+import { readFile, writeFile, createReadStream } from "fs";
+import * as readline from "readline";
 import { join } from "path";
 import { FileLike } from "./assets/compiling/classes";
 
@@ -14,11 +15,26 @@ interface InternalData {
 export const read_file_async = async function (
   path: string,
   encoding: string
-): Promise<string | Buffer> {
+): Promise<string> {
   return new Promise((res, rej) => {
     readFile(path, encoding, (err: any, data: any) => {
       if (err) rej(err);
       else res(data);
+    });
+  });
+};
+export const read_FileLike = async function (path: string): Promise<FileLike> {
+  return new Promise((res, _rej) => {
+    const buffer: string[] = [];
+    const readlines = readline.createInterface({
+      input: createReadStream(path),
+      crlfDelay: Infinity,
+    });
+    readlines.on("line", line => {
+      buffer.push(line);
+    });
+    readlines.on("close", () => {
+      res(new FileLike(buffer) as any);
     });
   });
 };

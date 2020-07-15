@@ -1,8 +1,8 @@
 import {
-  read_file_async,
   write_file_async,
   Store,
   store_defaults,
+  read_FileLike,
 } from "../storing";
 import { existsSync } from "fs";
 import { decompile } from "../assets/compiling/decompile";
@@ -72,7 +72,7 @@ export const decompile_on_click = async function (): Promise<void> {
     });
     return;
   }
-  const file_content = (await read_file_async(source_path, "utf8")).toString();
+  const file_content = (await read_FileLike(source_path)).as_array();
   const decimals_allowed = await Store.value_of(
     "preferences",
     "decompiling_perfect_decimal_match",

@@ -1,9 +1,9 @@
 import { IpAddress } from "../ftp";
 import {
-  read_file_async,
   write_file_async,
   Store,
   store_defaults,
+  read_FileLike,
 } from "../storing";
 import { compile } from "../assets/compiling/compile";
 import { existsSync } from "fs";
@@ -88,7 +88,7 @@ export const send = async function (
       }
     }
   }
-  const file_content = (await read_file_async(source_path, "utf8")).toString();
+  const file_content = await read_FileLike(source_path);
   // this is the path the compiled file will be stored to,
   // and where we want to get the file from before exporting to switch
   source_path = join(app.getPath("temp"), "compiled.txt");
@@ -96,7 +96,7 @@ export const send = async function (
     await write_file_async(
       source_path,
       compile(
-        file_content,
+        file_content.as_array(),
         await Store.value_of(
           "dialogs",
           "show_compiler_errors",

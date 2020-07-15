@@ -263,7 +263,7 @@ export const parse_line = function (
   return to_return;
 };
 export const compile = function (
-  script: string,
+  script: string[],
   throw_errors: boolean,
   no_script?: boolean,
   premade_update_frames?: ParsedLine[]
@@ -273,7 +273,7 @@ export const compile = function (
   let update_frames: ParsedLine[] = [];
   let current_frame = 1;
   if (!no_script) {
-    const lines = script.split("\n").map(x => x.replace(/[\r\n]/g, ""));
+    const lines = script.map(x => x.replace(/[\r\n]/g, ""));
     const contents = new Preprocessor(lines); // just initializing object
     contents.do_all(); // actually preprocess
     const file_lines = contents.current_content;
@@ -281,7 +281,7 @@ export const compile = function (
       if (throw_errors) {
         throw new Error("No valid lines were found.");
       }
-      return script;
+      return script.join("\n");
     }
     for (const line of file_lines) {
       // create list of frames where we need to update the controller, and what to do
@@ -299,7 +299,7 @@ export const compile = function (
   }
   if (update_frames.length === 0) {
     if (throw_errors) throw new Error("No valid lines were found.");
-    return script;
+    return script.join("\n");
   }
   const last_frame = update_frames[last_index_of(update_frames)].frame;
   // We use this instead of shift()ing because shift is very inefficient

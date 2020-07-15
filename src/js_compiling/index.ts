@@ -87,7 +87,7 @@ export const compile_on_click = async function (): Promise<void> {
     await write_file_async(
       save_path,
       compile(
-        "",
+        [],
         await Store.value_of(
           "dialogs",
           "show_compiler_errors",
