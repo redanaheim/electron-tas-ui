@@ -108,6 +108,12 @@ export async function create_menu(): Promise<Menu> {
         },
         { type: "separator" },
         {
+          click: menu_click_handlers.request_enter_export_name,
+          label: "Enter Export Name on Switch",
+          enabled: false,
+          id: "editing_enter_export_name",
+        },
+        {
           click: menu_click_handlers.request_enter_switch_ip,
           label: "Enter Switch's Local IP Address",
           enabled: false,

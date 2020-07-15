@@ -17,6 +17,7 @@ const menu_ids = {
     "editing_export_as_tig",
     "editing_export_to_switch",
     "editing_enter_switch_ip",
+    "editing_enter_export_name",
   ],
 };
 
@@ -371,6 +372,13 @@ menu_click_handlers.request_enter_switch_ip = (): void => {
   BrowserWindow.getFocusedWindow().webContents.send(
     "requests",
     "request_enter_ip"
+  );
+};
+
+menu_click_handlers.request_enter_switch_ip = (): void => {
+  BrowserWindow.getFocusedWindow().webContents.send(
+    "requests",
+    "request_enter_export_name"
   );
 };
 

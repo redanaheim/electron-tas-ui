@@ -12,9 +12,11 @@ import { script_from_parsed_lines } from "../assets/compiling/decompile";
 import { compile, parse_line } from "../assets/compiling/compile";
 import { Preprocessor } from "../assets/compiling/preprocess";
 import { IpAddress } from "../ftp";
-import { export_file, read_FileLike } from "../storing";
+import { export_file, read_FileLike, write_file_async } from "../storing";
 import { request_prompt } from "../assets/prompts/prompt_renderer";
 import { ipcRenderer, remote } from "electron";
+import { join } from "path";
+import { rand_string } from "../utils";
 
 interface PianoRollRowConstructorOptions {
   previous?: PianoRollRow;
@@ -688,6 +690,9 @@ export class PianoRoll {
   frozen = false;
   representing?: string;
   switch?: IpAddress;
+  export_name?: string;
+  temp_id?: string;
+  show_export_success = true;
   static from = async function (
     filepath: string,
     options: PianoRollConstructorOptions
@@ -768,11 +773,24 @@ export class PianoRoll {
           }
           break;
         }
+        case "export_name": {
+          piano.export_name = value;
+          break;
+        }
+        case "temp_id": {
+          piano.temp_id = value;
+          break;
+        }
         case "flags": {
           for (const flag of value.split(",")) {
             switch (flag) {
               case "no_clones": {
                 piano.show_clones = false;
+                break;
+              }
+              case "no_show_export_success": {
+                piano.show_export_success = false;
+                break;
               }
             }
           }
@@ -792,6 +810,7 @@ export class PianoRoll {
     this.contents = options.contents;
     this.reference = options.reference;
     this.reference.data("object", this);
+    this.temp_id = rand_string(15);
     // Create keys listener to see when shift is pressed (for key toggles)
     if (options.jquery_document) {
       // copy this.key_state because the this context changes in the handler function
@@ -857,8 +876,22 @@ export class PianoRoll {
               );
               break;
             }
+            case "request_export_to_switch": {
+              this.export_ftp().then(
+                () => void 0,
+                reason => console.error(reason)
+              );
+              break;
+            }
             case "request_enter_ip": {
               this.ask_for_ip().then(
+                () => void 0,
+                reason => console.error(reason)
+              );
+              break;
+            }
+            case "request_enter_export_name": {
+              this.ask_for_export_name().then(
                 () => void 0,
                 reason => console.error(reason)
               );
@@ -949,6 +982,96 @@ export class PianoRoll {
         () => void 0,
         reason => console.error(reason)
       );
+    }
+  }
+  async ask_for_export_name(): Promise<void> {
+    const response = await request_prompt("Enter the name to export as.");
+    if (response === "cancel") return;
+    if (!/^[0-9a-zA-Z.-]+$/.test(response)) {
+      await remote.dialog.showMessageBox(remote.getCurrentWindow(), {
+        message: "Invalid Export Name",
+        detail: "You can only use '.', '-', and alphanumeric characters.",
+        type: "error",
+        buttons: ["OK"],
+      });
+      return;
+    }
+    this.export_name = response;
+  }
+  async export_ftp(): Promise<void> {
+    const this_window = remote.getCurrentWindow();
+    if (!this.export_name) {
+      await this.ask_for_export_name();
+      if (!this.export_name) return;
+    }
+    if (!this.switch) {
+      await this.ask_for_ip();
+      if (!this.switch) return;
+    }
+    let is_replacing = false;
+    try {
+      is_replacing = await this.switch.exists(
+        "/scripts/",
+        this.export_name,
+        5000
+      );
+    } catch (err) {
+      console.error(err);
+      await remote.dialog.showMessageBox(this_window, {
+        title: "Error",
+        message: err.toString(),
+        type: "error",
+        buttons: ["OK"],
+      });
+      return;
+    }
+    if (is_replacing) {
+      const should_replace = await remote.dialog.showMessageBox(this_window, {
+        message: `This will overwrite /scripts/${this.export_name} on the Switch. The current file will be backed up, however do you still want to proceed?`,
+        type: "question",
+        buttons: ["Cancel", "Replace"],
+      });
+      if (should_replace.response === 0) {
+        return;
+      }
+    }
+    const temp_path = join(remote.app.getPath("temp"), `${this.temp_id}.txt`);
+    try {
+      await write_file_async(temp_path, this.make_nx_tas(false).as_string());
+    } catch (err) {
+      console.error(err);
+      await remote.dialog.showMessageBox(this_window, {
+        title: "Error",
+        message: err.toString(),
+        type: "error",
+        buttons: ["OK"],
+      });
+      return;
+    }
+    let result;
+    try {
+      result = await this.switch.send(temp_path, this.export_name, 5000);
+    } catch (err) {
+      console.error(err);
+      await remote.dialog.showMessageBox(this_window, {
+        title: "Error",
+        message: err.toString(),
+        type: "error",
+        buttons: ["OK"],
+      });
+      return;
+    }
+    if (this.show_export_success) {
+      const button = await remote.dialog.showMessageBox(this_window, {
+        message: result.did_succeed
+          ? "Sucessfully exported script to Switch."
+          : "Export failed.",
+        type: "info",
+        buttons: ["OK", "Do not show this again"],
+      });
+      if (button.response === 1) {
+        this.show_export_success = false;
+      }
     }
   }
   create_navbar(): void {
@@ -1092,6 +1215,15 @@ export class PianoRoll {
     }
     if (this.switch) {
       data_buffer += `// switch_ip:${this.switch.parts.join(".")}\r\n`;
+    }
+    if (this.export_name) {
+      data_buffer += `// export_name:${this.export_name}`;
+    }
+    if (this.temp_id) {
+      data_buffer += `// temp_id:${this.temp_id}`;
+    }
+    if (!this.show_export_success) {
+      flags.push("no_show_export_success");
     }
     return data_buffer + `// flags:${flags.join(",")}`;
   }
