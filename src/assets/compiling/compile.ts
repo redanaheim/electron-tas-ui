@@ -285,7 +285,7 @@ export const compile = function (
     }
     for (const line of file_lines) {
       // create list of frames where we need to update the controller, and what to do
-      if (!/^([0-9]+|\+) .+$/.test(line)) continue; // no valid frame number found, ignore
+      if (!/^([0-9]+|\+) /.test(line)) continue; // no valid frame number found, ignore
       const parsed_line = parse_line(
         line,
         current_frame,

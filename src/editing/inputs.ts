@@ -1,5 +1,3 @@
-// TODO: right click functions in the editor
-
 import {
   KeysList,
   StickPos,
@@ -11,7 +9,8 @@ import {
   string_to_key,
 } from "../assets/compiling/classes";
 import { script_from_parsed_lines } from "../assets/compiling/decompile";
-import { compile } from "../assets/compiling/compile";
+import { compile, parse_line } from "../assets/compiling/compile";
+import { Preprocessor } from "../assets/compiling/preprocess";
 import { IpAddress } from "../ftp";
 import { export_file } from "../storing";
 import { request_prompt } from "../assets/prompts/prompt_renderer";
@@ -148,13 +147,13 @@ export class PianoRollRow {
   is_clone = false; // is everthing about the frame the same as the previous?
   frozen = false; // should we stop evaluating keys?
   key_references: KeyToReferenceStore = {};
-  static from(
+  static apply(
+    row: PianoRollRow,
     line: ParsedLine,
     previous_active_keys = new KeysList(),
     previous_lstick_pos = new StickPos(0, 0),
     previous_rstick_pos = new StickPos(0, 0)
-  ): PianoRollRow {
-    const row = new PianoRollRow();
+  ): void {
     row.freeze();
     row.active_keys = previous_active_keys;
     row.set_key(
@@ -183,7 +182,6 @@ export class PianoRollRow {
     } else {
       row.set_stick(false, previous_rstick_pos, previous_rstick_pos);
     }
-    return row;
   }
   constructor(options?: PianoRollRowConstructorOptions) {
     if (!options) {
@@ -209,7 +207,7 @@ export class PianoRollRow {
           options.rstick_pos.magnitude
         );
       }
-      if ("previous" in options) {
+      if (options.previous) {
         // clone calculation
         // iterating over every key pressed in the previous frame, if it is pressed here too, it's a clone key
         for (const key of PianoRollRow.all_keys) {
@@ -493,6 +491,7 @@ export class PianoRollRow {
     if (this.is_rstick_clone) this.rstick_pos = previous.rstick_pos.clone();
   }
   reeval(previous: PianoRollRow, hide_clones?: boolean): void {
+    if (this.frozen) return;
     if (!previous) previous = this.previous || null;
     this.previous = previous;
     this.reeval_keys(previous, false);
@@ -676,6 +675,15 @@ class StickChangeDialogue {
   }
 }
 
+interface PianoRollConstructorOptions {
+  contents: PianoRollRow[];
+  reference: JQuery<HTMLElement>;
+  jquery_document?: JQuery<Document>;
+  navbar?: JQuery<HTMLElement>;
+  no_add_row?: boolean;
+  no_await_ipc?: boolean;
+}
+
 export class PianoRoll {
   readonly contents: PianoRollRow[];
   readonly reference: JQuery<HTMLElement>;
@@ -684,8 +692,98 @@ export class PianoRoll {
   navbar?: JQuery<HTMLElement>;
   show_clones = true;
   saved = false;
+  frozen = false;
   representing?: string;
   switch?: IpAddress;
+  static from(file: string[], options: PianoRollConstructorOptions): PianoRoll {
+    const piano = new PianoRoll(options);
+    piano.set_frozen();
+    let last_frame = 0;
+    // Preprocess the script so we don't have to deal with crazy loops and stuff
+    const preprocessor = new Preprocessor(file);
+    preprocessor.do_all();
+    file = preprocessor.current_content;
+    console.log(file);
+    // Deal with script now
+    let is_in_project_data = false;
+    const project_data: string[] = [];
+    for (const line of file) {
+      console.log(line);
+      console.log(is_in_project_data);
+      if (/^(?:\s+)?\/\/(?:\s+)Project Data/i.test(line)) {
+        is_in_project_data = true;
+        continue;
+      }
+      if (is_in_project_data) {
+        if (!line.trim().startsWith("//")) {
+          is_in_project_data = false;
+        } else {
+          project_data.push(line);
+          continue;
+        }
+      }
+      // We're parsing a line now
+      if (!/^([0-9]+|\+) /.test(line)) continue;
+      const parsed = parse_line(line, last_frame === 0 ? 1 : last_frame, false);
+      const before = piano.get(piano.contents.length - 1);
+      for (let i = 0; i < parsed.frame - last_frame; i++) {
+        piano.add(null, undefined, false).active_keys =
+          before?.active_keys.clone() ?? new KeysList();
+      }
+      const last = piano.get(piano.contents.length - 1) ?? new PianoRollRow();
+      PianoRollRow.apply(
+        last,
+        parsed,
+        before?.active_keys.clone() ?? new KeysList(),
+        before?.lstick_pos.clone() ?? new StickPos(0, 0),
+        before?.rstick_pos.clone() ?? new StickPos(0, 0)
+      );
+      last_frame = parsed.frame;
+    }
+    PianoRoll.apply(project_data, piano);
+    piano.contents.forEach(x => {
+      x.unfreeze();
+    });
+    piano.set_frozen(true);
+    piano.refresh();
+    return piano;
+  }
+  static apply(project_data: string[], piano: PianoRoll): void {
+    for (const line of project_data) {
+      if (line === "// Project Data") continue;
+      const result = /^(?:\s+)?\/\/(?:\s+)([a-z0-9_]+):([a-z0-9_,.]+)$/i.exec(
+        line
+      );
+      if (!result) continue;
+      const [, key, value] = result;
+      switch (key) {
+        case "row_show_clones": {
+          for (const row_number of value.split(",").map(x => +x)) {
+            piano.get(row_number)?.show_children(true);
+          }
+          break;
+        }
+        case "switch_ip": {
+          try {
+            piano.switch = new IpAddress(value);
+          } catch (err) {
+            console.error(err);
+          }
+          break;
+        }
+        case "flags": {
+          for (const flag of value.split(",")) {
+            switch (flag) {
+              case "no_clones": {
+                piano.show_clones = false;
+              }
+            }
+          }
+        }
+      }
+    }
+    piano.refresh();
+  }
   static click_handler_func = function (): void {
     $(this).parent().data("object").toggle_key($(this).data("value")); // get the clicked element's parent,
     // get the PianoRollRow object corresponding to that, then toggle the corresponding key
@@ -693,14 +791,7 @@ export class PianoRoll {
   static create_spacer_row = function (): JQuery<HTMLElement> {
     return $("<tr/>").addClass("row_spacer");
   };
-  constructor(options: {
-    contents: PianoRollRow[];
-    reference: JQuery<HTMLElement>;
-    jquery_document?: JQuery<Document>;
-    navbar?: JQuery<HTMLElement>;
-    no_add_row?: boolean;
-    no_await_ipc?: boolean;
-  }) {
+  constructor(options: PianoRollConstructorOptions) {
     this.contents = options.contents;
     this.reference = options.reference;
     this.reference.data("object", this);
@@ -730,9 +821,9 @@ export class PianoRoll {
     $(".key").click(PianoRoll.click_handler_func);
     this.stick_change_dialogue = new StickChangeDialogue(this);
   }
-  /*change_menu(): void {
-
-  }*/
+  set_frozen(unfreeze?: boolean): void {
+    this.frozen = !unfreeze;
+  }
   await_ipc(): void {
     // Handles all ipc messages sent to this page's webContents
     // Requests channel
@@ -897,11 +988,15 @@ export class PianoRoll {
     }
     return path;
   }
-  add(element: JQuery<HTMLElement> | null, position?: number): void {
+  add(
+    element: JQuery<HTMLElement> | null,
+    position?: number,
+    use_previous = true
+  ): PianoRollRow {
     position = position !== void 0 ? position : last_index_of(this.contents);
     const previous_in_position = this.get(position) || new PianoRollRow();
     const input_line = new PianoRollRow({
-      previous: previous_in_position,
+      previous: use_previous ? previous_in_position : null,
       active_keys: previous_in_position.active_keys.clone() || new KeysList(),
       lstick_pos: previous_in_position.lstick_pos.clone() || new StickPos(0, 0),
       rstick_pos: previous_in_position.rstick_pos.clone() || new StickPos(0, 0),
@@ -930,6 +1025,7 @@ export class PianoRoll {
       this.contents.splice(position, 0, input_line);
     }
     this.refresh();
+    return input_line;
   }
   remove(position: number): void {
     const in_position = this.get(position);
@@ -952,6 +1048,7 @@ export class PianoRoll {
     ipcRenderer.send("save_events", saved ? "saved" : "unsaved");
   }
   refresh(): void {
+    if (this.frozen) return;
     // EXTREMELY INTENSIVE
     this.get(0).reeval(new PianoRollRow());
     for (let i = 1; i < this.contents.length; i++) {

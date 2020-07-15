@@ -228,7 +228,7 @@ export const string_to_key = function (key: string | Key): Key {
 };
 
 export class KeysList {
-  private internal_set: Set<Key> = new Set();
+  internal_set: Set<Key> = new Set();
   static all_keys: Key[] = [
     Key.A,
     Key.B,
