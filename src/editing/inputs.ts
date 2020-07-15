@@ -150,12 +150,9 @@ export class PianoRollRow {
   static apply(
     row: PianoRollRow,
     line: ParsedLine,
-    previous_active_keys = new KeysList(),
     previous_lstick_pos = new StickPos(0, 0),
     previous_rstick_pos = new StickPos(0, 0)
   ): void {
-    row.freeze();
-    row.active_keys = previous_active_keys;
     row.set_key(
       line.keys_on.map(x => string_to_key(x)),
       true
@@ -170,8 +167,6 @@ export class PianoRollRow {
         new StickPos(...line.lstick_pos_polar),
         previous_lstick_pos
       );
-    } else {
-      row.set_stick(true, previous_lstick_pos, previous_lstick_pos);
     }
     if (line.rstick_changes) {
       row.set_stick(
@@ -179,8 +174,6 @@ export class PianoRollRow {
         new StickPos(...line.rstick_pos_polar),
         previous_rstick_pos
       );
-    } else {
-      row.set_stick(false, previous_rstick_pos, previous_rstick_pos);
     }
   }
   constructor(options?: PianoRollRowConstructorOptions) {
@@ -697,7 +690,6 @@ export class PianoRoll {
   switch?: IpAddress;
   static from(file: string[], options: PianoRollConstructorOptions): PianoRoll {
     const piano = new PianoRoll(options);
-    piano.set_frozen();
     let last_frame = 0;
     // Preprocess the script so we don't have to deal with crazy loops and stuff
     const preprocessor = new Preprocessor(file);
@@ -725,26 +717,20 @@ export class PianoRoll {
       // We're parsing a line now
       if (!/^([0-9]+|\+) /.test(line)) continue;
       const parsed = parse_line(line, last_frame === 0 ? 1 : last_frame, false);
-      const before = piano.get(piano.contents.length - 1);
+      const before_last = piano.get(piano.contents.length - 1);
       for (let i = 0; i < parsed.frame - last_frame; i++) {
-        piano.add(null, undefined, false).active_keys =
-          before?.active_keys.clone() ?? new KeysList();
+        piano.add(null);
       }
-      const last = piano.get(piano.contents.length - 1) ?? new PianoRollRow();
+      last_frame = parsed.frame;
+      const last = piano.get(piano.contents.length - 1);
       PianoRollRow.apply(
         last,
         parsed,
-        before?.active_keys.clone() ?? new KeysList(),
-        before?.lstick_pos.clone() ?? new StickPos(0, 0),
-        before?.rstick_pos.clone() ?? new StickPos(0, 0)
+        before_last?.lstick_pos.clone() ?? new StickPos(0, 0),
+        before_last?.rstick_pos.clone() ?? new StickPos(0, 0)
       );
-      last_frame = parsed.frame;
     }
     PianoRoll.apply(project_data, piano);
-    piano.contents.forEach(x => {
-      x.unfreeze();
-    });
-    piano.set_frozen(true);
     piano.refresh();
     return piano;
   }
@@ -993,6 +979,7 @@ export class PianoRoll {
     position?: number,
     use_previous = true
   ): PianoRollRow {
+    const position_set = !!position;
     position = position !== void 0 ? position : last_index_of(this.contents);
     const previous_in_position = this.get(position) || new PianoRollRow();
     const input_line = new PianoRollRow({
@@ -1010,7 +997,7 @@ export class PianoRoll {
       input_line.reference = element;
       const spacer_row = PianoRoll.create_spacer_row();
       input_line.associated_spacer = spacer_row;
-      if (this.contents.length === 0) {
+      if (this.contents.length === 0 || !position_set) {
         this.reference.append(element).append(spacer_row);
       } else {
         this.get(position > 0 ? position - 1 : 0).associated_spacer.after(
@@ -1019,7 +1006,7 @@ export class PianoRoll {
         element.after(spacer_row);
       }
     }
-    if (!position) {
+    if (!position_set) {
       this.contents.push(input_line);
     } else {
       this.contents.splice(position, 0, input_line);
