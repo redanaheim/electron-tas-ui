@@ -206,7 +206,7 @@ export class PianoRollRow {
         this.is_lstick_clone = this.lstick_pos.equals(
           options.previous.lstick_pos
         );
-        this.is_rstick_clone = this.lstick_pos.equals(
+        this.is_rstick_clone = this.rstick_pos.equals(
           options.previous.rstick_pos
         );
         // if both sticks are cloned, and this.clone_keys has the same length as this.active_keys, this object is a clone
@@ -215,6 +215,9 @@ export class PianoRollRow {
           this.is_rstick_clone &&
           this.cloned_on_keys.length() === Object.keys(Key).length;
       }
+    } else {
+      this.is_lstick_clone = false;
+      this.is_rstick_clone = false;
     }
   }
   create_element(): JQuery<HTMLElement> {
