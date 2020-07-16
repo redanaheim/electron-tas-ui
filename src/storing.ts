@@ -16,6 +16,7 @@ export const read_file_async = async function (
   path: string,
   encoding: string
 ): Promise<string> {
+  path = join(path);
   return new Promise((res, rej) => {
     readFile(path, encoding, (err: any, data: any) => {
       if (err) rej(err);
@@ -24,6 +25,7 @@ export const read_file_async = async function (
   });
 };
 export const read_FileLike = async function (path: string): Promise<FileLike> {
+  path = join(path);
   return new Promise((res, _rej) => {
     const buffer: string[] = [];
     const readlines = readline.createInterface({
@@ -45,6 +47,7 @@ export const write_file_async = async function (
   path: string,
   data: string
 ): Promise<boolean> {
+  path = join(path);
   return new Promise((res, rej) => {
     writeFile(path, data, (err: Error) => {
       if (err) rej(err);
