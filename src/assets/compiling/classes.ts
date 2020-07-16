@@ -33,7 +33,7 @@ export class FileLike {
   }
   as_array(): string[] {
     if (this.is_string && typeof this.contents === "string") {
-      this.contents.split(/(?:\r\n|\r|\n)/);
+      return this.contents.split(/(?:\r\n|\r|\n)/);
     } else if (this.contents instanceof Array) {
       return this.contents;
     }
@@ -117,6 +117,7 @@ export enum Key {
   MINUS = 13,
   LSTICK = 14,
   RSTICK = 15,
+  NONE = 16,
 }
 export const key_to_string = function (key: Key): string {
   switch (key) {
@@ -227,6 +228,12 @@ export const string_to_key = function (key: string | Key): Key {
     case "KEY_RSTICK": {
       return Key.RSTICK;
     }
+    case "KEY_NONE": {
+      return Key.NONE;
+    }
+    case "NONE": {
+      return Key.NONE;
+    }
     default: {
       return void 0;
     }
@@ -257,10 +264,12 @@ export class KeysList {
     this.internal_set = new Set(internal_array);
   }
   append(key: Key): void {
+    if (key === Key.NONE) return;
     this.internal_set.add(key);
   }
   append_list(key_list: Key[]): void {
     for (const key of key_list) {
+      if (key === Key.NONE) continue;
       this.internal_set.add(key);
     }
   }
@@ -295,6 +304,7 @@ export class KeysList {
     return true;
   }
   has(key: Key): boolean {
+    if (key === Key.NONE) return true;
     return this.internal_set.has(key);
   }
   clone(): KeysList {
@@ -314,6 +324,7 @@ export class StickPos {
     }{${this.angle.toString()},${this.magnitude.toString()}`;
   }
   equals(other: StickPos): boolean {
+    if (!other) return;
     return (
       (this.angle === other.angle && this.magnitude === other.magnitude) ||
       (this.empty() && other.empty())

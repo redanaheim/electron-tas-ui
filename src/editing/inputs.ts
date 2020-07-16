@@ -8,7 +8,10 @@ import {
   FileLike,
   string_to_key,
 } from "../assets/compiling/classes";
-import { script_from_parsed_lines } from "../assets/compiling/decompile";
+import {
+  script_from_parsed_lines,
+  decompile,
+} from "../assets/compiling/decompile";
 import { compile, parse_line } from "../assets/compiling/compile";
 import { Preprocessor } from "../assets/compiling/preprocess";
 import { IpAddress } from "../ftp";
@@ -149,12 +152,7 @@ export class PianoRollRow {
   is_clone = false; // is everthing about the frame the same as the previous?
   frozen = false; // should we stop evaluating keys?
   key_references: KeyToReferenceStore = {};
-  static apply(
-    row: PianoRollRow,
-    line: ParsedLine,
-    previous_lstick_pos = new StickPos(0, 0),
-    previous_rstick_pos = new StickPos(0, 0)
-  ): void {
+  static apply(row: PianoRollRow, line: ParsedLine): void {
     row.set_key(
       line.keys_on.map(x => string_to_key(x)),
       true
@@ -164,26 +162,14 @@ export class PianoRollRow {
       false
     );
     if (line.lstick_changes) {
-      row.set_stick(
-        true,
-        new StickPos(...line.lstick_pos_polar),
-        previous_lstick_pos
-      );
+      row.set_stick(true, new StickPos(...line.lstick_pos_polar));
     }
     if (line.rstick_changes) {
-      row.set_stick(
-        false,
-        new StickPos(...line.rstick_pos_polar),
-        previous_rstick_pos
-      );
+      row.set_stick(false, new StickPos(...line.rstick_pos_polar));
     }
   }
   constructor(options?: PianoRollRowConstructorOptions) {
-    if (!options) {
-      // Create empty object for the purpose of serving as previous for a later line
-      this.is_lstick_clone = false;
-      this.is_rstick_clone = false;
-    } else {
+    if (options) {
       // destructuring options for less unreadable code
       this.has_previous = Boolean(options.previous);
       this.reference = options.reference || null;
@@ -374,6 +360,7 @@ export class PianoRollRow {
     }
   }
   toggle_key(key: Key): void {
+    if (key === Key.NONE) return;
     if (this.active_keys.has(key)) {
       this.on_keys.remove(key);
       this.off_keys.append(key);
@@ -636,7 +623,11 @@ class StickChangeDialogue {
     element.fadeOut(0);
   }
   point_to(row: PianoRollRow, point_to_lstick: boolean): void {
-    if (this.pointing_to !== null && this.pointing_to !== void 0) {
+    if (
+      this.pointing_to !== null &&
+      this.pointing_to !== void 0 &&
+      this.in_row !== null
+    ) {
       this.in_row.set_stick(
         this.pointing_to_lstick,
         new StickPos(
@@ -681,7 +672,7 @@ interface PianoRollConstructorOptions {
 
 export class PianoRoll {
   readonly contents: PianoRollRow[];
-  readonly reference: JQuery<HTMLElement>;
+  private reference: JQuery<HTMLElement>;
   readonly key_state: PianoRollKeyState = {}; // for keeping track of pressed keys
   stick_change_dialogue: StickChangeDialogue;
   navbar?: JQuery<HTMLElement>;
@@ -695,7 +686,8 @@ export class PianoRoll {
   show_export_success = true;
   static from = async function (
     filepath: string,
-    options: PianoRollConstructorOptions
+    options: PianoRollConstructorOptions,
+    should_decompile?: boolean
   ): Promise<PianoRoll | null> {
     let file: string[];
     try {
@@ -704,19 +696,19 @@ export class PianoRoll {
       console.error(err);
       return null;
     }
+    if (should_decompile) {
+      file = decompile(file, true, false).split(/(?:\r\n|\r|\n)/);
+    }
     const piano = new PianoRoll(options);
     let last_frame = 0;
     // Preprocess the script so we don't have to deal with crazy loops and stuff
     const preprocessor = new Preprocessor(file);
     preprocessor.do_all();
     file = preprocessor.current_content;
-    console.log(file);
     // Deal with script now
     let is_in_project_data = false;
     const project_data: string[] = [];
     for (const line of file) {
-      console.log(line);
-      console.log(is_in_project_data);
       if (/^(?:\s+)?\/\/(?:\s+)Project Data/i.test(line)) {
         is_in_project_data = true;
         continue;
@@ -732,18 +724,12 @@ export class PianoRoll {
       // We're parsing a line now
       if (!/^([0-9]+|\+) /.test(line)) continue;
       const parsed = parse_line(line, last_frame === 0 ? 1 : last_frame, false);
-      const before_last = piano.get(piano.contents.length - 1);
       for (let i = 0; i < parsed.frame - last_frame; i++) {
         piano.add(null);
       }
       last_frame = parsed.frame;
       const last = piano.get(piano.contents.length - 1);
-      PianoRollRow.apply(
-        last,
-        parsed,
-        before_last?.lstick_pos.clone() ?? new StickPos(0, 0),
-        before_last?.rstick_pos.clone() ?? new StickPos(0, 0)
-      );
+      PianoRollRow.apply(last, parsed);
     }
     PianoRoll.apply(project_data, piano);
     piano.set_represented(filepath);
@@ -836,6 +822,15 @@ export class PianoRoll {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     $(".key").click(PianoRoll.click_handler_func);
     this.stick_change_dialogue = new StickChangeDialogue(this);
+  }
+  destroy(): void {
+    this.reference.empty();
+    this.navbar.empty();
+    while (this.contents.length > 0) {
+      this.contents.shift();
+    }
+    delete this.reference;
+    Object.seal(this);
   }
   set_frozen(unfreeze?: boolean): void {
     this.frozen = !unfreeze;
@@ -1217,10 +1212,10 @@ export class PianoRoll {
       data_buffer += `// switch_ip:${this.switch.parts.join(".")}\r\n`;
     }
     if (this.export_name) {
-      data_buffer += `// export_name:${this.export_name}`;
+      data_buffer += `// export_name:${this.export_name}\r\n`;
     }
     if (this.temp_id) {
-      data_buffer += `// temp_id:${this.temp_id}`;
+      data_buffer += `// temp_id:${this.temp_id}\r\n`;
     }
     if (!this.show_export_success) {
       flags.push("no_show_export_success");

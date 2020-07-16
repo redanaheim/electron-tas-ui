@@ -8,9 +8,25 @@ export async function create_menu(): Promise<Menu> {
       label: "File",
       submenu: [
         {
-          click: menu_click_handlers.create_editing_window,
+          click: menu_click_handlers.create_editing_window(false),
           accelerator: "CmdOrCtrl+E",
           label: "New Script",
+        },
+        {
+          click: menu_click_handlers.editing_open_script(false),
+          label: "Open",
+          submenu: [
+            {
+              click: menu_click_handlers.editing_open_script(false),
+              accelerator: "CmdOrCtrl+O",
+              label: "Open Better Scripts Script...",
+            },
+            {
+              click: menu_click_handlers.editing_open_script(true),
+              accelerator: "CmdOrCtrl+Shift+O",
+              label: "Open nx-TAS Script...",
+            },
+          ],
         },
         {
           click: menu_click_handlers.create_export_window,

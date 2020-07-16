@@ -85,79 +85,88 @@ menu_click_handlers.create_help_window = async (
   );
 };
 
-menu_click_handlers.create_editing_window = async (): Promise<void> => {
-  const current = await Store.value_of(
-    "config",
-    "theme",
-    store_defaults.config
-  );
-  const main_window = new BrowserWindow({
-    height: editing_window_size.height,
-    width: editing_window_size.width,
-    webPreferences: {
-      nodeIntegration: true,
-    },
-    backgroundColor: current === "dark" ? "#121212" : "#FFF",
-  });
-  main_window.loadFile(path.join(__dirname, "../src/editing/index.html")).then(
-    () => void 0,
-    reason => console.error(reason)
-  );
-  main_window.on("close", (e: Electron.Event) => {
-    if (main_window.isDocumentEdited()) {
-      e.preventDefault();
-      dialog
-        .showMessageBox(main_window, {
-          buttons: ["Cancel", "Close", "Save"],
-          message:
-            "Are you sure you want to close this window? All unsaved data will be lost.",
-        })
-        .then(
-          response => {
-            if (response.response === 1) main_window.destroy();
-            else if (response.response === 2) {
-              main_window.webContents.send("requests", "request_save");
-            }
-          },
-          reason => console.error(reason)
-        );
-    }
-  });
-  main_window.on("focus", () => {
-    menu_ids.editing_dependent.forEach((x: string) => {
-      Menu.getApplicationMenu().getMenuItemById(x).enabled = true;
+menu_click_handlers.create_editing_window = (
+  open?: boolean
+): (() => Promise<BrowserWindow>) => {
+  return async (): Promise<BrowserWindow> => {
+    const current = await Store.value_of(
+      "config",
+      "theme",
+      store_defaults.config
+    );
+    const main_window = new BrowserWindow({
+      height: editing_window_size.height,
+      width: editing_window_size.width,
+      webPreferences: {
+        nodeIntegration: true,
+      },
+      backgroundColor: current === "dark" ? "#121212" : "#FFF",
     });
-  });
-  main_window.on("blur", () => {
-    menu_ids.editing_dependent.forEach((x: string) => {
-      Menu.getApplicationMenu().getMenuItemById(x).enabled = false;
-    });
-  });
-  main_window.webContents.on(
-    "ipc-message",
-    (_event: Electron.Event, channel: string, data: any) => {
-      switch (channel) {
-        case "save_events": {
-          if (data.is_represented_update) {
-            main_window.setRepresentedFilename(data.path);
-          } else if (typeof data === "string") {
-            switch (data) {
-              case "saved": {
-                main_window.setDocumentEdited(false);
-                break;
+    main_window
+      .loadFile(
+        path.join(__dirname, `../src/editing/index${open ? "_open" : ""}.html`)
+      )
+      .then(
+        () => void 0,
+        reason => console.error(reason)
+      );
+    main_window.on("close", (e: Electron.Event) => {
+      if (main_window.isDocumentEdited()) {
+        e.preventDefault();
+        dialog
+          .showMessageBox(main_window, {
+            buttons: ["Cancel", "Close", "Save"],
+            message:
+              "Are you sure you want to close this window? All unsaved data will be lost.",
+          })
+          .then(
+            response => {
+              if (response.response === 1) main_window.destroy();
+              else if (response.response === 2) {
+                main_window.webContents.send("requests", "request_save");
               }
-              case "unsaved": {
-                main_window.setDocumentEdited(true);
-                break;
+            },
+            reason => console.error(reason)
+          );
+      }
+    });
+    main_window.on("focus", () => {
+      menu_ids.editing_dependent.forEach((x: string) => {
+        Menu.getApplicationMenu().getMenuItemById(x).enabled = true;
+      });
+    });
+    main_window.on("blur", () => {
+      menu_ids.editing_dependent.forEach((x: string) => {
+        Menu.getApplicationMenu().getMenuItemById(x).enabled = false;
+      });
+    });
+    main_window.webContents.on(
+      "ipc-message",
+      (_event: Electron.Event, channel: string, data: any) => {
+        switch (channel) {
+          case "save_events": {
+            if (data.is_represented_update) {
+              main_window.setRepresentedFilename(data.path);
+            } else if (typeof data === "string") {
+              switch (data) {
+                case "saved": {
+                  main_window.setDocumentEdited(false);
+                  break;
+                }
+                case "unsaved": {
+                  main_window.setDocumentEdited(true);
+                  break;
+                }
               }
             }
+            break;
           }
-          break;
         }
       }
-    }
-  );
-  listen_for_prompt_requests(main_window);
+    );
+    listen_for_prompt_requests(main_window);
+    return main_window;
+  };
 };
 
 menu_click_handlers.create_export_window = async (): Promise<void> => {
@@ -380,6 +389,25 @@ menu_click_handlers.request_enter_switch_ip = (): void => {
     "requests",
     "request_enter_export_name"
   );
+};
+
+menu_click_handlers.editing_open_script = (
+  open_nx_tas?: boolean
+): (() => Promise<void>) => {
+  return async (): Promise<void> => {
+    const response = await dialog.showOpenDialog(null);
+    if (response.canceled) return;
+    const main_window = await (menu_click_handlers.create_editing_window(
+      true
+    ) as () => Promise<BrowserWindow>)();
+    main_window.webContents.on("ipc-message", (e, channel, data) => {
+      if (channel !== "open_requests" || data !== "ready") return;
+      main_window.webContents.send("open_requests", {
+        path: response.filePaths[0],
+        decompile: open_nx_tas ?? false,
+      });
+    });
+  };
 };
 
 menu_click_handlers.toggle_theme = async (): Promise<void> => {

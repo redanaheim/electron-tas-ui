@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html style="font-size: 1px; padding: 0px;">
+  <head>
+    <title>Editing nx-TAS Script</title>
+    <script>
+      window.$ = window.jQuery = require("../assets/jquery.min.js");
+    </script>
+    <link rel="stylesheet" href="../assets/styles/themes.css" />
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto"
+    />
+    <script>
+      let { on_init, class_exports } = require("./index_open.js");
+      let { set_theme } = require("../theme.js");
+      $(document).ready(() => {
+        window.piano = on_init();
+        Object.assign(window, class_exports);
+      });
+    </script>
+  </head>
+  <body>
+    <table id="editing">
+      <col id="frame_col" />
+      <tr class="header">
+        <td id="frame_header" colspan="3">Frame</td>
+        <th id="button_header" colspan="17">Buttons</th>
+        <th id="add_remove_header" colspan="3"></th>
+      </tr>
+      <tr class="row_spacer"></tr>
+      <tbody id="script_rows"></tbody>
+      <tbody>
+        <tr style="height: 20px;"></tr>
+      </tbody>
+    </table>
+    <table id="navbar"></table>
+  </body>
+</html>
