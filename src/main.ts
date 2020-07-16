@@ -43,7 +43,7 @@ const exporting_window_size = {
 
 export const menu_click_handlers: { [key: string]: any } = {};
 
-menu_click_handlers.create_window = async (): Promise<void> => {
+/*menu_click_handlers.create_window = async (): Promise<void> => {
   const current = await Store.value_of(
     "config",
     "theme",
@@ -61,7 +61,12 @@ menu_click_handlers.create_window = async (): Promise<void> => {
     () => void 0,
     reason => console.error(reason)
   );
-};
+  main_window.webContents.on("ipc-message", (_e, channel, data) => {
+    if (channel !== "menu_requests" || typeof data !== "string") return;
+    if (!menu_click_handlers[data]) return;
+    let result = 
+  });
+};*/
 
 menu_click_handlers.create_help_window = async (
   html_path: string
@@ -531,9 +536,27 @@ menu_click_handlers.show_decompiler_errors = async function (
   }
 };
 
+// Menu items
+
+import { create_menu } from "./menu";
+
+// Theme change handling
+
+nativeTheme.on("updated", () => {
+  menu_click_handlers.on_os_theme_update(nativeTheme.shouldUseDarkColors);
+});
+
 // App events
 
-app.on("ready", menu_click_handlers.create_window);
+app.once("ready", () => {
+  create_menu().then(
+    (value: Menu) => {
+      Menu.setApplicationMenu(value);
+      menu_click_handlers.create_editing_window(false)();
+    },
+    reason => console.error(reason)
+  );
+});
 
 app.on("window-all-closed", () => {
   app.quit();
@@ -541,22 +564,6 @@ app.on("window-all-closed", () => {
 
 app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) {
-    menu_click_handlers.create_window();
+    menu_click_handlers.create_editing_window(false)();
   }
-});
-
-// Menu items
-import { create_menu } from "./menu";
-
-create_menu().then(
-  (value: Menu) => {
-    Menu.setApplicationMenu(value);
-  },
-  reason => console.error(reason)
-);
-
-// Theme change handling
-
-nativeTheme.on("updated", () => {
-  menu_click_handlers.on_os_theme_update(nativeTheme.shouldUseDarkColors);
 });

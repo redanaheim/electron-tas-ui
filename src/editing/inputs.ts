@@ -965,6 +965,23 @@ export class PianoRoll {
             )
             .addClass("navbar_button")
         )
+        .append(
+          $("<td/>")
+            .append(
+              $("<button/>")
+                .addClass("export_to_switch navbar_element")
+                .click(function () {
+                  const owner_piano: PianoRoll = $(this).data("owner");
+                  owner_piano.export_ftp().then(
+                    () => void 0,
+                    reason => console.error(reason)
+                  );
+                })
+                .data("owner", this)
+                .text("Export to Switch")
+            )
+            .addClass("navbar_button")
+        )
         .append($("<td/>").addClass("navbar_spacer"))
     );
   }
