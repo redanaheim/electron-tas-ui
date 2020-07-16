@@ -655,9 +655,16 @@ class StickChangeDialogue {
         point_to_lstick ? row.lstick_pos.magnitude : row.rstick_pos.magnitude
       );
     const coordinates = this.pointing_to.offset();
+    const window_width = $(window).width();
+    console.log("window_width: ", window_width);
+    const left_edge = this.reference.outerWidth() + coordinates.left;
+    console.log("left_edge: ", left_edge);
     this.reference.css({
       top: coordinates.top + this.pointing_to.height() + 10,
-      left: coordinates.left,
+      left:
+        left_edge > window_width
+          ? coordinates.left - (left_edge - window_width)
+          : coordinates.left,
       position: "absolute",
     }); // move the dialogue to below the stick clicked
     this.reference.fadeIn(200);
