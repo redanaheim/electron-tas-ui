@@ -7,7 +7,7 @@ export const prompt = function (
 ): Promise<string> {
   return new Promise<string>((res, rej) => {
     const prompt_window = new BrowserWindow({
-      width: 350,
+      width: 325,
       height: 60,
       frame: false,
       parent: window,
@@ -16,6 +16,7 @@ export const prompt = function (
         nodeIntegration: true,
       },
       resizable: false,
+      useContentSize: true,
     });
     prompt_window.loadFile(join(__dirname, "./index.html")).then(
       () => void 0,

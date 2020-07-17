@@ -3,8 +3,6 @@ import * as path from "path";
 import { readdir, unlink, existsSync, mkdirSync } from "fs";
 import { Store, store_defaults } from "./storing";
 import { listen_for_prompt_requests } from "./assets/prompts/prompt_main";
-const is_mac = process.platform === "darwin";
-
 if (require("electron-squirrel-startup")) {
   app.quit();
 }
@@ -29,16 +27,16 @@ const main_window_size = {
   width: 800,
 };
 const editing_window_size = {
-  height: 900,
-  width: 1000,
+  height: 850,
+  width: 950,
 };
 const compiling_window_size = {
-  height: is_mac ? 125 : 110,
-  width: is_mac ? 330 : 350,
+  height: 102,
+  width: 330,
 };
 const exporting_window_size = {
-  height: is_mac ? 150 : 120,
-  width: is_mac ? 330 : 430,
+  height: 130,
+  width: 330,
 };
 
 export const menu_click_handlers: { [key: string]: any } = {};
@@ -83,6 +81,7 @@ menu_click_handlers.create_help_window = async (
       nodeIntegration: true,
     },
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
+    useContentSize: true,
   });
   main_window.loadFile(path.join(__dirname, html_path)).then(
     () => void 0,
@@ -106,6 +105,7 @@ menu_click_handlers.create_editing_window = (
         nodeIntegration: true,
       },
       backgroundColor: current === "dark" ? "#121212" : "#FFF",
+      useContentSize: true,
     });
     main_window
       .loadFile(
@@ -188,6 +188,7 @@ menu_click_handlers.create_export_window = async (): Promise<void> => {
       nodeIntegration: true,
     },
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
+    useContentSize: true,
   });
   popup.setMenuBarVisibility(false);
   popup.loadFile(path.join(__dirname, "../src/exporting/index.html")).then(
@@ -210,6 +211,7 @@ menu_click_handlers.create_compile_window = async (): Promise<void> => {
       nodeIntegration: true,
     },
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
+    useContentSize: true,
   });
   popup.setMenuBarVisibility(false);
   popup.loadFile(path.join(__dirname, "../src/compiling/index.html")).then(
@@ -232,6 +234,7 @@ menu_click_handlers.create_numeric_value_window = async (): Promise<void> => {
       nodeIntegration: true,
     },
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
+    useContentSize: true,
   });
   popup.setMenuBarVisibility(false);
   popup.loadFile(path.join(__dirname, "../src/numbers/index.html")).then(
@@ -254,6 +257,7 @@ menu_click_handlers.create_decompile_window = async (): Promise<void> => {
       nodeIntegration: true,
     },
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
+    useContentSize: true,
   });
   popup.setMenuBarVisibility(false);
   popup.loadFile(path.join(__dirname, "../src/decompiling/index.html")).then(
@@ -276,6 +280,7 @@ menu_click_handlers.create_preprocessor_window = async (): Promise<void> => {
       nodeIntegration: true,
     },
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
+    useContentSize: true,
   });
   popup.setMenuBarVisibility(false);
   popup.loadFile(path.join(__dirname, "../src/preprocessing/index.html")).then(
@@ -298,6 +303,7 @@ menu_click_handlers.create_js_compile_window = async (): Promise<void> => {
       nodeIntegration: true,
     },
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
+    useContentSize: true,
   });
   popup.setMenuBarVisibility(false);
   popup.loadFile(path.join(__dirname, "../src/js_compiling/index.html")).then(
@@ -320,6 +326,7 @@ menu_click_handlers.create_compile_export_window = async (): Promise<void> => {
       nodeIntegration: true,
     },
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
+    useContentSize: true,
   });
   popup.setMenuBarVisibility(false);
   popup
@@ -346,6 +353,7 @@ menu_click_handlers.create_js_compile_export_window = async (): Promise<
       nodeIntegration: true,
     },
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
+    useContentSize: true,
   });
   popup.setMenuBarVisibility(false);
   popup
@@ -389,7 +397,7 @@ menu_click_handlers.request_enter_switch_ip = (): void => {
   );
 };
 
-menu_click_handlers.request_enter_switch_ip = (): void => {
+menu_click_handlers.request_enter_export_name = (): void => {
   BrowserWindow.getFocusedWindow().webContents.send(
     "requests",
     "request_enter_export_name"
