@@ -481,6 +481,7 @@ export class PianoRollRow {
     this.previous = previous;
     this.reeval_keys(previous, false);
     this.reeval_sticks(previous);
+    this.is_row_owner = false;
     // Update whether this row is a clone
     if (this.all_keys_cloned) {
       this.is_clone = this.is_lstick_clone && this.is_rstick_clone;
