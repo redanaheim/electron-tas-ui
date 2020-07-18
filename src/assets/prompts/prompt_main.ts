@@ -8,7 +8,7 @@ export const prompt = function (
   return new Promise<string>((res, rej) => {
     const prompt_window = new BrowserWindow({
       width: 325,
-      height: 60,
+      height: process.platform === "darwin" ? 60 : 87,
       frame: false,
       parent: window,
       transparent: true,

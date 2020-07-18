@@ -36,7 +36,7 @@ const compiling_window_size = {
 };
 const exporting_window_size = {
   height: 130,
-  width: 330,
+  width: process.platform === "darwin" ? 330 : 365,
 };
 
 export const menu_click_handlers: { [key: string]: any } = {};
