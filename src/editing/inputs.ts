@@ -285,12 +285,12 @@ export class PianoRollRow {
           .append(
             $("<button/>")
               .addClass("add_button")
-              .click(function () {
+              .click(async function () {
                 const row = $(this).parents("tr").data("object");
                 let add_count: number;
-                // eslint-disable-next-line no-constant-condition
-                if (false && row.owner.key_state.shift) {
-                  add_count = +prompt("How many rows?", "1") || 1;
+                if (row.owner.key_state.shift) {
+                  add_count =
+                    +(await request_prompt("How many rows?", "1")) || 1;
                   const position = row.owner.get_position(row) + 1;
                   for (let i = 0; i < add_count; i++) {
                     row.owner.add(null, position);
