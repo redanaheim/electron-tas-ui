@@ -121,6 +121,7 @@ export async function create_menu(): Promise<Menu> {
           label: "Export to Switch",
           enabled: false,
           id: "editing_export_to_switch",
+          accelerator: "CmdOrCtrl+P",
         },
         { type: "separator" },
         {
