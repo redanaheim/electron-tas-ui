@@ -473,7 +473,11 @@ menu_click_handlers.open_backups = (): void => {
   if (!existsSync(folder)) {
     mkdirSync(folder);
   }
-  shell.openItem(folder);
+  shell.openPath(folder).then(_value => {
+    console.log("Success opening " + folder + ".")
+  }, reason => {
+    console.error("Failed to open " + folder + ".", reason)
+  });
 };
 
 menu_click_handlers.clear_backups = async (): Promise<void> => {
