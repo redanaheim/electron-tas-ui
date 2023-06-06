@@ -1,12 +1,6 @@
 import {
-  KeysList,
-  StickPos,
-  Key,
-  FifteenBitInt,
-  string_to_key,
-  last_index_of,
-  ParsedLine,
-  key_to_string,
+  FifteenBitInt, Key, KeysList, key_to_string, last_index_of,
+  ParsedLine, StickPos, string_to_key
 } from "./classes";
 
 const calc_angle = function (x: number, y: number): number {
@@ -21,6 +15,7 @@ const calc_angle = function (x: number, y: number): number {
   if (x < 0 && y === 0) return 270;
 };
 
+// autofold/fold_next
 const cartesian_to_polar = (
   x: number,
   y: number,
@@ -34,6 +29,7 @@ const cartesian_to_polar = (
   );
 };
 
+// autofold/fold_next
 const all_keys = [
   Key.A,
   Key.B,

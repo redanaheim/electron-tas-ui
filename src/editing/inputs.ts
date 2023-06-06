@@ -17,7 +17,8 @@ import { Preprocessor } from "../assets/compiling/preprocess";
 import { IpAddress } from "../ftp";
 import { export_file, read_FileLike, write_file_async } from "../storing";
 import { request_prompt } from "../assets/prompts/prompt_renderer";
-import { ipcRenderer, remote } from "electron";
+const remote = require("@electron/remote");
+import { ipcRenderer } from "electron";
 import { join } from "path";
 import { rand_string } from "../utils";
 

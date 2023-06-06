@@ -70,7 +70,8 @@
       "@typescript-eslint/no-unnecessary-type-assertion": "error",
       "@typescript-eslint/no-unnecessary-boolean-literal-compare": "error",
       "@typescript-eslint/no-for-in-array": "error",
-      "@typescript-eslint/no-floating-promises": "error"
+      "@typescript-eslint/no-floating-promises": "error",
+      "import/no-unresolved": "off"
     }
   },
   "devDependencies": {
@@ -82,13 +83,14 @@
     "@types/ping": "^0.2.0",
     "@typescript-eslint/eslint-plugin": "^2.31.0",
     "@typescript-eslint/parser": "^2.31.0",
-    "electron": "^9.4.0",
+    "electron": "^25.0.1",
     "electron-builder": ">=22.9.1",
     "eslint": "^7.4.0",
     "eslint-plugin-import": "^2.20.2",
     "typescript": "^3.8.3"
   },
   "dependencies": {
+    "@electron/remote": "^2.0.10",
     "electron-squirrel-startup": "^1.0.0",
     "ftp": "^0.3.10",
     "ping": "^0.2.3"

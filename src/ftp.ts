@@ -5,7 +5,8 @@
 // TODO: Find out why connection sometimes never closes
 import * as Client from "ftp";
 import { existsSync, mkdirSync, createWriteStream, writeFile } from "fs";
-import { app, remote, BrowserWindow } from "electron";
+import { app, BrowserWindow } from "electron";
+import * as remote from "@electron/remote"; 
 import { sys } from "ping";
 import { join } from "path";
 
@@ -41,7 +42,8 @@ export class IpAddress {
   /**
    * Regular expression to check if a string is a valid dotted-decimal notation IPv4 address
    */
-  static regex = /^((([0-2][0-5]?[0-5]?|[0-1][0-9]?[0-9]?)|[0-9][0-9])|[0-9])\.((([0-2][0-5]?[0-5]?|[0-1][0-9]?[0-9]?)|[0-9][0-9])|[0-9])\.((([0-2][0-5]?[0-5]?|[0-1][0-9]?[0-9]?)|[0-9][0-9])|[0-9])\.((([0-2][0-5]?[0-5]?|[0-1][0-9]?[0-9]?)|[0-9][0-9])|[0-9])$/;
+  static regex =
+    /^((([0-2][0-5]?[0-5]?|[0-1][0-9]?[0-9]?)|[0-9][0-9])|[0-9])\.((([0-2][0-5]?[0-5]?|[0-1][0-9]?[0-9]?)|[0-9][0-9])|[0-9])\.((([0-2][0-5]?[0-5]?|[0-1][0-9]?[0-9]?)|[0-9][0-9])|[0-9])\.((([0-2][0-5]?[0-5]?|[0-1][0-9]?[0-9]?)|[0-9][0-9])|[0-9])$/;
   parts: number[];
   did_succeed: boolean;
   error: string;
@@ -59,10 +61,7 @@ export class IpAddress {
   };
   constructor(text: string) {
     const parts = text.split(".").map(x => +x);
-    if (
-      !parts.some(x => x > 255 || x < 0 || isNaN(x)) &&
-      parts.length === 4
-    ) {
+    if (!parts.some(x => x > 255 || x < 0 || isNaN(x)) && parts.length === 4) {
       this.parts = parts;
       this.did_succeed = true;
     } else {
@@ -88,10 +87,12 @@ export class IpAddress {
    * Gets the connections object to pass to FTP module.
    * @param port Optional port number, default is 5000 which almost always works for Switches.
    */
-  get_connect_obj(port?: number): any {
+  get_connect_obj(port?: number): Client.Options {
     return {
       host: this.parts.join("."),
       port: port || 5000,
+      user: "anonymous",
+      password: "anonymous@",
     };
   }
   /**

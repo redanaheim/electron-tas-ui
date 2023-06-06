@@ -3,9 +3,13 @@ import * as path from "path";
 import { readdir, unlink, existsSync, mkdirSync } from "fs";
 import { Store, store_defaults } from "./storing";
 import { listen_for_prompt_requests } from "./assets/prompts/prompt_main";
+
 if (require("electron-squirrel-startup")) {
   app.quit();
 }
+
+const remote = require("@electron/remote/main");
+remote.initialize()
 
 const menu_ids = {
   editing_dependent: [
@@ -18,9 +22,6 @@ const menu_ids = {
     "editing_enter_export_name",
   ],
 };
-
-// https://github.com/electron/electron/issues/18397#
-app.allowRendererProcessReuse = true;
 
 const main_window_size = {
   height: 600,
@@ -79,10 +80,12 @@ menu_click_handlers.create_help_window = async (
     width: main_window_size.width,
     webPreferences: {
       nodeIntegration: true,
+      contextIsolation: false
     },
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
     useContentSize: true,
   });
+  remote.enable(main_window.webContents)
   main_window.loadFile(path.join(__dirname, html_path)).then(
     () => void 0,
     reason => console.error(reason)
@@ -103,10 +106,12 @@ menu_click_handlers.create_editing_window = (
       width: editing_window_size.width,
       webPreferences: {
         nodeIntegration: true,
+        contextIsolation: false
       },
       backgroundColor: current === "dark" ? "#121212" : "#FFF",
       useContentSize: true,
     });
+    remote.enable(main_window.webContents)
     main_window
       .loadFile(
         path.join(__dirname, `../src/editing/index${open ? "_open" : ""}.html`)
@@ -186,10 +191,12 @@ menu_click_handlers.create_export_window = async (): Promise<void> => {
     resizable: process.platform === "darwin" ? false : true,
     webPreferences: {
       nodeIntegration: true,
+      contextIsolation: false
     },
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
     useContentSize: true,
   });
+  remote.enable(popup.webContents);
   popup.setMenuBarVisibility(false);
   popup.loadFile(path.join(__dirname, "../src/exporting/index.html")).then(
     () => void 0,
@@ -209,10 +216,12 @@ menu_click_handlers.create_compile_window = async (): Promise<void> => {
     resizable: process.platform === "darwin" ? false : true,
     webPreferences: {
       nodeIntegration: true,
+      contextIsolation: false
     },
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
     useContentSize: true,
   });
+  remote.enable(popup.webContents);
   popup.setMenuBarVisibility(false);
   popup.loadFile(path.join(__dirname, "../src/compiling/index.html")).then(
     () => void 0,
@@ -236,6 +245,7 @@ menu_click_handlers.create_numeric_value_window = async (): Promise<void> => {
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
     useContentSize: true,
   });
+  remote.enable(popup.webContents);
   popup.setMenuBarVisibility(false);
   popup.loadFile(path.join(__dirname, "../src/numbers/index.html")).then(
     () => void 0,
@@ -255,10 +265,12 @@ menu_click_handlers.create_decompile_window = async (): Promise<void> => {
     resizable: process.platform === "darwin" ? false : true,
     webPreferences: {
       nodeIntegration: true,
+      contextIsolation: false
     },
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
     useContentSize: true,
   });
+  remote.enable(popup.webContents);
   popup.setMenuBarVisibility(false);
   popup.loadFile(path.join(__dirname, "../src/decompiling/index.html")).then(
     () => void 0,
@@ -278,10 +290,12 @@ menu_click_handlers.create_preprocessor_window = async (): Promise<void> => {
     resizable: process.platform === "darwin" ? false : true,
     webPreferences: {
       nodeIntegration: true,
+      contextIsolation: false
     },
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
     useContentSize: true,
   });
+  remote.enable(popup.webContents);
   popup.setMenuBarVisibility(false);
   popup.loadFile(path.join(__dirname, "../src/preprocessing/index.html")).then(
     () => void 0,
@@ -301,10 +315,12 @@ menu_click_handlers.create_js_compile_window = async (): Promise<void> => {
     resizable: process.platform === "darwin" ? false : true,
     webPreferences: {
       nodeIntegration: true,
+      contextIsolation: false
     },
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
     useContentSize: true,
   });
+  remote.enable(popup.webContents);
   popup.setMenuBarVisibility(false);
   popup.loadFile(path.join(__dirname, "../src/js_compiling/index.html")).then(
     () => void 0,
@@ -324,10 +340,12 @@ menu_click_handlers.create_compile_export_window = async (): Promise<void> => {
     resizable: process.platform === "darwin" ? false : true,
     webPreferences: {
       nodeIntegration: true,
+      contextIsolation: false
     },
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
     useContentSize: true,
   });
+  remote.enable(popup.webContents);
   popup.setMenuBarVisibility(false);
   popup
     .loadFile(path.join(__dirname, "../src/compiling_to_switch/index.html"))
@@ -351,10 +369,12 @@ menu_click_handlers.create_js_compile_export_window = async (): Promise<
     resizable: process.platform === "darwin" ? false : true,
     webPreferences: {
       nodeIntegration: true,
+      contextIsolation: false
     },
     backgroundColor: current === "dark" ? "#121212" : "#FFF",
     useContentSize: true,
   });
+  remote.enable(popup.webContents);
   popup.setMenuBarVisibility(false);
   popup
     .loadFile(path.join(__dirname, "../src/js_compiling_to_switch/index.html"))

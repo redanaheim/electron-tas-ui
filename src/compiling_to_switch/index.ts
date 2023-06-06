@@ -9,7 +9,7 @@ import { compile } from "../assets/compiling/compile";
 import { existsSync } from "fs";
 import { join } from "path";
 let path: any = null;
-import { remote } from "electron";
+import * as remote from "@electron/remote"; 
 const { app, dialog, BrowserWindow } = remote;
 export const on_init = async function (): Promise<void> {
   // Set input values to ones from last time

@@ -2,7 +2,7 @@ import { IpAddress } from "../ftp";
 import { Store, store_defaults } from "../storing";
 import { existsSync } from "fs";
 let path: any = null;
-import { remote } from "electron";
+import * as remote from "@electron/remote"; 
 const { dialog, BrowserWindow } = remote;
 export const on_init = async function (): Promise<void> {
   // Set input values to ones from last time

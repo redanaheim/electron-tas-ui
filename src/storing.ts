@@ -1,8 +1,9 @@
-import { app, remote, BrowserWindow, dialog } from "electron";
+import { app, BrowserWindow, dialog } from "electron";
 import { readFile, writeFile, createReadStream } from "fs";
 import * as readline from "readline";
 import { join } from "path";
 import { FileLike } from "./assets/compiling/classes";
+const remote = process.type === "browser" ? require("@electron/remote/main") : require("@electron/remote");
 
 interface InternalData {
   [key: string]: any;

@@ -7,7 +7,7 @@ import {
 import { existsSync } from "fs";
 import { decompile } from "../assets/compiling/decompile";
 // import { basename } from "path";
-const { dialog, BrowserWindow } = require("electron").remote;
+const { dialog, BrowserWindow } = require("@electron/remote");
 export const on_init = async function (): Promise<void> {
   // Set input values to ones from last time
   const last_values = new Store(
